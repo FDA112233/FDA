@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Shield,
@@ -59,7 +59,7 @@ export default function Login() {
       className="min-h-screen flex"
       style={{ backgroundColor: BUSINESS_COLORS.neutral.slate }}
     >
-      {/* 左��� - 品牌展示区域 */}
+      {/* 左侧 - 品牌展示区域 */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative">
         {/* 渐变背景 */}
         <div
@@ -214,7 +214,7 @@ export default function Login() {
                 登录控制台
               </h2>
               <p style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                请输入您的凭据以访问安全管理控制台
+                请输入您的凭据以访问安全��理控制台
               </p>
             </div>
 
