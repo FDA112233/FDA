@@ -155,6 +155,7 @@ function App() {
       <BrowserRouter>
         <AppLayout />
         <ToastContainer />
+        <DebugAuth />
       </BrowserRouter>
     </AuthProvider>
   );
