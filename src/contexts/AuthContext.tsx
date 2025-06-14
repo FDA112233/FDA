@@ -34,13 +34,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (username: string) => {
+    console.log("执行登录:", username);
     setIsAuthenticated(true);
     setUser(username);
     localStorage.setItem("cyberguard_auth", "true");
     localStorage.setItem("cyberguard_user", username);
+    console.log("登录状态已更新");
   };
 
   const logout = () => {
+    console.log("执行登出");
     setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem("cyberguard_auth");
@@ -48,7 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, isInitialized, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
