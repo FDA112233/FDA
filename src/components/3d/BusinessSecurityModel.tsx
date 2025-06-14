@@ -8,7 +8,6 @@ import {
   Line,
   Html,
   Billboard,
-  Trail,
   Sparkles,
 } from "@react-three/drei";
 import * as THREE from "three";
@@ -165,7 +164,7 @@ function NetworkNode({
 
   return (
     <group ref={meshRef} position={position}>
-      {/* 主要几何体 */}
+      {/* 主��几何体 */}
       {type === "core" && (
         <>
           <Cylinder args={[0.8, 0.8, 1.2, 8]}>
