@@ -1,303 +1,317 @@
-import { Link } from "react-router-dom";
+import React from "react";
 import {
-  Activity,
-  AlertTriangle,
-  FileText,
   Shield,
-  Server,
+  Activity,
+  BarChart3,
   Users,
-  Key,
-  Settings,
-  TrendingUp,
-  Zap,
+  Server,
   Globe,
-  Monitor,
+  CheckCircle,
+  TrendingUp,
+  AlertTriangle,
+  Clock,
+  ArrowRight,
 } from "lucide-react";
-
-const features = [
-  {
-    title: "仪表板",
-    description: "实时威胁监控和系统状态概览",
-    path: "/",
-    icon: Activity,
-    color: "neon-blue",
-    stats: "实时更新",
-  },
-  {
-    title: "威胁告警管理",
-    description: "高级告警处理和状态管理系统",
-    path: "/alerts",
-    icon: AlertTriangle,
-    color: "threat-critical",
-    stats: "智能过滤",
-  },
-  {
-    title: "安全报告",
-    description: "数据可视化和报告生成中心",
-    path: "/reports",
-    icon: FileText,
-    color: "neon-green",
-    stats: "多格式导出",
-  },
-  {
-    title: "威胁情报中心",
-    description: "全球威胁情报分析和监控",
-    path: "/threat-intelligence",
-    icon: Shield,
-    color: "neon-purple",
-    stats: "156个国家",
-  },
-  {
-    title: "资产管理",
-    description: "IT资产清单和安全状态监控",
-    path: "/assets",
-    icon: Server,
-    color: "threat-medium",
-    stats: "实时监控",
-  },
-  {
-    title: "用户管理",
-    description: "用户账户和权限管理系统",
-    path: "/users",
-    icon: Users,
-    color: "neon-green",
-    stats: "角色控制",
-  },
-  {
-    title: "系统日志",
-    description: "系统日志查看和分析工具",
-    path: "/logs",
-    icon: Monitor,
-    color: "threat-info",
-    stats: "智能检索",
-  },
-  {
-    title: "API密钥管理",
-    description: "第三方集成和API访问控制",
-    path: "/api-keys",
-    icon: Key,
-    color: "neon-yellow",
-    stats: "安全认证",
-  },
-  {
-    title: "系统设置",
-    description: "系统配置和个性化设置",
-    path: "/settings",
-    icon: Settings,
-    color: "muted",
-    stats: "灵活配置",
-  },
-];
-
-const highlights = [
-  {
-    title: "实时数据更新",
-    description: "所有数据组件支持5-15秒自动刷新，确保信息实时性",
-    icon: TrendingUp,
-  },
-  {
-    title: "交互式图表",
-    description: "支持多种图表类型切换，悬停查看详情，时间范围选择",
-    icon: Activity,
-  },
-  {
-    title: "高级过滤器",
-    description: "多维度数据过滤，支持复合条件查询和时间范围筛选",
-    icon: Settings,
-  },
-  {
-    title: "通知系统",
-    description: "完整的Toast通知系统，支持成功、警告、错误和信息提示",
-    icon: Zap,
-  },
-  {
-    title: "响应式设计",
-    description: "完美适配桌面、平板和移动设备，保证最佳用户体验",
-    icon: Globe,
-  },
-  {
-    title: "科幻主题",
-    description: "深色矩阵风格配霓虹色彩，动画效果营造未来科技感",
-    icon: Monitor,
-  },
-];
+import {
+  BusinessCard,
+  StatusCard,
+  InfoCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
 export default function Overview() {
+  const features = [
+    {
+      title: "实时威胁监控",
+      description: "24/7全天候网络安全监控，实时发现和响应各类网络威胁",
+      icon: Shield,
+      color: BUSINESS_COLORS.primary.blue,
+    },
+    {
+      title: "智能分析报告",
+      description: "基于AI的威胁分析和风险评估，提供详细的安全报告",
+      icon: BarChart3,
+      color: BUSINESS_COLORS.status.success,
+    },
+    {
+      title: "资产管理",
+      description: "全面的网络资产发现、分类和安全状态管理",
+      icon: Server,
+      color: BUSINESS_COLORS.status.warning,
+    },
+    {
+      title: "用户权限管理",
+      description: "基于角色的访问控制，确保系统安全和合规性",
+      icon: Users,
+      color: BUSINESS_COLORS.primary.navy,
+    },
+    {
+      title: "威胁情报",
+      description: "整合全球威胁情报，提供最新的安全态势信息",
+      icon: Globe,
+      color: BUSINESS_COLORS.status.info,
+    },
+    {
+      title: "系统监控",
+      description: "全面的系统性能监控和日志审计功能",
+      icon: Activity,
+      color: BUSINESS_COLORS.threat.medium,
+    },
+  ];
+
+  const quickStats = [
+    {
+      title: "系统运行时间",
+      value: "99.9%",
+      icon: Clock,
+      status: "success" as const,
+    },
+    {
+      title: "今日阻止攻击",
+      value: "1,247",
+      icon: Shield,
+      status: "success" as const,
+    },
+    {
+      title: "活跃告警",
+      value: "23",
+      icon: AlertTriangle,
+      status: "warning" as const,
+    },
+    {
+      title: "受保护资产",
+      value: "342",
+      icon: Server,
+      status: "info" as const,
+    },
+  ];
+
   return (
-    <div className="p-8 pt-16 lg:pt-8 min-h-screen matrix-bg">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-white glow-text mb-4">
-          CyberGuard 网络安全监控系统
-        </h1>
-        <p className="text-xl text-muted-foreground mb-2">
-          全功能网络安全监控平台 - 专业版
-        </p>
-        <p className="text-muted-foreground">
-          集成威胁检测、资产管理、用户控制、系统监控于一体的企业级安全解决方案
-        </p>
-      </div>
-
-      {/* 功能特色 */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
-          <Zap className="w-6 h-6 text-neon-blue" />
-          <span>核心特色</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {highlights.map((highlight, index) => {
-            const Icon = highlight.icon;
-            return (
-              <div
-                key={index}
-                className="cyber-card p-6 hover:scale-105 transition-transform"
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-neon-blue/20 rounded-lg flex items-center justify-center border border-neon-blue/30">
-                    <Icon className="w-6 h-6 text-neon-blue" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {highlight.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {highlight.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+    <div
+      className="p-8 pt-16 lg:pt-8 min-h-screen"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
+      <div className="mb-12 text-center">
+        <div className="flex items-center justify-center mb-6">
+          <div
+            className="w-20 h-20 rounded-2xl flex items-center justify-center"
+            style={{
+              backgroundColor: BUSINESS_COLORS.primary.blue,
+              boxShadow: BUSINESS_COLORS.shadows.xl,
+            }}
+          >
+            <Shield className="w-10 h-10 text-white" />
+          </div>
         </div>
+        <h1
+          className="text-4xl font-bold mb-4"
+          style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+        >
+          CyberGuard 网络安全管理平台
+        </h1>
+        <p
+          className="text-xl mb-2"
+          style={{ color: BUSINESS_COLORS.neutral.silver }}
+        >
+          企业级网络安全管理平台 - 专业版
+        </p>
+        <p
+          className="text-lg max-w-2xl mx-auto"
+          style={{ color: BUSINESS_COLORS.ui.text.muted }}
+        >
+          为企业提供全方位的网络安全防护，实时监控威胁、智能分析风险、快速响应事件
+        </p>
       </div>
 
-      {/* 功能模块 */}
+      {/* 快速统计 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        {quickStats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <StatusCard
+              key={index}
+              title={stat.title}
+              value={stat.value}
+              icon={<Icon className="w-5 h-5" />}
+              status={stat.status}
+            />
+          );
+        })}
+      </div>
+
+      {/* 核心功能 */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
-          <Activity className="w-6 h-6 text-neon-green" />
-          <span>功能模块</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="text-center mb-8">
+          <h2
+            className="text-3xl font-bold mb-4"
+            style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+          >
+            核心安全功能
+          </h2>
+          <p style={{ color: BUSINESS_COLORS.ui.text.muted }}>
+            全面的网络安全解决方案，保护您的数字资产
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Link
+              <BusinessCard
                 key={index}
-                to={feature.path}
-                className="cyber-card p-6 hover:scale-105 transition-all duration-300 group"
+                hoverable
+                className="group cursor-pointer h-full"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div
-                    className={`w-12 h-12 bg-${feature.color}/20 rounded-lg flex items-center justify-center border border-${feature.color}/30`}
-                  >
-                    <Icon className={`w-6 h-6 text-${feature.color}`} />
+                <div className="flex flex-col h-full">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200"
+                      style={{
+                        backgroundColor: `${feature.color}20`,
+                        color: feature.color,
+                      }}
+                    >
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3
+                        className="text-xl font-bold"
+                        style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                      >
+                        {feature.title}
+                      </h3>
+                    </div>
                   </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded bg-${feature.color}/20 text-${feature.color}`}
+                  <p
+                    className="text-sm flex-1"
+                    style={{ color: BUSINESS_COLORS.ui.text.secondary }}
                   >
-                    {feature.stats}
-                  </span>
+                    {feature.description}
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center text-sm text-blue-600 group-hover:text-blue-700">
+                      <span>了解更多</span>
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-neon-blue transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {feature.description}
-                </p>
-              </Link>
+              </BusinessCard>
             );
           })}
         </div>
       </div>
 
-      {/* 技术规格 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="cyber-card p-6">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
-            <Shield className="w-5 h-5 text-neon-blue" />
-            <span>技术架构</span>
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">前端框架:</span>
-              <span className="text-white">React 18 + TypeScript</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">UI组件库:</span>
-              <span className="text-white">Radix UI + Tailwind CSS</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">路由管理:</span>
-              <span className="text-white">React Router 6</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">图表组件:</span>
-              <span className="text-white">Recharts</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">构建工具:</span>
-              <span className="text-white">Vite</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">代码规范:</span>
-              <span className="text-white">ESLint + Prettier</span>
-            </div>
+      {/* 系统优势 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <InfoCard
+          title="为什么选择 CyberGuard？"
+          description="专业的网络安全管理平台，为企业提供全方位保护"
+        >
+          <div className="space-y-4">
+            {[
+              "企业级安全架构，支持大规模部署",
+              "AI驱动的威胁检测和智能分析",
+              "符合国际安全标准和合规要求",
+              "7x24小时专业技术支持服务",
+              "灵活的API接口，支持第三方集成",
+              "直观的可视化界面，操作简单高效",
+            ].map((item, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <CheckCircle
+                  className="w-5 h-5 flex-shrink-0"
+                  style={{ color: BUSINESS_COLORS.status.success }}
+                />
+                <span
+                  className="text-sm"
+                  style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+                >
+                  {item}
+                </span>
+              </div>
+            ))}
           </div>
-        </div>
+        </InfoCard>
 
-        <div className="cyber-card p-6">
-          <h3 className="text-xl font-bold text-white mb-4 flex items-center space-x-2">
-            <TrendingUp className="w-5 h-5 text-neon-green" />
-            <span>系统指标</span>
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">总代码行数:</span>
-              <span className="text-white">5,000+ 行</span>
+        <InfoCard title="技术规格" description="了解平台的技术特性和性能指标">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h4
+                className="font-medium mb-2"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
+                性能指标
+              </h4>
+              <ul
+                className="text-sm space-y-1"
+                style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+              >
+                <li>• 支持10万+并发设备</li>
+                <li>• 毫秒级威胁响应</li>
+                <li>• 99.9%系统可用性</li>
+                <li>• PB级数据处理能力</li>
+              </ul>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">组件数量:</span>
-              <span className="text-white">50+ 个</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">页面数量:</span>
-              <span className="text-white">10 个</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">自定义Hook:</span>
-              <span className="text-white">5 个</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">响应式支持:</span>
-              <span className="text-white">100%</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">类型安全:</span>
-              <span className="text-white">完整覆盖</span>
+            <div>
+              <h4
+                className="font-medium mb-2"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
+                安全特性
+              </h4>
+              <ul
+                className="text-sm space-y-1"
+                style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+              >
+                <li>• 零信任安全架构</li>
+                <li>• 端到端数据加密</li>
+                <li>• 多因子身份认证</li>
+                <li>• 完整审计日志</li>
+              </ul>
             </div>
           </div>
-        </div>
+        </InfoCard>
       </div>
 
-      {/* 底部信息 */}
-      <div className="mt-12 text-center">
-        <div className="cyber-card p-8">
-          <h3 className="text-2xl font-bold text-white mb-4">
-            🛡️ 专业级网络安全监控解决方案
+      {/* 联系信息 */}
+      <BusinessCard className="text-center">
+        <div>
+          <h3
+            className="text-2xl font-bold mb-4"
+            style={{ color: BUSINESS_COLORS.ui.text.primary }}
+          >
+            开始使用 CyberGuard
           </h3>
-          <p className="text-muted-foreground mb-6">
-            基于现代Web技术栈构建的企业级安全监控平台，提供完整的威胁检测、
-            资产管理、用户控制和系统监控功能。采用科幻主题设计，
-            支持实时数据更新和交互式操作，是现代化安全运营中心的理想选择。
+          <p
+            className="text-lg mb-6"
+            style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+          >
+            立即部署企业级网络安全解决方案，保护您的数字资产
           </p>
-          <div className="flex items-center justify-center space-x-8 text-sm text-muted-foreground">
-            <span>🔒 企业级安全</span>
-            <span>⚡ 实时监控</span>
-            <span>📊 数据可视化</span>
-            <span>🌐 响应式设计</span>
-            <span>🚀 高性能架构</span>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              className="px-8 py-3 rounded-lg font-medium transition-all duration-200"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                color: "white",
+                boxShadow: BUSINESS_COLORS.shadows.md,
+              }}
+            >
+              联系销售团队
+            </button>
+            <button
+              className="px-8 py-3 rounded-lg font-medium transition-all duration-200"
+              style={{
+                backgroundColor: "transparent",
+                color: BUSINESS_COLORS.primary.blue,
+                border: `2px solid ${BUSINESS_COLORS.primary.blue}`,
+              }}
+            >
+              申请试用
+            </button>
           </div>
         </div>
-      </div>
+      </BusinessCard>
     </div>
   );
 }
