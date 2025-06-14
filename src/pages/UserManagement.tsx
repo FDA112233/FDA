@@ -207,7 +207,7 @@ export default function UserManagement() {
   };
 
   return (
-    <div className="ml-64 p-8 min-h-screen matrix-bg">
+    <div className="p-8 pt-16 lg:pt-8 min-h-screen matrix-bg">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white glow-text mb-2">
           用户管理
@@ -294,7 +294,7 @@ export default function UserManagement() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
             >
-              <option value="all">所有状态</option>
+              <option value="all">所有���态</option>
               <option value="active">活跃</option>
               <option value="inactive">非活跃</option>
               <option value="locked">已锁定</option>
