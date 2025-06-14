@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
 import {
   Shield,
   AlertTriangle,
@@ -15,6 +16,8 @@ import {
   Key,
   Monitor,
   Globe,
+  Menu,
+  X,
 } from "lucide-react";
 
 const navItems = [
