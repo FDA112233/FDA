@@ -272,16 +272,16 @@ export default function Login() {
               </div>
 
               {/* 密码输入 */}
-              <div>
+              <div className="relative">
                 <label
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-2 transition-colors duration-300"
                   style={{ color: BUSINESS_COLORS.ui.text.primary }}
                 >
                   密码
                 </label>
-                <div className="relative">
+                <div className="relative group">
                   <Lock
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 enhanced-icon transition-all duration-300 group-focus-within:scale-110"
                     style={{ color: BUSINESS_COLORS.ui.text.muted }}
                   />
                   <input
@@ -290,7 +290,7 @@ export default function Login() {
                     value={formData.password}
                     onChange={handleInputChange}
                     placeholder="请输入密码"
-                    className="w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+                    className="w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none transition-all duration-300 enhanced-button"
                     style={{
                       borderColor: BUSINESS_COLORS.ui.border.primary,
                       backgroundColor: BUSINESS_COLORS.ui.background.card,
@@ -298,19 +298,21 @@ export default function Login() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = BUSINESS_COLORS.primary.blue;
-                      e.target.style.boxShadow = `0 0 0 3px ${BUSINESS_COLORS.primary.blue}20`;
+                      e.target.style.boxShadow = `0 0 0 4px ${BUSINESS_COLORS.primary.blue}20, 0 0 20px ${BUSINESS_COLORS.primary.blue}20`;
+                      e.target.style.transform = "translateY(-2px)";
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor =
                         BUSINESS_COLORS.ui.border.primary;
                       e.target.style.boxShadow = "none";
+                      e.target.style.transform = "translateY(0)";
                     }}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 transition-colors"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 transition-all duration-300 enhanced-icon hover:scale-110"
                     style={{ color: BUSINESS_COLORS.ui.text.muted }}
                   >
                     {showPassword ? (
@@ -319,6 +321,12 @@ export default function Login() {
                       <Eye className="w-5 h-5" />
                     )}
                   </button>
+
+                  {/* 输入框底部光效 */}
+                  <div
+                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 opacity-0 group-focus-within:opacity-100"
+                    style={{ width: formData.password ? "100%" : "0%" }}
+                  />
                 </div>
               </div>
 
@@ -326,16 +334,18 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg"
+                className="w-full py-4 px-6 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed enhanced-button relative overflow-hidden group"
                 style={{
                   backgroundColor: BUSINESS_COLORS.primary.blue,
                   color: "white",
+                  boxShadow: `0 4px 20px ${BUSINESS_COLORS.primary.blue}40`,
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) {
                     e.currentTarget.style.backgroundColor =
                       BUSINESS_COLORS.primary.navy;
-                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = `0 8px 30px ${BUSINESS_COLORS.primary.blue}60`;
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -343,18 +353,25 @@ export default function Login() {
                     e.currentTarget.style.backgroundColor =
                       BUSINESS_COLORS.primary.blue;
                     e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = `0 4px 20px ${BUSINESS_COLORS.primary.blue}40`;
                   }
                 }}
               >
-                <div className="flex items-center justify-center space-x-3">
+                {/* 按钮背景动效 */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />
+                </div>
+
+                <div className="relative flex items-center justify-center space-x-3">
                   {loading ? (
                     <>
                       <Loader className="w-5 h-5 animate-spin" />
                       <span>验证中...</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
                     </>
                   ) : (
                     <>
-                      <Shield className="w-5 h-5" />
+                      <Shield className="w-5 h-5 enhanced-icon group-hover:rotate-12" />
                       <span>登录系统</span>
                     </>
                   )}
