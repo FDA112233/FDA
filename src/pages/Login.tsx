@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { BusinessCard, AlertCard } from "@/components/ui/BusinessCard";
 import { BUSINESS_COLORS } from "@/lib/businessColors";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
