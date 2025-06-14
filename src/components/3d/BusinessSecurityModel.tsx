@@ -44,7 +44,7 @@ function AnimatedParticle({
   );
 }
 
-// 数据流粒子
+// 数据流粒子 - 稳定版本（无Trail依赖）
 function DataFlow({
   start,
   end,
@@ -57,12 +57,12 @@ function DataFlow({
   speed?: number;
 }) {
   const particleRef = useRef<THREE.Mesh>(null);
-  const [progress, setProgress] = useState(0);
+  const trailParticles = useRef<THREE.Mesh[]>([]);
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     if (particleRef.current) {
       const t = (Math.sin(state.clock.elapsedTime * speed) + 1) / 2;
-      setProgress(t);
 
       const currentPos = new THREE.Vector3().lerpVectors(
         new THREE.Vector3(...start),
@@ -74,16 +74,53 @@ function DataFlow({
       particleRef.current.scale.setScalar(
         0.5 + Math.sin(state.clock.elapsedTime * 4) * 0.3,
       );
+
+      // 更新尾迹粒子
+      trailParticles.current.forEach((particle, index) => {
+        if (particle) {
+          const trailT = Math.max(0, t - (index + 1) * 0.1);
+          const trailPos = new THREE.Vector3().lerpVectors(
+            new THREE.Vector3(...start),
+            new THREE.Vector3(...end),
+            trailT,
+          );
+          particle.position.copy(trailPos);
+          particle.scale.setScalar(0.3 * (1 - index * 0.2));
+
+          // 设置透明度
+          if (particle.material instanceof THREE.MeshBasicMaterial) {
+            particle.material.opacity = Math.max(0, 0.8 - index * 0.2);
+          }
+        }
+      });
     }
   });
 
   return (
-    <Trail width={0.1} length={10} color={color} attenuation={(t) => t * t}>
+    <group ref={groupRef}>
+      {/* 主粒子 */}
       <mesh ref={particleRef}>
         <sphereGeometry args={[0.05, 8, 8]} />
         <meshBasicMaterial color={color} />
       </mesh>
-    </Trail>
+
+      {/* 尾迹粒子 */}
+      {Array.from({ length: 5 }).map((_, index) => (
+        <mesh
+          key={index}
+          ref={(el) => {
+            if (el) trailParticles.current[index] = el;
+          }}
+        >
+          <sphereGeometry args={[0.03, 6, 6]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0.6 - index * 0.1}
+          />
+        </mesh>
+      ))}
+    </group>
   );
 }
 
