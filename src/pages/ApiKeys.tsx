@@ -71,7 +71,7 @@ const mockApiKeys: ApiKey[] = [
 ];
 
 const availablePermissions = [
-  { id: "read:alerts", label: "读取告警", category: "告警管理" },
+  { id: "read:alerts", label: "读取告���", category: "告警管理" },
   { id: "write:alerts", label: "管理告警", category: "告警管理" },
   { id: "read:metrics", label: "读取指标", category: "数据查询" },
   { id: "read:reports", label: "读取报告", category: "报告管理" },
@@ -176,7 +176,7 @@ export default function ApiKeys() {
   };
 
   return (
-    <div className="ml-64 p-8 min-h-screen matrix-bg">
+    <div className="p-8 pt-16 lg:pt-8 min-h-screen matrix-bg">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white glow-text mb-2">
           API密钥管理
