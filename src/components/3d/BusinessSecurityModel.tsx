@@ -8,7 +8,6 @@ import {
   Line,
   Html,
   Billboard,
-  Sparkles,
 } from "@react-three/drei";
 import * as THREE from "three";
 import { BUSINESS_COLORS } from "@/lib/businessColors";
