@@ -288,7 +288,7 @@ export default function Settings() {
     },
     {
       id: "system",
-      title: "系统配置",
+      title: "���统配置",
       icon: SettingsIcon,
       description: "主题、语言、时区和系统参数设置",
       isNew: true,
@@ -498,7 +498,7 @@ export default function Settings() {
 
             <SettingToggle
               label="双因子认证"
-              description="增强账户安全性的双重验证"
+              description="增强账户安全��的双重验证"
               checked={settings.security.twoFactorAuth}
               onChange={(checked) =>
                 handleSettingChange("security", "twoFactorAuth", checked)
@@ -615,7 +615,7 @@ export default function Settings() {
             }
             options={[
               { value: "low", label: "低 - 6位以上" },
-              { value: "medium", label: "中 - 8位以上，包含数字" },
+              { value: "medium", label: "中 - 8位��上，包含数字" },
               {
                 value: "high",
                 label: "高 - 12位以上，包含大小写、数字和特殊字符",
@@ -906,7 +906,7 @@ export default function Settings() {
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <SettingToggle
             label="自动升级"
-            description="严重告警自动升级通知级别"
+            description="严重告警自动升级通知���别"
             checked={settings.alerts.autoEscalation}
             onChange={(checked) =>
               handleSettingChange("alerts", "autoEscalation", checked)
@@ -1118,7 +1118,7 @@ export default function Settings() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 监控设置 */}
+          {/* ��控设置 */}
           <div className="space-y-4">
             <h4
               className="text-lg font-semibold font-mono"
@@ -1196,7 +1196,7 @@ export default function Settings() {
 
             <SettingInput
               label="备份位置"
-              description="��份文件存储路径"
+              description="备份文件存储路径"
               type="text"
               value={settings.monitoring.backupLocation}
               onChange={(value) =>
@@ -1503,7 +1503,7 @@ export default function Settings() {
               }
               options={[
                 { value: "dark", label: "深色主题" },
-                { value: "light", label: "浅��主题" },
+                { value: "light", label: "浅色主题" },
                 { value: "auto", label: "自动切换" },
                 { value: "cyber", label: "赛博朋克" },
               ]}
@@ -1577,7 +1577,7 @@ export default function Settings() {
 
             <SettingToggle
               label="调试模式"
-              description="启用系统调试模式"
+              description="启用系统��试模式"
               checked={settings.system.debugMode}
               onChange={(checked) =>
                 handleSettingChange("system", "debugMode", checked)
@@ -1609,7 +1609,7 @@ export default function Settings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <SettingInput
               label="API速率限制"
-              description="每分钟最大API请求数"
+              description="每分钟��大API请求数"
               type="number"
               value={settings.system.apiRateLimit}
               onChange={(value) =>
@@ -1666,7 +1666,7 @@ export default function Settings() {
 
   return (
     <div
-      className="min-h-screen w-full p-6"
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
       style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
     >
       {/* 顶部标题栏 */}
