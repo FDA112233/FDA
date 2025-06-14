@@ -246,7 +246,7 @@ export default function Alerts() {
         affectedAssets: ["workstation-205"],
         iocCount: 3,
         confidenceScore: 72,
-        notes: ["可能为误报", "继续观察"],
+        notes: ["可能为���报", "继续观察"],
         relatedAlerts: [],
       },
       {
@@ -522,7 +522,7 @@ export default function Alerts() {
 
   return (
     <div
-      className="min-h-screen w-full p-6"
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
       style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
     >
       {/* 顶部标题和控制栏 */}
@@ -1536,7 +1536,7 @@ function ThreatActionsTab({ alert }: { alert: ThreatAlert }) {
             className="text-lg font-bold font-mono mb-4"
             style={{ color: TECH_COLORS.ui.text.primary }}
           >
-            自动��响应
+            自动化响应
           </h3>
           <div className="space-y-2">
             {alert.actions.automated.length === 0 ? (
