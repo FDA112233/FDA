@@ -67,9 +67,41 @@ export function Navigation() {
   };
 
   return (
-    <nav className="cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg">
+    <>
+      {/* 移动端菜单按钮 */}
+      {isMobile && (
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-lg bg-matrix-surface/90 backdrop-blur-sm border border-matrix-border text-white"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
+
       {/* 移动端遮罩 */}
-      <div className="lg:hidden fixed inset-0 bg-black/50 z-40" />
+      {isMobile && isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={closeMobileMenu}
+        />
+      )}
+
+      {/* 导航菜单 */}
+      <nav
+        className={cn(
+          "cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg transition-transform duration-300",
+          isMobile && !isMobileMenuOpen && "-translate-x-full"
+        )}
+      >
+        {/* 移动端关闭按钮 */}
+        {isMobile && (
+          <button
+            onClick={closeMobileMenu}
+            className="lg:hidden absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-matrix-accent"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       {/* Logo */}
       <div className="p-6 border-b border-matrix-border">
         <div className="flex items-center space-x-3">
