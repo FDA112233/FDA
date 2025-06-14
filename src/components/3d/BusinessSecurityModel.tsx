@@ -164,7 +164,7 @@ function NetworkNode({
 
   return (
     <group ref={meshRef} position={position}>
-      {/* 主��几何体 */}
+      {/* 主要几何体 */}
       {type === "core" && (
         <>
           <Cylinder args={[0.8, 0.8, 1.2, 8]}>
@@ -556,14 +556,19 @@ export function BusinessSecurityModel({
       />
 
       {/* 环境粒子效果 */}
-      <Sparkles
-        count={50}
-        scale={[8, 3, 8]}
-        size={1}
-        speed={0.2}
-        opacity={0.1}
-        color={BUSINESS_COLORS.primary.blue}
-      />
+      {Array.from({ length: 25 }).map((_, i) => {
+        const x = (Math.random() - 0.5) * 16;
+        const y = (Math.random() - 0.5) * 6;
+        const z = (Math.random() - 0.5) * 16;
+        return (
+          <AnimatedParticle
+            key={i}
+            position={[x, y, z]}
+            color={BUSINESS_COLORS.primary.blue}
+            speed={0.3 + Math.random() * 0.4}
+          />
+        );
+      })}
 
       {/* 雾效 */}
       <fog
