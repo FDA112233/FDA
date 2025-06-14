@@ -15,6 +15,7 @@ import ApiKeys from "@/pages/ApiKeys";
 import SituationDisplay from "@/pages/SituationDisplay";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
+import { DebugAuth } from "@/components/DebugAuth";
 
 // 受保护的布局组件
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
