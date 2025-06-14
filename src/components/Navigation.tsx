@@ -245,28 +245,43 @@ export function Navigation() {
           style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
         >
           <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 group">
               <div
-                className="w-2 h-2 rounded-full animate-pulse"
+                className="w-2 h-2 rounded-full animate-pulse status-indicator status-online relative"
                 style={{ backgroundColor: BUSINESS_COLORS.status.success }}
               />
-              <span style={{ color: BUSINESS_COLORS.status.success }}>
+              <span
+                className="transition-colors duration-300 group-hover:text-green-600"
+                style={{ color: BUSINESS_COLORS.status.success }}
+              >
                 系统在线
               </span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 group cursor-pointer">
               <Bell
-                className="w-4 h-4"
+                className="w-4 h-4 enhanced-icon transition-colors duration-300 group-hover:text-orange-600"
                 style={{ color: BUSINESS_COLORS.status.warning }}
               />
               <span
-                className="px-2 py-0.5 text-xs rounded-full"
+                className="px-2 py-0.5 text-xs rounded-full transition-all duration-300 group-hover:scale-110"
                 style={{
                   backgroundColor: `${BUSINESS_COLORS.status.warning}20`,
                   color: BUSINESS_COLORS.status.warning,
                 }}
               >
                 3
+              </span>
+            </div>
+          </div>
+
+          {/* 实时数据指示器 */}
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <div className="flex justify-between text-xs">
+              <span style={{ color: BUSINESS_COLORS.ui.text.muted }}>
+                CPU: <span className="text-green-500">23%</span>
+              </span>
+              <span style={{ color: BUSINESS_COLORS.ui.text.muted }}>
+                内存: <span className="text-blue-500">67%</span>
               </span>
             </div>
           </div>
