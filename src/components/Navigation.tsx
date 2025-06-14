@@ -292,28 +292,34 @@ export function Navigation() {
           className="p-4 border-t"
           style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
         >
-          <div className="flex items-center space-x-3 mb-3">
+          <div className="flex items-center space-x-3 mb-3 group">
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 relative"
               style={{
                 backgroundColor: BUSINESS_COLORS.ui.background.secondary,
                 border: `2px solid ${BUSINESS_COLORS.primary.blue}`,
               }}
             >
               <User
-                className="w-4 h-4"
+                className="w-4 h-4 enhanced-icon"
                 style={{ color: BUSINESS_COLORS.primary.blue }}
+              />
+
+              {/* 在线状态指示器 */}
+              <div
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white"
+                style={{ backgroundColor: BUSINESS_COLORS.status.success }}
               />
             </div>
             <div className="flex-1 min-w-0">
               <p
-                className="text-sm font-medium truncate"
+                className="text-sm font-medium truncate transition-colors duration-300 group-hover:text-blue-600"
                 style={{ color: BUSINESS_COLORS.ui.text.primary }}
               >
                 {user || "安全管理员"}
               </p>
               <p
-                className="text-xs truncate"
+                className="text-xs truncate transition-colors duration-300"
                 style={{ color: BUSINESS_COLORS.ui.text.muted }}
               >
                 admin@cyberguard.com
@@ -321,21 +327,54 @@ export function Navigation() {
             </div>
           </div>
 
+          {/* 用户统计信息 */}
+          <div
+            className="mb-3 p-2 rounded-lg"
+            style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+          >
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="text-center">
+                <div
+                  className="font-medium"
+                  style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                >
+                  15
+                </div>
+                <div style={{ color: BUSINESS_COLORS.ui.text.muted }}>
+                  今日操作
+                </div>
+              </div>
+              <div className="text-center">
+                <div
+                  className="font-medium"
+                  style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                >
+                  98%
+                </div>
+                <div style={{ color: BUSINESS_COLORS.ui.text.muted }}>
+                  安全评分
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 登出按钮 */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded transition-all duration-200"
+            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded transition-all duration-300 enhanced-button group"
             style={{ color: BUSINESS_COLORS.ui.text.secondary }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = `${BUSINESS_COLORS.status.error}10`;
               e.currentTarget.style.color = BUSINESS_COLORS.status.error;
+              e.currentTarget.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = "transparent";
               e.currentTarget.style.color = BUSINESS_COLORS.ui.text.secondary;
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 enhanced-icon group-hover:rotate-6" />
             <span>退出登录</span>
           </button>
         </div>
