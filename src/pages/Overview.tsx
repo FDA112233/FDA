@@ -124,7 +124,7 @@ const highlights = [
 
 export default function Overview() {
   return (
-    <div className="ml-64 p-8 min-h-screen matrix-bg">
+    <div className="p-8 pt-16 lg:pt-8 min-h-screen matrix-bg">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white glow-text mb-4">
           CyberGuard 网络安全监控系统
