@@ -73,7 +73,9 @@ function AppLayout() {
         path="/settings"
         element={
           <ProtectedRoute>
-            <Settings />
+            <ProtectedLayout>
+              <Settings />
+            </ProtectedLayout>
           </ProtectedRoute>
         }
       />
