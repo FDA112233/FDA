@@ -89,11 +89,10 @@ export function Navigation() {
       {/* 导航菜单 */}
       <nav
         className={cn(
-          "cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg transition-transform duration-300",
+          "cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg mobile-nav-transition",
           isMobile && !isMobileMenuOpen && "-translate-x-full",
         )}
       >
-        {/* 移动端关闭按钮 */}
         {isMobile && (
           <button
             onClick={closeMobileMenu}
