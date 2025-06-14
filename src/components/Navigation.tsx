@@ -165,7 +165,7 @@ export function Navigation() {
 
         {/* Navigation Items */}
         <div className="flex-1 p-4 space-y-1">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
 
@@ -175,14 +175,16 @@ export function Navigation() {
                 to={item.path}
                 onClick={closeMobileMenu}
                 className={cn(
-                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 relative group",
-                  isActive ? "shadow-md" : "hover:shadow-sm",
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 relative group enhanced-button overflow-hidden",
+                  isActive ? "shadow-lg" : "hover:shadow-md",
+                  "hover-lift",
                 )}
                 style={{
                   backgroundColor: isActive
                     ? BUSINESS_COLORS.primary.blue
                     : "transparent",
                   color: isActive ? "white" : BUSINESS_COLORS.ui.text.secondary,
+                  animationDelay: `${index * 50}ms`,
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
@@ -190,6 +192,7 @@ export function Navigation() {
                       BUSINESS_COLORS.ui.background.secondary;
                     e.currentTarget.style.color =
                       BUSINESS_COLORS.ui.text.primary;
+                    e.currentTarget.style.transform = "translateX(8px)";
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -197,18 +200,40 @@ export function Navigation() {
                     e.currentTarget.style.backgroundColor = "transparent";
                     e.currentTarget.style.color =
                       BUSINESS_COLORS.ui.text.secondary;
+                    e.currentTarget.style.transform = "translateX(0)";
                   }
                 }}
               >
-                <Icon className="w-5 h-5" />
+                <Icon
+                  className={cn(
+                    "w-5 h-5 enhanced-icon transition-transform duration-300",
+                    isActive && "animate-pulse",
+                  )}
+                />
                 <span className="font-medium">{item.name}</span>
 
                 {isActive && (
-                  <div
-                    className="absolute right-2 w-2 h-2 rounded-full"
-                    style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
-                  />
+                  <>
+                    <div
+                      className="absolute right-2 w-2 h-2 rounded-full animate-pulse"
+                      style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
+                    />
+                    <div
+                      className="absolute inset-0 opacity-20"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                        animation: "shimmer 2s infinite",
+                      }}
+                    />
+                  </>
                 )}
+
+                {/* 悬停指示器 */}
+                <div
+                  className="absolute left-0 top-0 w-1 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ backgroundColor: BUSINESS_COLORS.primary.lightBlue }}
+                />
               </Link>
             );
           })}
