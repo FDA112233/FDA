@@ -141,7 +141,7 @@ export default function Login() {
               <div>
                 <h3 className="font-semibold text-lg mb-1">合规管理</h3>
                 <p className="text-blue-100 text-sm">
-                  满足各种行业法���和合规要求的安全管理
+                  满足各种行业法规和合规要求的安全管理
                 </p>
               </div>
             </div>
@@ -225,16 +225,16 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* 用户名输入 */}
-              <div>
+              <div className="relative">
                 <label
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-2 transition-colors duration-300"
                   style={{ color: BUSINESS_COLORS.ui.text.primary }}
                 >
                   用户名
                 </label>
-                <div className="relative">
+                <div className="relative group">
                   <User
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 enhanced-icon transition-all duration-300 group-focus-within:scale-110"
                     style={{ color: BUSINESS_COLORS.ui.text.muted }}
                   />
                   <input
@@ -243,7 +243,7 @@ export default function Login() {
                     value={formData.username}
                     onChange={handleInputChange}
                     placeholder="请输入用户名"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-all duration-300 enhanced-button"
                     style={{
                       borderColor: BUSINESS_COLORS.ui.border.primary,
                       backgroundColor: BUSINESS_COLORS.ui.background.card,
@@ -251,14 +251,22 @@ export default function Login() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = BUSINESS_COLORS.primary.blue;
-                      e.target.style.boxShadow = `0 0 0 3px ${BUSINESS_COLORS.primary.blue}20`;
+                      e.target.style.boxShadow = `0 0 0 4px ${BUSINESS_COLORS.primary.blue}20, 0 0 20px ${BUSINESS_COLORS.primary.blue}20`;
+                      e.target.style.transform = "translateY(-2px)";
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor =
                         BUSINESS_COLORS.ui.border.primary;
                       e.target.style.boxShadow = "none";
+                      e.target.style.transform = "translateY(0)";
                     }}
                     required
+                  />
+
+                  {/* 输入框底部光效 */}
+                  <div
+                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300 opacity-0 group-focus-within:opacity-100"
+                    style={{ width: formData.username ? "100%" : "0%" }}
                   />
                 </div>
               </div>
