@@ -77,6 +77,9 @@ export default function SituationDisplay() {
     showLabels: true,
     animationSpeed: 1.0,
     viewAngle: 60,
+    modelType: "security",
+    showTraffic: true,
+    threatSimulation: false,
   });
 
   // 模拟实时数据
