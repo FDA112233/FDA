@@ -50,6 +50,9 @@ interface Scene3DSettings {
   showLabels: boolean;
   animationSpeed: number;
   viewAngle: number;
+  modelType: "security" | "network" | "shield";
+  showTraffic: boolean;
+  threatSimulation: boolean;
 }
 
 export default function SituationDisplay() {
@@ -417,7 +420,7 @@ export default function SituationDisplay() {
           </div>
         )}
 
-        {/* 2D���据面板区域 */}
+        {/* 2D数据面板区域 */}
         {(viewMode === "2d" || viewMode === "split") && (
           <div
             className={`transition-all duration-500 ${
