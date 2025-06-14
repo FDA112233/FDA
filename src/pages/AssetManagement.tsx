@@ -778,7 +778,7 @@ export default function AssetManagement() {
 
   return (
     <div
-      className="min-h-screen w-full p-6"
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
       style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
     >
       {/* 顶部标题和控制栏 */}
@@ -1222,7 +1222,7 @@ function AssetInventoryTab({
         className="text-sm font-mono"
         style={{ color: TECH_COLORS.ui.text.secondary }}
       >
-        网络拓扑可视化功能正在开发中...
+        网络拓扑可视化功能正���开发中...
       </p>
     </div>
   );
@@ -1644,7 +1644,7 @@ function AssetDiscoveryTab({ tasks }: { tasks: DiscoveryTask[] }) {
                   className="text-sm font-mono"
                   style={{ color: TECH_COLORS.ui.text.primary }}
                 >
-                  {Math.floor(task.duration / 60)}分钟
+                  {Math.floor(task.duration / 60)}分���
                 </div>
                 <div
                   className="text-xs font-mono"
