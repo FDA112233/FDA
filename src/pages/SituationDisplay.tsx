@@ -27,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import {
   BusinessSecurityModel,
   BusinessShield,
+  BusinessNetworkTopology,
 } from "@/components/3d/BusinessSecurityModel";
 import {
   BusinessCard,
@@ -184,7 +185,7 @@ export default function SituationDisplay() {
             className="text-xl font-bold mb-2"
             style={{ color: BUSINESS_COLORS.ui.text.inverse }}
           >
-            初始化态��感知系统
+            初始化态势感知系统
           </h2>
           <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
             正在加载安全监控界面...
@@ -416,7 +417,7 @@ export default function SituationDisplay() {
           </div>
         )}
 
-        {/* 2D数据面板区域 */}
+        {/* 2D���据面板区域 */}
         {(viewMode === "2d" || viewMode === "split") && (
           <div
             className={`transition-all duration-500 ${
