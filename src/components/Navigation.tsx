@@ -19,6 +19,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
 const navItems = [
   { name: "仪表板", path: "/", icon: Activity },
