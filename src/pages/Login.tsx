@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,10 +35,10 @@ export default function Login() {
     // 模拟登录验证
     setTimeout(() => {
       if (formData.username === "admin" && formData.password === "123456") {
-        // 保存登录状态
-        localStorage.setItem("cyberguard_auth", "true");
-        localStorage.setItem("cyberguard_user", formData.username);
-        navigate("/");
+        // 使用AuthContext的login方法
+        login(formData.username);
+        // 导航到首页
+        navigate("/", { replace: true });
       } else {
         setError("用户名或密码错误");
       }
@@ -58,7 +59,7 @@ export default function Login() {
       className="min-h-screen flex"
       style={{ backgroundColor: BUSINESS_COLORS.neutral.slate }}
     >
-      {/* 左侧 - 品牌展示区域 */}
+      {/* 左��� - 品牌展示区域 */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative">
         {/* 渐变背景 */}
         <div
