@@ -43,7 +43,7 @@ function AppLayout() {
         element={
           <ProtectedRoute>
             <ProtectedLayout>
-              <Index />
+              <TestIndex />
             </ProtectedLayout>
           </ProtectedRoute>
         }
