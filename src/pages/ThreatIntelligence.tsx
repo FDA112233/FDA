@@ -570,7 +570,7 @@ export default function ThreatIntelligence() {
 
   return (
     <div
-      className="min-h-screen w-full p-6"
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
       style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
     >
       {/* 顶部标题和控制栏 */}
@@ -784,7 +784,7 @@ export default function ThreatIntelligence() {
               <option value="actor">威胁组织</option>
               <option value="malware">恶意软件</option>
               <option value="vulnerability">漏洞情报</option>
-              <option value="technique">攻击技术</option>
+              <option value="technique">攻���技术</option>
               <option value="ioc">IOC指标</option>
             </select>
 
@@ -1887,7 +1887,7 @@ function ThreatIntelIndicatorsTab({ intel }: { intel: ThreatIntelligence }) {
         className="text-lg font-bold font-mono"
         style={{ color: TECH_COLORS.ui.text.primary }}
       >
-        IOC指标���表
+        IOC指标列表
       </h3>
 
       {intel.indicators.length === 0 ? (
