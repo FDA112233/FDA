@@ -21,11 +21,10 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-matrix-bg text-white font-mono">
       <Navigation />
-      <main className="ml-64 min-h-screen">{children}</main>
+      <main className="lg:ml-64 min-h-screen">{children}</main>
     </div>
   );
 }
-
 // 主应用布局组件
 function AppLayout() {
   return (
