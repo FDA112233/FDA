@@ -141,7 +141,7 @@ export default function Login() {
               <div>
                 <h3 className="font-semibold text-lg mb-1">合规管理</h3>
                 <p className="text-blue-100 text-sm">
-                  满足各种行业法规和合规要求的安全管理
+                  满足各种行业法���和合规要求的安全管理
                 </p>
               </div>
             </div>
@@ -191,11 +191,22 @@ export default function Login() {
           </div>
 
           {/* 登录表单容器 */}
-          <BusinessCard size="lg" className="shadow-xl">
+          <BusinessCard size="lg" className="shadow-xl" elevated glow>
             {/* 表单标题 */}
             <div className="text-center mb-8">
+              <div className="mb-4">
+                <div
+                  className="w-16 h-16 mx-auto rounded-xl flex items-center justify-center animate-pulse-glow"
+                  style={{
+                    backgroundColor: BUSINESS_COLORS.primary.blue,
+                    boxShadow: `0 0 30px ${BUSINESS_COLORS.primary.blue}40`,
+                  }}
+                >
+                  <Shield className="w-8 h-8 text-white animate-float" />
+                </div>
+              </div>
               <h2
-                className="text-2xl font-bold mb-2"
+                className="text-2xl font-bold mb-2 gradient-text"
                 style={{ color: BUSINESS_COLORS.ui.text.primary }}
               >
                 登录控制台
