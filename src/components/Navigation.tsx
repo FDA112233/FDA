@@ -42,6 +42,8 @@ export function Navigation() {
 
   return (
     <nav className="cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg">
+      {/* 移动端遮罩 */}
+      <div className="lg:hidden fixed inset-0 bg-black/50 z-40" />
       {/* Logo */}
       <div className="p-6 border-b border-matrix-border">
         <div className="flex items-center space-x-3">
