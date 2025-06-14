@@ -19,7 +19,13 @@ import NotFound from "@/pages/NotFound";
 // 受保护的布局组件
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-matrix-bg text-white font-mono">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "#f8fafc", // BUSINESS_COLORS.ui.background.card
+        color: "#0f172a", // BUSINESS_COLORS.ui.text.primary
+      }}
+    >
       <Navigation />
       <main className="lg:ml-64 min-h-screen">{children}</main>
     </div>
