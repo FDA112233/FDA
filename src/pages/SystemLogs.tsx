@@ -1,530 +1,464 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   Search,
   Filter,
   Download,
+  RefreshCw,
   Calendar,
+  Clock,
   AlertTriangle,
   Info,
   CheckCircle,
   XCircle,
-  Clock,
+  Eye,
+  Server,
   User,
-  Monitor,
+  Shield,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { AdvancedFilter } from "@/components/ui/AdvancedFilter";
+import {
+  BusinessCard,
+  StatusCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
 interface LogEntry {
   id: string;
   timestamp: string;
-  level: "info" | "warning" | "error" | "critical";
-  category: "system" | "security" | "network" | "user" | "application";
+  level: "info" | "warning" | "error" | "debug";
   source: string;
   message: string;
-  details?: string;
   user?: string;
   ip?: string;
+  action?: string;
+  category: "auth" | "system" | "security" | "audit" | "network";
 }
 
-const mockLogs: LogEntry[] = [
-  {
-    id: "1",
-    timestamp: "2024-01-15 14:32:15",
-    level: "critical",
-    category: "security",
-    source: "FirewallEngine",
-    message: "检测到DDoS攻击，已自动启动防护措施",
-    details: "来源IP: 192.168.1.100, 攻击类型: SYN Flood, 攻击强度: 10,000 pps",
-    ip: "192.168.1.100",
-  },
-  {
-    id: "2",
-    timestamp: "2024-01-15 14:30:08",
-    level: "info",
-    category: "user",
-    source: "AuthService",
-    message: "用户登录成功",
-    user: "admin",
-    ip: "10.0.0.15",
-  },
-  {
-    id: "3",
-    timestamp: "2024-01-15 14:28:42",
-    level: "warning",
-    category: "network",
-    source: "TrafficMonitor",
-    message: "网络流量异常，超过正常阈值25%",
-    details: "当前流量: 875 Mbps, 正常阈值: 700 Mbps",
-  },
-  {
-    id: "4",
-    timestamp: "2024-01-15 14:25:33",
-    level: "error",
-    category: "application",
-    source: "DatabaseConnector",
-    message: "数据库连接超时",
-    details: "连接池状态: 活跃连接 45/50, 等待连接 12",
-  },
-  {
-    id: "5",
-    timestamp: "2024-01-15 14:22:17",
-    level: "info",
-    category: "system",
-    source: "SystemMonitor",
-    message: "系统性能检查完成",
-    details: "CPU: 45%, Memory: 67%, Disk: 23%",
-  },
-  {
-    id: "6",
-    timestamp: "2024-01-15 14:20:55",
-    level: "warning",
-    category: "security",
-    source: "IntrusionDetection",
-    message: "检测到可疑登录尝试",
-    details: "连续失败登录5次，用户: unknown_user, IP: 203.45.67.89",
-    ip: "203.45.67.89",
-  },
-  {
-    id: "7",
-    timestamp: "2024-01-15 14:18:22",
-    level: "info",
-    category: "network",
-    source: "BandwidthMonitor",
-    message: "带宽使用率正常",
-    details: "入站: 234 Mbps, 出站: 189 Mbps",
-  },
-  {
-    id: "8",
-    timestamp: "2024-01-15 14:15:10",
-    level: "critical",
-    category: "security",
-    source: "MalwareDetector",
-    message: "检测到恶意软件活动",
-    details: "文件: /tmp/suspicious.exe, 威胁类型: Trojan.Generic, 已隔离",
-  },
-];
-
-const logFilters = [
-  {
-    id: "level",
-    label: "日志级别",
-    type: "multiselect" as const,
-    options: [
-      { value: "info", label: "信息" },
-      { value: "warning", label: "警告" },
-      { value: "error", label: "错误" },
-      { value: "critical", label: "严重" },
-    ],
-  },
-  {
-    id: "category",
-    label: "分类",
-    type: "multiselect" as const,
-    options: [
-      { value: "system", label: "系统" },
-      { value: "security", label: "安全" },
-      { value: "network", label: "网络" },
-      { value: "user", label: "用户" },
-      { value: "application", label: "应用" },
-    ],
-  },
-  {
-    id: "source",
-    label: "来源",
-    type: "text" as const,
-  },
-  {
-    id: "timeRange",
-    label: "时间范围",
-    type: "daterange" as const,
-  },
-];
-
 export default function SystemLogs() {
-  const [logs, setLogs] = useState<LogEntry[]>(mockLogs);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
+  const [filterLevel, setFilterLevel] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [isAutoRefresh, setIsAutoRefresh] = useState(true);
 
+  // 模拟日志数据
+  useEffect(() => {
+    const mockLogs: LogEntry[] = [
+      {
+        id: "log-001",
+        timestamp: "2024-01-15T14:30:22.123Z",
+        level: "info",
+        source: "AuthService",
+        message: "用户登录成功",
+        user: "zhang.security",
+        ip: "192.168.1.100",
+        action: "LOGIN",
+        category: "auth",
+      },
+      {
+        id: "log-002",
+        timestamp: "2024-01-15T14:25:15.456Z",
+        level: "warning",
+        source: "FirewallService",
+        message: "检测到可疑端口扫描活动",
+        ip: "203.0.113.45",
+        action: "PORT_SCAN_DETECTED",
+        category: "security",
+      },
+      {
+        id: "log-003",
+        timestamp: "2024-01-15T14:20:08.789Z",
+        level: "error",
+        source: "DatabaseService",
+        message: "数据库连接失败，尝试重连",
+        action: "DB_CONNECTION_FAILED",
+        category: "system",
+      },
+      {
+        id: "log-004",
+        timestamp: "2024-01-15T14:15:33.012Z",
+        level: "info",
+        source: "AssetScanner",
+        message: "资产发现扫描完成，发现342个设备",
+        action: "ASSET_SCAN_COMPLETED",
+        category: "network",
+      },
+      {
+        id: "log-005",
+        timestamp: "2024-01-15T14:10:45.345Z",
+        level: "warning",
+        source: "ThreatDetector",
+        message: "发现恶意文件，已隔离处理",
+        ip: "192.168.1.205",
+        action: "MALWARE_QUARANTINED",
+        category: "security",
+      },
+    ];
+    setLogs(mockLogs);
+  }, []);
+
+  // 过滤日志
   const filteredLogs = logs.filter((log) => {
-    // 搜索过滤
     const matchesSearch =
       log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (log.details &&
-        log.details.toLowerCase().includes(searchTerm.toLowerCase()));
+      (log.user && log.user.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesLevel = filterLevel === "all" || log.level === filterLevel;
+    const matchesCategory =
+      filterCategory === "all" || log.category === filterCategory;
 
-    // 级别过滤
-    if (filters.level && filters.level.length > 0) {
-      if (!filters.level.includes(log.level)) return false;
-    }
-
-    // 分类过滤
-    if (filters.category && filters.category.length > 0) {
-      if (!filters.category.includes(log.category)) return false;
-    }
-
-    // 来源过滤
-    if (filters.source) {
-      if (!log.source.toLowerCase().includes(filters.source.toLowerCase()))
-        return false;
-    }
-
-    return matchesSearch;
+    return matchesSearch && matchesLevel && matchesCategory;
   });
 
-  const getLevelIcon = (level: string) => {
-    switch (level) {
-      case "info":
-        return <Info className="w-4 h-4 text-neon-blue" />;
-      case "warning":
-        return <AlertTriangle className="w-4 h-4 text-threat-medium" />;
-      case "error":
-        return <XCircle className="w-4 h-4 text-threat-high" />;
-      case "critical":
-        return <AlertTriangle className="w-4 h-4 text-threat-critical" />;
-      default:
-        return <Info className="w-4 h-4 text-muted-foreground" />;
-    }
-  };
-
+  // 获取日志级别颜色
   const getLevelColor = (level: string) => {
     switch (level) {
-      case "info":
-        return "text-neon-blue bg-neon-blue/10 border-neon-blue/30";
-      case "warning":
-        return "text-threat-medium bg-threat-medium/10 border-threat-medium/30";
       case "error":
-        return "text-threat-high bg-threat-high/10 border-threat-high/30";
-      case "critical":
-        return "text-threat-critical bg-threat-critical/10 border-threat-critical/30";
+        return BUSINESS_COLORS.status.error;
+      case "warning":
+        return BUSINESS_COLORS.status.warning;
+      case "info":
+        return BUSINESS_COLORS.status.info;
+      case "debug":
+        return BUSINESS_COLORS.neutral.silver;
       default:
-        return "text-muted-foreground bg-muted/10 border-muted/30";
+        return BUSINESS_COLORS.neutral.silver;
     }
   };
 
-  const getLevelText = (level: string) => {
+  // 获取日志级别图标
+  const getLevelIcon = (level: string) => {
     switch (level) {
-      case "info":
-        return "信息";
-      case "warning":
-        return "警告";
       case "error":
-        return "错误";
-      case "critical":
-        return "严重";
+        return XCircle;
+      case "warning":
+        return AlertTriangle;
+      case "info":
+        return Info;
+      case "debug":
+        return CheckCircle;
       default:
-        return "未知";
+        return Info;
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "system":
-        return <Monitor className="w-4 h-4" />;
-      case "security":
-        return <AlertTriangle className="w-4 h-4" />;
-      case "network":
-        return <Info className="w-4 h-4" />;
-      case "user":
-        return <User className="w-4 h-4" />;
-      case "application":
-        return <FileText className="w-4 h-4" />;
-      default:
-        return <Info className="w-4 h-4" />;
-    }
-  };
-
-  const getCategoryText = (category: string) => {
-    switch (category) {
-      case "system":
-        return "系统";
-      case "security":
-        return "安全";
-      case "network":
-        return "网络";
-      case "user":
-        return "用户";
-      case "application":
-        return "应用";
-      default:
-        return "未知";
-    }
-  };
-
-  const exportLogs = () => {
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      "时间,级别,分类,来源,消息,详情\n" +
-      filteredLogs
-        .map(
-          (log) =>
-            `"${log.timestamp}","${getLevelText(log.level)}","${getCategoryText(log.category)}","${log.source}","${log.message}","${log.details || ""}"`,
-        )
-        .join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute(
-      "download",
-      `system_logs_${new Date().toISOString().split("T")[0]}.csv`,
-    );
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    if (window.showToast) {
-      window.showToast({
-        title: "导出成功",
-        description: `已导出 ${filteredLogs.length} 条日志记录`,
-        type: "success",
-      });
-    }
+  // 统计数据
+  const logStats = {
+    total: logs.length,
+    errors: logs.filter((l) => l.level === "error").length,
+    warnings: logs.filter((l) => l.level === "warning").length,
+    security: logs.filter((l) => l.category === "security").length,
   };
 
   return (
-    <div className="p-8 pt-16 lg:pt-8 min-h-screen matrix-bg">
+    <div
+      className="p-8 pt-16 lg:pt-8 min-h-screen"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white glow-text mb-2">
-          系统日志
-        </h1>
-        <p className="text-muted-foreground">
-          查看和分析系统运行日志，监控系统状态和安全事件
-        </p>
-      </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.lg,
+              }}
+            >
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+              >
+                系统日志
+              </h1>
+              <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
+                系统运行日志查看和安全审计记录
+              </p>
+            </div>
+          </div>
 
-      {/* 统计面板 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="cyber-card p-4 border-l-4 border-l-neon-blue">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">总日志数</p>
-              <p className="text-xl font-bold text-white">{logs.length}</p>
-            </div>
-            <FileText className="w-6 h-6 text-neon-blue" />
-          </div>
-        </div>
-        <div className="cyber-card p-4 border-l-4 border-l-threat-critical">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">严重错误</p>
-              <p className="text-xl font-bold text-threat-critical">
-                {logs.filter((l) => l.level === "critical").length}
-              </p>
-            </div>
-            <AlertTriangle className="w-6 h-6 text-threat-critical" />
-          </div>
-        </div>
-        <div className="cyber-card p-4 border-l-4 border-l-threat-medium">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">警告</p>
-              <p className="text-xl font-bold text-threat-medium">
-                {logs.filter((l) => l.level === "warning").length}
-              </p>
-            </div>
-            <AlertTriangle className="w-6 h-6 text-threat-medium" />
-          </div>
-        </div>
-        <div className="cyber-card p-4 border-l-4 border-l-neon-green">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">信息日志</p>
-              <p className="text-xl font-bold text-neon-green">
-                {logs.filter((l) => l.level === "info").length}
-              </p>
-            </div>
-            <CheckCircle className="w-6 h-6 text-neon-green" />
-          </div>
-        </div>
-      </div>
-
-      {/* 搜索和过滤 */}
-      <div className="cyber-card p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-4 flex-1">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input
-                type="text"
-                placeholder="搜索日志消息、来源或详情..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue"
-              />
-            </div>
-            <AdvancedFilter filters={logFilters} onFiltersChange={setFilters} />
+          <div className="flex items-center space-x-3">
             <button
-              onClick={exportLogs}
-              className="neon-button flex items-center space-x-2 px-4 py-2"
+              onClick={() => setIsAutoRefresh(!isAutoRefresh)}
+              className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                isAutoRefresh ? "animate-pulse" : ""
+              }`}
+              style={{
+                backgroundColor: isAutoRefresh
+                  ? BUSINESS_COLORS.status.success
+                  : BUSINESS_COLORS.ui.background.panel,
+                color: isAutoRefresh
+                  ? "white"
+                  : BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${isAutoRefresh ? "animate-spin" : ""}`}
+              />
+              <span className="text-sm">
+                {isAutoRefresh ? "自动刷新" : "手动刷新"}
+              </span>
+            </button>
+
+            <button
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: BUSINESS_COLORS.ui.background.panel,
+                color: BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
             >
               <Download className="w-4 h-4" />
-              <span>导出日志</span>
+              <span className="text-sm">导出日志</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* 日志列表 */}
-      <div className="cyber-card">
-        <div className="p-6 border-b border-matrix-border">
-          <h3 className="text-lg font-semibold text-white">
-            日志记录 ({filteredLogs.length})
-          </h3>
-        </div>
+      {/* 统计指标 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <StatusCard
+          title="总日志数"
+          value={logStats.total.toLocaleString()}
+          icon={<FileText className="w-5 h-5" />}
+          status="info"
+        />
 
-        <div className="divide-y divide-matrix-border/50 max-h-[600px] overflow-y-auto">
-          {filteredLogs.map((log) => (
-            <div
-              key={log.id}
-              className="p-6 hover:bg-matrix-accent/30 transition-colors cursor-pointer"
-              onClick={() => setSelectedLog(log)}
-            >
-              <div className="flex items-start space-x-4">
-                {/* 级别图标 */}
-                <div className="flex-shrink-0 mt-1">
-                  {getLevelIcon(log.level)}
-                </div>
+        <StatusCard
+          title="错误日志"
+          value={logStats.errors}
+          icon={<XCircle className="w-5 h-5" />}
+          status="error"
+        />
 
-                <div className="flex-1 min-w-0">
-                  {/* 头部信息 */}
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs border",
-                        getLevelColor(log.level),
-                      )}
-                    >
-                      {getLevelText(log.level)}
-                    </span>
-                    <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                      {getCategoryIcon(log.category)}
-                      <span>{getCategoryText(log.category)}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground bg-matrix-surface px-2 py-1 rounded">
-                      {log.source}
-                    </span>
-                  </div>
+        <StatusCard
+          title="警告日志"
+          value={logStats.warnings}
+          icon={<AlertTriangle className="w-5 h-5" />}
+          status="warning"
+        />
 
-                  {/* 消息 */}
-                  <p className="text-white font-medium mb-2">{log.message}</p>
-
-                  {/* 详情 */}
-                  {log.details && (
-                    <p className="text-sm text-muted-foreground mb-3 bg-matrix-surface/50 p-2 rounded">
-                      {log.details}
-                    </p>
-                  )}
-
-                  {/* 元数据 */}
-                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{log.timestamp}</span>
-                    </div>
-                    {log.user && (
-                      <div className="flex items-center space-x-1">
-                        <User className="w-3 h-3" />
-                        <span>用户: {log.user}</span>
-                      </div>
-                    )}
-                    {log.ip && (
-                      <div className="flex items-center space-x-1">
-                        <Monitor className="w-3 h-3" />
-                        <span>IP: {log.ip}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <StatusCard
+          title="安全事件"
+          value={logStats.security}
+          icon={<Shield className="w-5 h-5" />}
+          status="warning"
+        />
       </div>
 
-      {/* 日志详情弹窗 */}
-      {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setSelectedLog(null)}
-          />
-          <div className="relative w-full max-w-2xl mx-4">
-            <div className="cyber-card border-2 border-neon-blue/30 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">日志详情</h3>
-                <button
-                  onClick={() => setSelectedLog(null)}
-                  className="text-muted-foreground hover:text-white transition-colors"
-                >
-                  ×
-                </button>
-              </div>
+      {/* 搜索和过滤 */}
+      <BusinessCard className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            <div className="relative flex-1 max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              />
+              <input
+                type="text"
+                placeholder="搜索日志内容、来源或用户..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              />
+            </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      时间
-                    </label>
-                    <p className="text-white font-mono">
-                      {selectedLog.timestamp}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      级别
-                    </label>
-                    <p
-                      className={cn(
-                        "text-sm",
-                        getLevelColor(selectedLog.level),
-                      )}
-                    >
-                      {getLevelText(selectedLog.level)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      分类
-                    </label>
-                    <p className="text-white">
-                      {getCategoryText(selectedLog.category)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      来源
-                    </label>
-                    <p className="text-white font-mono">{selectedLog.source}</p>
-                  </div>
-                </div>
+            <div className="flex gap-3">
+              <select
+                value={filterLevel}
+                onChange={(e) => setFilterLevel(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有级别</option>
+                <option value="error">错误</option>
+                <option value="warning">警告</option>
+                <option value="info">信息</option>
+                <option value="debug">调试</option>
+              </select>
 
-                <div>
-                  <label className="text-sm text-muted-foreground">消息</label>
-                  <p className="text-white bg-matrix-surface p-3 rounded mt-1">
-                    {selectedLog.message}
-                  </p>
-                </div>
-
-                {selectedLog.details && (
-                  <div>
-                    <label className="text-sm text-muted-foreground">
-                      详细信息
-                    </label>
-                    <pre className="text-white bg-matrix-surface p-3 rounded mt-1 text-sm overflow-x-auto">
-                      {selectedLog.details}
-                    </pre>
-                  </div>
-                )}
-              </div>
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有分类</option>
+                <option value="auth">认证</option>
+                <option value="system">系统</option>
+                <option value="security">安全</option>
+                <option value="audit">审计</option>
+                <option value="network">网络</option>
+              </select>
             </div>
           </div>
         </div>
-      )}
+      </BusinessCard>
+
+      {/* 日志列表 */}
+      <DataTableCard
+        title="系统日志记录"
+        description={`共 ${filteredLogs.length} 条日志记录`}
+        data={filteredLogs}
+        columns={[
+          {
+            key: "level",
+            label: "级别",
+            render: (value) => {
+              const Icon = getLevelIcon(value);
+              return (
+                <div className="flex items-center space-x-2">
+                  <Icon
+                    className="w-4 h-4"
+                    style={{ color: getLevelColor(value) }}
+                  />
+                  <span
+                    className="font-medium text-sm uppercase"
+                    style={{ color: getLevelColor(value) }}
+                  >
+                    {value}
+                  </span>
+                </div>
+              );
+            },
+          },
+          {
+            key: "timestamp",
+            label: "时间",
+            render: (value) => (
+              <div>
+                <p className="text-sm font-mono">
+                  {new Date(value).toLocaleDateString("zh-CN")}
+                </p>
+                <p
+                  className="text-xs font-mono"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {new Date(value).toLocaleTimeString("zh-CN")}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: "source",
+            label: "来源",
+            render: (value) => (
+              <div className="flex items-center space-x-2">
+                <Server
+                  className="w-3 h-3"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                />
+                <span
+                  className="text-sm font-mono"
+                  style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+                >
+                  {value}
+                </span>
+              </div>
+            ),
+          },
+          {
+            key: "message",
+            label: "消息内容",
+            render: (value, row) => (
+              <div>
+                <p className="text-sm">{value}</p>
+                {row.action && (
+                  <span
+                    className="inline-block mt-1 px-2 py-0.5 rounded text-xs font-mono"
+                    style={{
+                      backgroundColor: `${BUSINESS_COLORS.primary.blue}20`,
+                      color: BUSINESS_COLORS.primary.blue,
+                    }}
+                  >
+                    {row.action}
+                  </span>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "category",
+            label: "分类",
+            render: (value) => (
+              <span
+                className="px-2 py-1 rounded text-xs font-medium"
+                style={{
+                  backgroundColor: `${BUSINESS_COLORS.neutral.lightGray}40`,
+                  color: BUSINESS_COLORS.ui.text.secondary,
+                }}
+              >
+                {value === "auth"
+                  ? "认证"
+                  : value === "system"
+                    ? "系统"
+                    : value === "security"
+                      ? "安全"
+                      : value === "audit"
+                        ? "审计"
+                        : "网络"}
+              </span>
+            ),
+          },
+          {
+            key: "user",
+            label: "用户/IP",
+            render: (value, row) => (
+              <div>
+                {value && (
+                  <div className="flex items-center space-x-2">
+                    <User
+                      className="w-3 h-3"
+                      style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    />
+                    <span className="text-sm">{value}</span>
+                  </div>
+                )}
+                {row.ip && (
+                  <p
+                    className="text-xs font-mono mt-1"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    {row.ip}
+                  </p>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "actions",
+            label: "操作",
+            render: () => (
+              <button
+                className="p-1 rounded transition-colors"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }
