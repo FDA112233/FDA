@@ -125,12 +125,12 @@ export function Navigation() {
 
         {/* Logo */}
         <div
-          className="p-6 border-b"
+          className="p-6 border-b relative group"
           style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
         >
           <div className="flex items-center space-x-3">
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-105 enhanced-icon"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
                 boxShadow: BUSINESS_COLORS.shadows.md,
@@ -140,19 +140,27 @@ export function Navigation() {
             </div>
             <div>
               <h1
-                className="text-xl font-bold"
+                className="text-xl font-bold gradient-text transition-all duration-300"
                 style={{ color: BUSINESS_COLORS.ui.text.primary }}
               >
                 CyberGuard
               </h1>
               <p
-                className="text-xs"
+                className="text-xs transition-colors duration-300"
                 style={{ color: BUSINESS_COLORS.ui.text.muted }}
               >
                 网络安全管理平台
               </p>
             </div>
           </div>
+
+          {/* Logo背景光效 */}
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at center, ${BUSINESS_COLORS.primary.blue}10 0%, transparent 70%)`,
+            }}
+          />
         </div>
 
         {/* Navigation Items */}
