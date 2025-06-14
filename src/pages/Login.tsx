@@ -18,7 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,6 +26,13 @@ export default function Login() {
     username: "",
     password: "",
   });
+
+  // 检查是否已经登录，如果已登录则重定向到首页
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,7 +221,7 @@ export default function Login() {
                 登录控制台
               </h2>
               <p style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                请输入您的凭据以访问安全��理控制台
+                请输入您的凭据以访问安全管理控制台
               </p>
             </div>
 
