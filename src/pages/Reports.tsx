@@ -100,7 +100,7 @@ interface SecurityReport {
 }
 
 /**
- * 报告模���接口
+ * 报告模板接口
  */
 interface ReportTemplate {
   id: string;
@@ -189,7 +189,7 @@ export default function Reports() {
       {
         id: "report-002",
         title: "恶意软件感染事件报告",
-        description: "Emotet变种感染事件的详��分析和响应报告",
+        description: "Emotet变种感染事件的详细分析和响应报告",
         type: "incident",
         status: "completed",
         createdAt: "2024-01-15T14:30:00Z",
@@ -478,7 +478,7 @@ export default function Reports() {
 
   return (
     <div
-      className="min-h-screen w-full p-6"
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
       style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
     >
       {/* 顶部标题和控制栏 */}
@@ -708,7 +708,7 @@ export default function Reports() {
               className="text-lg font-bold font-mono"
               style={{ color: TECH_COLORS.ui.text.primary }}
             >
-              响应时间指标
+              响��时间指标
             </h3>
           </div>
           <div className="h-64">
