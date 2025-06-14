@@ -219,7 +219,7 @@ export default function Alerts() {
         iocCount: 8,
         confidenceScore: 88,
         assignedTo: "incident-response",
-        notes: ["已联系相关ISP", "监控中"],
+        notes: ["已��系相关ISP", "监控中"],
         relatedAlerts: ["alert-001"],
       },
       {
@@ -529,7 +529,7 @@ export default function Alerts() {
   return (
     <div
       className="min-h-screen w-full p-6 pt-16 lg:pt-6"
-      style={{ backgroundColor: TECH_COLORS.ui.background.primary }}
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
     >
       {/* 顶部标题和控制栏 */}
       <div className="mb-8">
@@ -537,29 +537,28 @@ export default function Alerts() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
               <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
                 style={{
-                  background: TECH_COLORS.gradients.plasma,
-                  boxShadow: `0 0 20px ${TECH_COLORS.primary.plasma}66`,
+                  backgroundColor: BUSINESS_COLORS.primary.blue,
+                  boxShadow: BUSINESS_COLORS.shadows.lg,
                 }}
               >
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1
-                  className="text-3xl font-bold font-mono"
+                  className="text-3xl font-bold"
                   style={{
-                    color: TECH_COLORS.ui.text.primary,
-                    textShadow: `0 0 10px ${TECH_COLORS.primary.plasma}66`,
+                    color: BUSINESS_COLORS.ui.text.inverse,
                   }}
                 >
-                  THREAT ALERT CENTER
+                  威胁告警中心
                 </h1>
                 <p
-                  className="text-sm font-mono"
-                  style={{ color: TECH_COLORS.ui.text.secondary }}
+                  className="text-sm"
+                  style={{ color: BUSINESS_COLORS.neutral.silver }}
                 >
-                  Real-time Threat Detection & Incident Response
+                  实时威胁检测与事件响应管理
                 </p>
               </div>
             </div>
@@ -1026,7 +1025,7 @@ function ThreatAlertCard({
             style={{ color: TECH_COLORS.ui.text.muted }}
           >
             <Target className="w-4 h-4" />
-            <span>置信���: {alert.confidenceScore}%</span>
+            <span>置信度: {alert.confidenceScore}%</span>
           </div>
           <div
             className="flex items-center space-x-1"
