@@ -81,7 +81,7 @@ export function Navigation() {
       {/* 移动端遮罩 */}
       {isMobile && isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/50 z-40 mobile-menu-overlay"
           onClick={closeMobileMenu}
         />
       )}
