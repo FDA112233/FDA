@@ -101,7 +101,7 @@ export function BusinessCard({
     },
   };
 
-  const currentVariant = variants[variant];
+  const currentVariant = variants[variant] || variants.default;
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (disabled || !onClick) return;
