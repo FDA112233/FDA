@@ -46,7 +46,13 @@ import {
   Hexagon,
   Triangle as TriangleIcon,
 } from "lucide-react";
-import { TechCard, StatusCard } from "@/components/ui/TechCard";
+import {
+  BusinessCard,
+  StatusCard,
+  InfoCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 import {
   TECH_COLORS,
   getThreatLevelColor,
@@ -246,7 +252,7 @@ export default function Alerts() {
         affectedAssets: ["workstation-205"],
         iocCount: 3,
         confidenceScore: 72,
-        notes: ["可能为���报", "继续观察"],
+        notes: ["可能为误报", "继续观察"],
         relatedAlerts: [],
       },
       {
@@ -1020,7 +1026,7 @@ function ThreatAlertCard({
             style={{ color: TECH_COLORS.ui.text.muted }}
           >
             <Target className="w-4 h-4" />
-            <span>置信度: {alert.confidenceScore}%</span>
+            <span>置信���: {alert.confidenceScore}%</span>
           </div>
           <div
             className="flex items-center space-x-1"
