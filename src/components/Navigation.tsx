@@ -73,7 +73,12 @@ export function Navigation() {
       {isMobile && (
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-lg bg-matrix-surface/90 backdrop-blur-sm border border-matrix-border text-white"
+          className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-lg backdrop-blur-sm border shadow-lg"
+          style={{
+            backgroundColor: BUSINESS_COLORS.ui.background.panel,
+            borderColor: BUSINESS_COLORS.ui.border.primary,
+            color: BUSINESS_COLORS.ui.text.primary,
+          }}
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -90,38 +95,68 @@ export function Navigation() {
       {/* 导航菜单 */}
       <nav
         className={cn(
-          "cyber-card w-64 h-screen fixed left-0 top-0 z-50 flex flex-col matrix-bg mobile-nav-transition",
+          "w-64 h-screen fixed left-0 top-0 z-50 flex flex-col mobile-nav-transition border-r shadow-xl",
           isMobile && !isMobileMenuOpen && "-translate-x-full",
         )}
+        style={{
+          backgroundColor: BUSINESS_COLORS.ui.background.panel,
+          borderColor: BUSINESS_COLORS.ui.border.primary,
+        }}
       >
+        {/* 移动端关闭按钮 */}
         {isMobile && (
           <button
             onClick={closeMobileMenu}
-            className="lg:hidden absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-matrix-accent"
+            className="lg:hidden absolute top-4 right-4 p-2 rounded-lg transition-colors"
+            style={{
+              color: BUSINESS_COLORS.ui.text.secondary,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor =
+                BUSINESS_COLORS.ui.background.secondary;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
           >
             <X className="w-5 h-5" />
           </button>
         )}
+
         {/* Logo */}
-        <div className="p-6 border-b border-matrix-border">
+        <div
+          className="p-6 border-b"
+          style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
+        >
           <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Shield className="w-8 h-8 text-neon-blue glow-text" />
-              <div className="absolute inset-0 animate-pulse-glow">
-                <Shield className="w-8 h-8 text-neon-blue opacity-50" />
-              </div>
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.md,
+              }}
+            >
+              <Shield className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white glow-text">
+              <h1
+                className="text-xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
                 CyberGuard
               </h1>
-              <p className="text-xs text-muted-foreground">态势感知监控系统</p>
+              <p
+                className="text-xs"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              >
+                网络安全管理平台
+              </p>
             </div>
           </div>
         </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 p-4 space-y-2">
+        <div className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -132,17 +167,39 @@ export function Navigation() {
                 to={item.path}
                 onClick={closeMobileMenu}
                 className={cn(
-                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 relative overflow-hidden group",
-                  isActive
-                    ? "bg-neon-blue/20 text-neon-blue border border-neon-blue/30 glow-border"
-                    : "text-muted-foreground hover:text-white hover:bg-matrix-accent",
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 relative group",
+                  isActive ? "shadow-md" : "hover:shadow-sm",
                 )}
+                style={{
+                  backgroundColor: isActive
+                    ? BUSINESS_COLORS.primary.blue
+                    : "transparent",
+                  color: isActive ? "white" : BUSINESS_COLORS.ui.text.secondary,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor =
+                      BUSINESS_COLORS.ui.background.secondary;
+                    e.currentTarget.style.color =
+                      BUSINESS_COLORS.ui.text.primary;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color =
+                      BUSINESS_COLORS.ui.text.secondary;
+                  }
+                }}
               >
-                <Icon className={cn("w-5 h-5", isActive && "glow-text")} />
+                <Icon className="w-5 h-5" />
                 <span className="font-medium">{item.name}</span>
 
                 {isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-blue/10 to-transparent animate-scan-line" />
+                  <div
+                    className="absolute right-2 w-2 h-2 rounded-full"
+                    style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
+                  />
                 )}
               </Link>
             );
@@ -150,30 +207,67 @@ export function Navigation() {
         </div>
 
         {/* Status Indicator */}
-        <div className="p-4 border-t border-matrix-border">
+        <div
+          className="p-4 border-t"
+          style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
+        >
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
-              <span className="text-neon-green">系统在线</span>
+              <div
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: BUSINESS_COLORS.status.success }}
+              />
+              <span style={{ color: BUSINESS_COLORS.status.success }}>
+                系统在线
+              </span>
             </div>
             <div className="flex items-center space-x-2">
-              <Bell className="w-4 h-4 text-threat-medium" />
-              <span className="text-threat-medium">3</span>
+              <Bell
+                className="w-4 h-4"
+                style={{ color: BUSINESS_COLORS.status.warning }}
+              />
+              <span
+                className="px-2 py-0.5 text-xs rounded-full"
+                style={{
+                  backgroundColor: `${BUSINESS_COLORS.status.warning}20`,
+                  color: BUSINESS_COLORS.status.warning,
+                }}
+              >
+                3
+              </span>
             </div>
           </div>
         </div>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-matrix-border">
+        <div
+          className="p-4 border-t"
+          style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
+        >
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-neon-blue/20 rounded-full flex items-center justify-center border border-neon-blue/30">
-              <User className="w-4 h-4 text-neon-blue" />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.ui.background.secondary,
+                border: `2px solid ${BUSINESS_COLORS.primary.blue}`,
+              }}
+            >
+              <User
+                className="w-4 h-4"
+                style={{ color: BUSINESS_COLORS.primary.blue }}
+              />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
+              <p
+                className="text-sm font-medium truncate"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
                 {user || "安全管理员"}
               </p>
-              <p className="text-xs text-muted-foreground truncate">
+              <p
+                className="text-xs truncate"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              >
                 admin@cyberguard.com
               </p>
             </div>
@@ -182,7 +276,16 @@ export function Navigation() {
           {/* 登出按钮 */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-2 px-3 py-2 text-sm text-muted-foreground hover:text-threat-critical hover:bg-threat-critical/10 rounded transition-colors"
+            className="w-full flex items-center space-x-2 px-3 py-2 text-sm rounded transition-all duration-200"
+            style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = `${BUSINESS_COLORS.status.error}10`;
+              e.currentTarget.style.color = BUSINESS_COLORS.status.error;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = BUSINESS_COLORS.ui.text.secondary;
+            }}
           >
             <LogOut className="w-4 h-4" />
             <span>退出登录</span>
