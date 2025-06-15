@@ -89,43 +89,96 @@ export default function Overview() {
 
   return (
     <div
-      className="p-8 pt-16 lg:pt-8 min-h-screen"
-      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+      className="p-8 pt-16 lg:pt-8 min-h-screen relative overflow-hidden"
+      style={{
+        background: BACKEND_COLORS.backgrounds.secondary,
+      }}
     >
+      {/* 动态背景装饰 */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            background: `radial-gradient(circle at 30% 20%, rgba(var(--brand-primary), 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(var(--brand-accent), 0.08) 0%, transparent 50%)`,
+          }}
+        />
+
+        {/* 装饰粒子 */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3 + 1}px`,
+              height: `${Math.random() * 3 + 1}px`,
+              backgroundColor:
+                BACKEND_COLORS.effects.particle[
+                  i % BACKEND_COLORS.effects.particle.length
+                ],
+              borderRadius: "50%",
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${Math.random() * 3 + 2}s`,
+            }}
+          />
+        ))}
+      </div>
       {/* 页面标题 */}
-      <div className="mb-12 text-center">
+      <div className="mb-12 text-center relative z-10">
         <div className="flex items-center justify-center mb-6">
           <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center"
+            className="w-24 h-24 rounded-2xl flex items-center justify-center relative group overflow-hidden"
             style={{
-              backgroundColor: BUSINESS_COLORS.primary.blue,
-              boxShadow: BUSINESS_COLORS.shadows.xl,
+              background: BACKEND_COLORS.navigation.logo.background,
+              boxShadow: BACKEND_COLORS.navigation.logo.shadow,
             }}
           >
-            <Shield
-              className="w-10 h-10"
+            {/* 内部光效 */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                color: `rgb(var(--brand-lightest))`,
-                filter: `drop-shadow(0 0 12px rgba(var(--brand-accent), 0.7))`,
+                background: `radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%)`,
+              }}
+            />
+
+            <Shield
+              className="w-12 h-12 relative z-10 transition-transform duration-300 group-hover:scale-110"
+              style={{
+                color: BACKEND_COLORS.text.glow,
+                filter: `drop-shadow(0 0 16px rgba(var(--brand-accent), 0.8))`,
               }}
             />
           </div>
         </div>
+
         <h1
-          className="text-4xl font-bold mb-4"
-          style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+          className="text-5xl font-bold mb-4 bg-gradient-to-r bg-clip-text text-transparent"
+          style={{
+            backgroundImage: `linear-gradient(45deg,
+              ${BACKEND_COLORS.text.primary} 0%,
+              ${BACKEND_COLORS.text.accent} 50%,
+              ${BACKEND_COLORS.text.secondary} 100%)`,
+            textShadow: `0 0 30px rgba(var(--brand-primary), 0.3)`,
+          }}
         >
           CyberGuard 网络安全管理平台
         </h1>
+
         <p
           className="text-xl mb-2"
-          style={{ color: BUSINESS_COLORS.neutral.silver }}
+          style={{
+            color: BACKEND_COLORS.text.secondary,
+            textShadow: `0 0 8px rgba(var(--brand-light), 0.3)`,
+          }}
         >
           企业级网络安全管理平台 - 专业版
         </p>
+
         <p
           className="text-lg max-w-2xl mx-auto"
-          style={{ color: BUSINESS_COLORS.ui.text.muted }}
+          style={{ color: BACKEND_COLORS.text.muted }}
         >
           为企业提供全方位的网络安全防护，实时监控威胁、智能分析风险、快速响应事件
         </p>
