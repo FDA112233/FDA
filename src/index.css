@@ -36,14 +36,30 @@
   --threat-low: 234 179 8; /* #eab308 */
   --threat-safe: 16 185 129; /* #10b981 */
 
-  /* UI界面配色 */
+  /* UI界面配色 - 多彩渐变系统 */
   --background-primary: var(--neutral-900); /* 主背景 */
   --background-secondary: var(--neutral-800); /* 次要背景 */
   --background-tertiary: var(--neutral-700); /* 第三背景 */
-  --background-panel: var(--neutral-white); /* 面板背景 */
-  --background-card: 248 250 252; /* #f8fafc 卡片背景 */
-  --background-overlay: rgba(15, 23, 42, 0.8); /* 遮罩背景 */
-  --background-glass: rgba(255, 255, 255, 0.1); /* 玻璃效果 */
+  --background-panel: linear-gradient(
+    135deg,
+    rgba(var(--neutral-white), 0.95) 0%,
+    rgba(var(--brand-lightest), 0.1) 100%
+  ); /* 面板背景 */
+  --background-card: linear-gradient(
+    135deg,
+    rgba(248, 250, 252, 0.9) 0%,
+    rgba(var(--brand-light), 0.05) 100%
+  ); /* 卡片背景 */
+  --background-overlay: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.8) 0%,
+    rgba(var(--brand-darkest), 0.9) 100%
+  ); /* 遮罩背景 */
+  --background-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(var(--brand-accent), 0.05) 100%
+  ); /* 玻璃效果 */
 
   /* 边框色彩 */
   --border-primary: var(--neutral-400); /* 主边框 */
@@ -178,10 +194,54 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: rgb(var(--background-primary));
+    background: linear-gradient(
+      135deg,
+      rgb(var(--neutral-900)) 0%,
+      rgb(var(--neutral-800)) 25%,
+      rgb(var(--brand-darkest)) 50%,
+      rgb(var(--neutral-800)) 75%,
+      rgb(var(--neutral-900)) 100%
+    );
+    background-attachment: fixed;
     color: rgb(var(--text-primary));
     line-height: 1.5;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* 动态背景粒子效果 */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(
+        circle at 20% 20%,
+        rgba(var(--brand-accent), 0.1) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 80% 40%,
+        rgba(var(--brand-primary), 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 40% 80%,
+        rgba(var(--brand-light), 0.06) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        circle at 70% 70%,
+        rgba(var(--info), 0.05) 0%,
+        transparent 50%
+      );
+    animation: backgroundShift 30s ease-in-out infinite;
+    z-index: -1;
+    pointer-events: none;
   }
 
   /* 标题样式系统 */
@@ -426,7 +486,7 @@
     min-height: 3.5rem;
   }
 
-  /* 输入框组件���式 */
+  /* 输入框组件样式 */
   .input {
     background-color: rgb(var(--background-panel));
     border: 1px solid rgb(var(--border-primary));
