@@ -491,17 +491,22 @@ export function BusinessSecurityModel({
       />
 
       {/* 网络连接线 */}
-      {connections.map((connection, index) => (
-        <Line
-          key={index}
-          points={[connection.from, connection.to]}
-          color={BUSINESS_COLORS.primary.lightBlue}
-          lineWidth={2}
-          dashed={false}
-          transparent
-          opacity={0.6}
-        />
-      ))}
+      {connections.map((connection, index) => {
+        const points = [];
+        points.push(new THREE.Vector3(...connection.from));
+        points.push(new THREE.Vector3(...connection.to));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        return (
+          <line key={index} geometry={geometry}>
+            <lineBasicMaterial
+              color={BUSINESS_COLORS.primary.lightBlue}
+              transparent
+              opacity={0.6}
+            />
+          </line>
+        );
+      })}
 
       {/* 数据流粒子 */}
       {dataFlows.map((flow, index) => (
