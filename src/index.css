@@ -424,7 +424,7 @@
       0 1px 3px 0 rgba(var(--shadow-color), var(--shadow-opacity-light));
   }
 
-  /* 按钮组件基础样式 */
+  /* 按钮组件基础样式 - 增强交互效果 */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -439,6 +439,28 @@
     text-decoration: none;
     padding: 0.75rem 1.5rem;
     min-height: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 100%
+    );
+    transition: left var(--duration-normal) var(--easing-ease-out);
+  }
+
+  .btn:hover::before {
+    left: 100%;
   }
 
   .btn:disabled {
@@ -447,19 +469,34 @@
     pointer-events: none;
   }
 
-  /* 按钮变体 */
+  .btn:active {
+    transform: translateY(1px) scale(0.98);
+    transition-duration: var(--duration-fast);
+  }
+
+  /* 按钮变体 - 多彩渐变设计 */
   .btn-primary {
-    background-color: rgb(var(--brand-primary));
+    background: linear-gradient(
+      135deg,
+      rgb(var(--brand-primary)) 0%,
+      rgb(var(--brand-accent)) 100%
+    );
     color: rgb(var(--neutral-white));
-    box-shadow: 0 1px 3px 0
-      rgba(var(--shadow-color), var(--shadow-opacity-light));
+    box-shadow:
+      0 4px 12px rgba(var(--brand-primary), 0.3),
+      0 1px 3px rgba(var(--shadow-color), var(--shadow-opacity-light));
   }
 
   .btn-primary:hover:not(:disabled) {
-    background-color: rgb(var(--brand-dark));
-    box-shadow: 0 4px 6px -1px
-      rgba(var(--shadow-color), var(--shadow-opacity-light));
-    transform: translateY(-1px);
+    background: linear-gradient(
+      135deg,
+      rgb(var(--brand-dark)) 0%,
+      rgb(var(--brand-primary)) 100%
+    );
+    box-shadow:
+      0 8px 20px rgba(var(--brand-primary), 0.4),
+      0 4px 6px rgba(var(--shadow-color), var(--shadow-opacity-light));
+    transform: translateY(-2px) scale(1.02);
   }
 
   .btn-secondary {
@@ -649,23 +686,48 @@
     animation: spin 1s linear infinite;
   }
 
-  /* 进度条样式 */
+  /* 进度条样式 - 多彩动画设计 */
   .progress-bar {
-    background-color: rgb(var(--background-secondary));
+    background: linear-gradient(
+      90deg,
+      rgba(var(--brand-darkest), 0.2) 0%,
+      rgba(var(--brand-dark), 0.1) 100%
+    );
     border-radius: var(--radius-full);
     overflow: hidden;
     height: 0.5rem;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(var(--shadow-color), 0.1);
   }
 
   .progress-fill {
     background: linear-gradient(
       90deg,
       rgb(var(--brand-primary)) 0%,
+      rgb(var(--brand-accent)) 50%,
       rgb(var(--brand-light)) 100%
     );
     height: 100%;
     border-radius: var(--radius-full);
     transition: width var(--duration-slow) var(--easing-ease-out);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    animation: progressShimmer 2s infinite;
   }
 
   /* 表格样式 */
