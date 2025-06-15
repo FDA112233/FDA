@@ -72,7 +72,8 @@ export default function NotFound() {
                 className="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200"
                 style={{
                   backgroundColor: BUSINESS_COLORS.primary.blue,
-                  color: "white",
+                  color: `rgb(var(--brand-lightest))`,
+                  textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                   boxShadow: BUSINESS_COLORS.shadows.md,
                 }}
               >

@@ -346,7 +346,8 @@ export default function Login() {
                 className="w-full py-4 px-6 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed enhanced-button relative overflow-hidden group"
                 style={{
                   backgroundColor: BUSINESS_COLORS.primary.blue,
-                  color: "white",
+                  color: `rgb(var(--brand-lightest))`,
+                  textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                   boxShadow: `0 4px 20px ${BUSINESS_COLORS.primary.blue}40`,
                 }}
                 onMouseEnter={(e) => {

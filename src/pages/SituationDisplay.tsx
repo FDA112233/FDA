@@ -618,7 +618,12 @@ export default function SituationDisplay() {
                 backgroundColor: isPaused
                   ? BUSINESS_COLORS.status.warning
                   : BUSINESS_COLORS.ui.background.secondary,
-                color: isPaused ? "white" : BUSINESS_COLORS.ui.text.secondary,
+                color: isPaused
+                  ? `rgb(var(--brand-lightest))`
+                  : BUSINESS_COLORS.ui.text.secondary,
+                textShadow: isPaused
+                  ? `0 0 8px rgba(var(--brand-lightest), 0.5)`
+                  : "none",
               }}
               title={isPaused ? "恢复更新" : "暂停更新"}
             >
@@ -1171,7 +1176,8 @@ export default function SituationDisplay() {
                   className="flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors"
                   style={{
                     backgroundColor: BUSINESS_COLORS.primary.blue,
-                    color: "white",
+                    color: `rgb(var(--brand-lightest))`,
+                    textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                   }}
                 >
                   <Download className="w-4 h-4" />
@@ -2017,7 +2023,7 @@ export default function SituationDisplay() {
                           }}
                         >
                           <Download className="w-4 h-4 inline mr-2" />
-                          导出当前视图
+                          导出当前��图
                         </button>
                         <button
                           className="w-full text-left p-2 text-sm rounded transition-colors hover:scale-[1.02]"
