@@ -4,7 +4,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Navigation } from "@/components/Navigation";
 import { ToastContainer } from "@/components/ui/toast";
 import Index from "@/pages/Index";
-import TestIndex from "@/pages/TestIndex";
+import Dashboard from "@/pages/Dashboard";
 import Alerts from "@/pages/Alerts";
 import Reports from "@/pages/Reports";
 import Settings from "@/pages/Settings";
@@ -92,7 +92,7 @@ function AppLayout() {
         element={
           <ProtectedRoute>
             <ProtectedLayout>
-              <TestIndex />
+              <Dashboard />
             </ProtectedLayout>
           </ProtectedRoute>
         }
