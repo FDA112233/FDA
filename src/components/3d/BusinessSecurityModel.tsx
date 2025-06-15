@@ -473,7 +473,7 @@ export function BusinessSecurityModel({
     [],
   );
 
-  // 连接线
+  // 连接��
   const connections = useMemo(
     () => [
       { from: [0, 0, 0], to: [2, 1, 2] },
@@ -508,24 +508,12 @@ export function BusinessSecurityModel({
 
       {/* 网络连接线 */}
       {connections.map((connection, index) => (
-        <group key={index}>
-          <mesh>
-            <cylinderGeometry
-              args={[
-                0.005,
-                0.005,
-                new THREE.Vector3(...connection.from).distanceTo(
-                  new THREE.Vector3(...connection.to),
-                ),
-              ]}
-            />
-            <meshBasicMaterial
-              color={BUSINESS_COLORS.primary.lightBlue}
-              transparent
-              opacity={0.6}
-            />
-          </mesh>
-        </group>
+        <LineConnection
+          key={index}
+          start={connection.from}
+          end={connection.to}
+          color={BUSINESS_COLORS.primary.lightBlue}
+        />
       ))}
 
       {/* 数据流粒子 */}
