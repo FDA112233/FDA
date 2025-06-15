@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Sphere, Box, Cylinder, Text } from "@react-three/drei";
+import { Sphere, Box, Cylinder } from "@react-three/drei";
 import * as THREE from "three";
 import { BUSINESS_COLORS } from "@/lib/businessColors";
 
