@@ -83,7 +83,13 @@ export default function Login() {
                 className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-2xl"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <Shield className="w-12 h-12 text-white" />
+                <Shield
+                  className="w-12 h-12"
+                  style={{
+                    color: `rgb(var(--brand-lightest))`,
+                    filter: `drop-shadow(0 0 16px rgba(var(--brand-accent), 0.8))`,
+                  }}
+                />
               </div>
             </div>
             <h1 className="text-5xl font-bold mb-4">CyberGuard</h1>
