@@ -57,7 +57,7 @@ const mockAlerts: Alert[] = [
   {
     id: "4",
     type: "low",
-    title: "端口扫描",
+    title: "端口���描",
     description: "检测到对多个端口的扫描行为",
     source: "172.16.0.45",
     location: "深圳市",
@@ -139,7 +139,13 @@ function AlertItem({ alert, onClick }: { alert: Alert; onClick?: () => void }) {
                   alert.type === "low" && "text-threat-low",
                 )}
               />
-              <h4 className="font-semibold text-white truncate">
+              <h4
+                className="font-semibold truncate"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  textShadow: `0 0 6px rgba(var(--brand-lightest), 0.4)`,
+                }}
+              >
                 {alert.title}
               </h4>
               <span
