@@ -1,1145 +1,1157 @@
-import React, { useRef, useMemo, useState, useEffect } from "react";
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Sphere, Box, Cylinder } from "@react-three/drei";
+import {
+  Sphere,
+  Box,
+  Cylinder,
+  Cone,
+  Torus,
+  Dodecahedron,
+} from "@react-three/drei";
 import * as THREE from "three";
 import { BUSINESS_COLORS } from "@/lib/businessColors";
 
-// 动画粒子组件 - 增强版本
-function AnimatedParticle({
-  position,
-  color,
-  speed = 1,
-  size = 0.02,
-  opacity = 1,
-  pulseIntensity = 0.5,
-}: {
+// 类型定义
+interface NetworkNode {
+  id: string;
   position: [number, number, number];
-  color: string;
-  speed?: number;
-  size?: number;
-  opacity?: number;
-  pulseIntensity?: number;
-}) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [offset] = useState(Math.random() * Math.PI * 2);
+  type:
+    | "core"
+    | "server"
+    | "firewall"
+    | "router"
+    | "endpoint"
+    | "database"
+    | "cloud"
+    | "edge";
+  status: "online" | "offline" | "warning" | "error" | "maintenance";
+  load: number;
+  connections: string[];
+  threatLevel: "safe" | "low" | "medium" | "high" | "critical";
+  lastActivity: Date;
+  dataFlow: number;
+}
 
-  useFrame((state) => {
-    if (meshRef.current) {
+interface ThreatEvent {
+  id: string;
+  source: [number, number, number];
+  target: [number, number, number];
+  type: "ddos" | "malware" | "intrusion" | "phishing" | "ransomware";
+  severity: "low" | "medium" | "high" | "critical";
+  active: boolean;
+  timestamp: Date;
+}
+
+interface SecurityShieldConfig {
+  enabled: boolean;
+  strength: number;
+  coverage: number;
+  activeDefenses: string[];
+}
+
+// 增强动画粒子组件
+const EnhancedParticle = React.memo(
+  ({
+    position,
+    color,
+    size = 0.02,
+    speed = 1,
+    behavior = "float",
+    intensity = 1,
+  }: {
+    position: [number, number, number];
+    color: string;
+    size?: number;
+    speed?: number;
+    behavior?: "float" | "pulse" | "orbit" | "spiral" | "data";
+    intensity?: number;
+  }) => {
+    const meshRef = useRef<THREE.Mesh>(null);
+    const [offset] = useState(Math.random() * Math.PI * 2);
+    const [direction] = useState(
+      new THREE.Vector3(
+        (Math.random() - 0.5) * 0.1,
+        (Math.random() - 0.5) * 0.1,
+        (Math.random() - 0.5) * 0.1,
+      ),
+    );
+
+    useFrame((state) => {
+      if (!meshRef.current) return;
+
       const time = state.clock.elapsedTime;
-      meshRef.current.position.y =
-        position[1] + Math.sin(time * speed + offset) * 0.5;
+      const basePos = new THREE.Vector3(...position);
 
-      // 脉冲效果
-      const pulseScale = 1 + Math.sin(time * 3 + offset) * pulseIntensity;
-      meshRef.current.scale.setScalar(pulseScale);
+      switch (behavior) {
+        case "float":
+          meshRef.current.position.y =
+            basePos.y + Math.sin(time * speed + offset) * 0.3;
+          meshRef.current.position.x =
+            basePos.x + Math.cos(time * speed * 0.7 + offset) * 0.1;
+          break;
 
-      // 透明度动画
-      if (meshRef.current.material instanceof THREE.MeshBasicMaterial) {
+        case "pulse":
+          const pulse = 1 + Math.sin(time * speed * 3 + offset) * 0.5;
+          meshRef.current.scale.setScalar(pulse);
+          break;
+
+        case "orbit":
+          const radius = 0.5;
+          const angle = time * speed + offset;
+          meshRef.current.position.x = basePos.x + Math.cos(angle) * radius;
+          meshRef.current.position.z = basePos.z + Math.sin(angle) * radius;
+          meshRef.current.position.y = basePos.y + Math.sin(angle * 2) * 0.2;
+          break;
+
+        case "spiral":
+          const spiralAngle = time * speed + offset;
+          const spiralRadius = 0.3 + Math.sin(time * 0.5) * 0.2;
+          meshRef.current.position.x =
+            basePos.x + Math.cos(spiralAngle) * spiralRadius;
+          meshRef.current.position.z =
+            basePos.z + Math.sin(spiralAngle) * spiralRadius;
+          meshRef.current.position.y =
+            basePos.y + ((spiralAngle * 0.1) % 2) - 1;
+          break;
+
+        case "data":
+          meshRef.current.position.add(direction);
+          const opacity = Math.sin(time * speed * 2 + offset) * 0.5 + 0.5;
+          if (meshRef.current.material instanceof THREE.MeshBasicMaterial) {
+            meshRef.current.material.opacity = opacity * intensity;
+          }
+          break;
+      }
+
+      // 通用脉冲效果
+      if (
+        behavior !== "pulse" &&
+        meshRef.current.material instanceof THREE.MeshBasicMaterial
+      ) {
         meshRef.current.material.opacity =
-          opacity * (0.6 + Math.sin(time * 2 + offset) * 0.4);
+          intensity * (0.7 + Math.sin(time * 2 + offset) * 0.3);
       }
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={position}>
-      <sphereGeometry args={[size, 8, 8]} />
-      <meshBasicMaterial color={color} transparent opacity={opacity} />
-    </mesh>
-  );
-}
-
-// 连接线组件 - 增强版本
-function EnhancedLineConnection({
-  start,
-  end,
-  color,
-  animated = true,
-  intensity = 1,
-}: {
-  start: [number, number, number];
-  end: [number, number, number];
-  color: string;
-  animated?: boolean;
-  intensity?: number;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const pulseRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (animated && pulseRef.current) {
-      const pulse = Math.sin(state.clock.elapsedTime * 2) * 0.3 + 0.7;
-      if (pulseRef.current.material instanceof THREE.MeshBasicMaterial) {
-        pulseRef.current.material.opacity = pulse * intensity;
-      }
-    }
-  });
-
-  // 计算连接点
-  const points = useMemo(() => {
-    const startVec = new THREE.Vector3(...start);
-    const endVec = new THREE.Vector3(...end);
-    const distance = startVec.distanceTo(endVec);
-    const numPoints = Math.max(6, Math.floor(distance * 3));
-
-    return Array.from({ length: numPoints }, (_, i) => {
-      const t = i / (numPoints - 1);
-      const x = start[0] + (end[0] - start[0]) * t;
-      const y = start[1] + (end[1] - start[1]) * t;
-      const z = start[2] + (end[2] - start[2]) * t;
-      return [x, y, z] as [number, number, number];
     });
-  }, [start, end]);
 
-  return (
-    <group ref={groupRef}>
-      {/* 主连接线 */}
-      {points.map((point, i) => (
-        <mesh key={i} position={point}>
-          <sphereGeometry args={[0.015, 6, 6]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.8 * intensity}
-          />
-        </mesh>
-      ))}
+    return (
+      <mesh ref={meshRef} position={position}>
+        <sphereGeometry args={[size, 8, 8]} />
+        <meshBasicMaterial color={color} transparent opacity={intensity} />
+      </mesh>
+    );
+  },
+);
 
-      {/* 脉冲效果 */}
-      {animated && (
-        <mesh ref={pulseRef} position={points[Math.floor(points.length / 2)]}>
-          <sphereGeometry args={[0.03, 8, 8]} />
-          <meshBasicMaterial color={color} transparent opacity={0.5} />
-        </mesh>
-      )}
-    </group>
-  );
-}
+// 高级数据流组件
+const AdvancedDataFlow = React.memo(
+  ({
+    start,
+    end,
+    color,
+    speed = 1,
+    intensity = 1,
+    flowType = "standard",
+    particleCount = 3,
+  }: {
+    start: [number, number, number];
+    end: [number, number, number];
+    color: string;
+    speed?: number;
+    intensity?: number;
+    flowType?: "standard" | "encrypted" | "threat" | "backup";
+    particleCount?: number;
+  }) => {
+    const groupRef = useRef<THREE.Group>(null);
+    const particlesRef = useRef<THREE.Mesh[]>([]);
 
-// 数据流粒子 - 增强版本
-function EnhancedDataFlow({
-  start,
-  end,
-  color,
-  speed = 2,
-  particleCount = 5,
-}: {
-  start: [number, number, number];
-  end: [number, number, number];
-  color: string;
-  speed?: number;
-  particleCount?: number;
-}) {
-  const particleRefs = useRef<THREE.Mesh[]>([]);
-  const trailRefs = useRef<THREE.Mesh[]>([]);
-  const groupRef = useRef<THREE.Group>(null);
+    const flowColors = {
+      standard: color,
+      encrypted: BUSINESS_COLORS.status.success,
+      threat: BUSINESS_COLORS.threat.critical,
+      backup: BUSINESS_COLORS.status.info,
+    };
 
-  useFrame((state) => {
-    particleRefs.current.forEach((particle, index) => {
-      if (particle) {
+    const flowColor = flowColors[flowType] || color;
+
+    useFrame((state) => {
+      particlesRef.current.forEach((particle, index) => {
+        if (!particle) return;
+
         const offset = (index / particleCount) * Math.PI * 2;
         const t = (Math.sin(state.clock.elapsedTime * speed + offset) + 1) / 2;
 
-        const currentPos = new THREE.Vector3().lerpVectors(
-          new THREE.Vector3(...start),
-          new THREE.Vector3(...end),
-          t,
-        );
+        const startVec = new THREE.Vector3(...start);
+        const endVec = new THREE.Vector3(...end);
+
+        // 创建贝塞尔曲线路径
+        const mid = startVec.clone().lerp(endVec, 0.5);
+        mid.y += Math.sin(offset) * 0.5; // 添加弧度
+
+        const currentPos = new THREE.Vector3();
+        currentPos
+          .copy(startVec)
+          .lerp(mid, t * 2)
+          .lerp(endVec, Math.max(0, t * 2 - 1));
 
         particle.position.copy(currentPos);
+
+        // 根据流类型调整大小和效果
+        const baseScale =
+          flowType === "threat"
+            ? 0.6 + Math.sin(state.clock.elapsedTime * 8) * 0.4
+            : 1;
         particle.scale.setScalar(
-          0.5 + Math.sin(state.clock.elapsedTime * 4 + offset) * 0.3,
+          baseScale *
+            (0.5 + Math.sin(state.clock.elapsedTime * 4 + offset) * 0.3),
         );
 
-        // 更新尾迹
-        trailRefs.current.forEach((trail, trailIndex) => {
-          if (trail && trailIndex === index) {
-            const trailT = Math.max(0, t - 0.15);
-            const trailPos = new THREE.Vector3().lerpVectors(
-              new THREE.Vector3(...start),
-              new THREE.Vector3(...end),
-              trailT,
-            );
-            trail.position.copy(trailPos);
-            trail.scale.setScalar(0.3);
-
-            if (trail.material instanceof THREE.MeshBasicMaterial) {
-              trail.material.opacity = Math.max(0, 0.5 - (t - trailT) * 2);
-            }
-          }
-        });
-      }
+        // 透明度变化
+        if (particle.material instanceof THREE.MeshBasicMaterial) {
+          particle.material.opacity =
+            intensity *
+            (0.8 + Math.sin(state.clock.elapsedTime * 3 + offset) * 0.2);
+        }
+      });
     });
-  });
 
-  return (
-    <group ref={groupRef}>
-      {/* 主粒子 */}
-      {Array.from({ length: particleCount }).map((_, index) => (
-        <mesh
-          key={`particle-${index}`}
-          ref={(el) => {
-            if (el) particleRefs.current[index] = el;
-          }}
-        >
-          <sphereGeometry args={[0.04, 8, 8]} />
-          <meshBasicMaterial color={color} />
-        </mesh>
-      ))}
+    return (
+      <group ref={groupRef}>
+        {Array.from({ length: particleCount }).map((_, index) => (
+          <mesh
+            key={index}
+            ref={(el) => {
+              if (el) particlesRef.current[index] = el;
+            }}
+          >
+            <sphereGeometry args={[0.04, 8, 8]} />
+            <meshBasicMaterial color={flowColor} transparent />
+          </mesh>
+        ))}
+      </group>
+    );
+  },
+);
 
-      {/* 尾迹粒子 */}
-      {Array.from({ length: particleCount }).map((_, index) => (
-        <mesh
-          key={`trail-${index}`}
-          ref={(el) => {
-            if (el) trailRefs.current[index] = el;
-          }}
-        >
-          <sphereGeometry args={[0.02, 6, 6]} />
-          <meshBasicMaterial color={color} transparent opacity={0.5} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
+// 高级网络节点组件
+const AdvancedNetworkNode = React.memo(
+  ({
+    node,
+    isSelected = false,
+    onSelect,
+    threatEvents = [],
+  }: {
+    node: NetworkNode;
+    isSelected?: boolean;
+    onSelect?: (nodeId: string) => void;
+    threatEvents?: ThreatEvent[];
+  }) => {
+    const groupRef = useRef<THREE.Group>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    const [pulsing, setPulsing] = useState(false);
 
-// 网络节点组件 - 增强版本
-function EnhancedNetworkNode({
-  position,
-  type,
-  label,
-  status = "online",
-  threat = false,
-  load = 0,
-  connections = 0,
-}: {
-  position: [number, number, number];
-  type: string;
-  label: string;
-  status?: "online" | "offline" | "warning" | "error";
-  threat?: boolean;
-  load?: number;
-  connections?: number;
-}) {
-  const meshRef = useRef<THREE.Group>(null);
-  const [hovered, setHovered] = useState(false);
-  const [pulsing, setPulsing] = useState(false);
+    const statusColors = {
+      online: BUSINESS_COLORS.status.success,
+      offline: BUSINESS_COLORS.neutral[600],
+      warning: BUSINESS_COLORS.status.warning,
+      error: BUSINESS_COLORS.status.error,
+      maintenance: BUSINESS_COLORS.status.info,
+    };
 
-  const statusColors = {
-    online: BUSINESS_COLORS.status.success,
-    offline: BUSINESS_COLORS.neutral.silver,
-    warning: BUSINESS_COLORS.status.warning,
-    error: BUSINESS_COLORS.status.error,
-  };
+    const threatColors = {
+      safe: BUSINESS_COLORS.threat.safe,
+      low: BUSINESS_COLORS.threat.low,
+      medium: BUSINESS_COLORS.threat.medium,
+      high: BUSINESS_COLORS.threat.high,
+      critical: BUSINESS_COLORS.threat.critical,
+    };
 
-  const threatColor = threat
-    ? BUSINESS_COLORS.status.error
-    : statusColors[status];
+    const nodeColor = statusColors[node.status];
+    const threatColor = threatColors[node.threatLevel];
 
-  // 负载颜色
-  const loadColor = useMemo(() => {
-    if (load < 30) return BUSINESS_COLORS.status.success;
-    if (load < 70) return BUSINESS_COLORS.status.warning;
-    return BUSINESS_COLORS.status.error;
-  }, [load]);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      // 基础旋转
-      meshRef.current.rotation.y =
-        Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
-
-      // 威胁警告动画
-      if (threat) {
-        const scale = 1 + Math.sin(state.clock.elapsedTime * 8) * 0.15;
-        meshRef.current.scale.setScalar(scale);
-      } else {
-        meshRef.current.scale.setScalar(1);
-      }
-
-      // 悬停效果
-      if (hovered) {
-        meshRef.current.position.y =
-          position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.1;
-      } else {
-        meshRef.current.position.y = position[1];
-      }
-    }
-  });
-
-  // 随机脉冲效果
-  useEffect(() => {
-    const interval = setInterval(
-      () => {
-        setPulsing(true);
-        setTimeout(() => setPulsing(false), 500);
-      },
-      3000 + Math.random() * 5000,
+    // 检查是否有活跃威胁
+    const hasActiveThreat = threatEvents.some(
+      (threat) =>
+        threat.active &&
+        (threat.target.toString() === node.position.toString() ||
+          threat.source.toString() === node.position.toString()),
     );
 
-    return () => clearInterval(interval);
-  }, []);
+    useFrame((state) => {
+      if (!groupRef.current) return;
 
-  return (
-    <group
-      ref={meshRef}
-      position={position}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    >
-      {/* 主要几何体 */}
-      {type === "core" && (
-        <>
-          <Cylinder args={[0.8, 0.8, 1.2, 8]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.primary.navy}
-              metalness={0.3}
-              roughness={0.4}
-              emissive={
-                threat
-                  ? BUSINESS_COLORS.status.error
-                  : BUSINESS_COLORS.primary.blue
-              }
-              emissiveIntensity={threat ? 0.3 : 0.1}
-            />
-          </Cylinder>
-          {/* 核心发光环 */}
-          <Sphere args={[1.2]} position={[0, 0, 0]}>
-            <meshBasicMaterial
-              color={threatColor}
-              transparent
-              opacity={0.1}
-              side={THREE.DoubleSide}
-            />
-          </Sphere>
-          {/* 数据访问指示器 */}
-          <Sphere args={[1.4]} position={[0, 0, 0]}>
-            <meshBasicMaterial
-              color={BUSINESS_COLORS.primary.lightBlue}
-              transparent
-              opacity={pulsing ? 0.3 : 0.05}
-              side={THREE.DoubleSide}
-            />
-          </Sphere>
-        </>
-      )}
+      const time = state.clock.elapsedTime;
 
-      {type === "server" && (
-        <>
-          <Box args={[0.6, 0.8, 0.4]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.primary.blue}
-              metalness={0.2}
-              roughness={0.6}
-              emissive={threat ? BUSINESS_COLORS.status.error : undefined}
-              emissiveIntensity={threat ? 0.2 : 0}
-            />
-          </Box>
-          {/* 负载指示器 */}
-          <Box
-            args={[0.7, (load / 100) * 0.8, 0.1]}
-            position={[0, -0.4 + (load / 100) * 0.4, 0.3]}
-          >
-            <meshBasicMaterial color={loadColor} transparent opacity={0.7} />
-          </Box>
-        </>
-      )}
+      // 基础旋转
+      groupRef.current.rotation.y = Math.sin(time * 0.5) * 0.1;
 
-      {type === "firewall" && (
-        <>
-          <Box args={[1.2, 0.4, 0.3]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.status.warning}
-              metalness={0.1}
-              roughness={0.7}
-              emissive={BUSINESS_COLORS.status.warning}
-              emissiveIntensity={0.2}
-            />
-          </Box>
-          {/* 防护屏障效果 */}
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Sphere key={i} args={[1.5 + i * 0.2]} position={[0, 0, 0]}>
-              <meshBasicMaterial
-                color={BUSINESS_COLORS.status.warning}
-                transparent
-                opacity={0.05 - i * 0.01}
-                side={THREE.DoubleSide}
-              />
-            </Sphere>
-          ))}
-        </>
-      )}
+      // 威胁警告动画
+      if (hasActiveThreat || node.threatLevel === "critical") {
+        const scale = 1 + Math.sin(time * 8) * 0.15;
+        groupRef.current.scale.setScalar(scale);
+      } else {
+        groupRef.current.scale.setScalar(isSelected ? 1.1 : 1);
+      }
 
-      {type === "endpoint" && (
-        <>
-          <Sphere args={[0.3, 16, 16]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.neutral.lightGray}
-              metalness={0.1}
-              roughness={0.8}
-              emissive={threat ? BUSINESS_COLORS.status.error : undefined}
-              emissiveIntensity={threat ? 0.3 : 0}
-            />
-          </Sphere>
-          {/* 连接数指示器 */}
-          {Array.from({ length: Math.min(connections, 4) }).map((_, i) => {
-            const angle = (i / 4) * Math.PI * 2;
-            const radius = 0.5;
-            return (
-              <mesh
-                key={i}
-                position={[
-                  Math.cos(angle) * radius,
-                  0,
-                  Math.sin(angle) * radius,
-                ]}
-              >
-                <sphereGeometry args={[0.05, 6, 6]} />
-                <meshBasicMaterial color={BUSINESS_COLORS.primary.lightBlue} />
-              </mesh>
-            );
-          })}
-        </>
-      )}
+      // 悬停和选中效果
+      const targetY =
+        node.position[1] +
+        (isHovered || isSelected ? Math.sin(time * 3) * 0.1 : 0);
+      groupRef.current.position.y +=
+        (targetY - groupRef.current.position.y) * 0.1;
 
-      {type === "database" && (
-        <>
-          <Cylinder args={[0.5, 0.5, 0.8, 12]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.neutral.gray}
-              metalness={0.4}
-              roughness={0.3}
-              emissive={
-                threat
-                  ? BUSINESS_COLORS.status.error
-                  : BUSINESS_COLORS.primary.blue
-              }
-              emissiveIntensity={threat ? 0.2 : 0.05}
-            />
-          </Cylinder>
-          {/* 数据层指示器 */}
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Cylinder
-              key={i}
-              args={[0.52, 0.52, 0.05, 12]}
-              position={[0, -0.2 + i * 0.2, 0]}
-            >
-              <meshBasicMaterial
-                color={BUSINESS_COLORS.primary.lightBlue}
-                transparent
-                opacity={0.6}
-              />
-            </Cylinder>
-          ))}
-        </>
-      )}
+      // 负载脉冲
+      if (node.load > 80) {
+        setPulsing(Math.sin(time * 4) > 0.5);
+      }
+    });
 
-      {type === "router" && (
-        <>
-          <Box args={[0.8, 0.3, 0.8]}>
-            <meshStandardMaterial
-              color={BUSINESS_COLORS.primary.lightBlue}
-              metalness={0.2}
-              roughness={0.5}
-              emissive={threat ? BUSINESS_COLORS.status.error : undefined}
-              emissiveIntensity={threat ? 0.2 : 0}
-            />
-          </Box>
-          {/* 路由信号指示器 */}
-          {Array.from({ length: 6 }).map((_, i) => {
-            const angle = (i / 6) * Math.PI * 2;
-            const radius = 0.6;
-            return (
-              <mesh
-                key={i}
-                position={[
-                  Math.cos(angle) * radius,
-                  0.2,
-                  Math.sin(angle) * radius,
-                ]}
-              >
-                <sphereGeometry args={[0.03, 4, 4]} />
+    // 点击处理
+    const handleClick = useCallback(() => {
+      onSelect?.(node.id);
+    }, [node.id, onSelect]);
+
+    const renderNodeGeometry = () => {
+      const commonProps = {
+        onPointerOver: () => setIsHovered(true),
+        onPointerOut: () => setIsHovered(false),
+        onClick: handleClick,
+      };
+
+      switch (node.type) {
+        case "core":
+          return (
+            <group {...commonProps}>
+              <Dodecahedron args={[0.8]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.dark}
+                  metalness={0.8}
+                  roughness={0.2}
+                  emissive={threatColor}
+                  emissiveIntensity={hasActiveThreat ? 0.4 : 0.1}
+                />
+              </Dodecahedron>
+              {/* 核心环绕效果 */}
+              <Torus args={[1.2, 0.1, 16, 32]} rotation={[Math.PI / 2, 0, 0]}>
                 <meshBasicMaterial
-                  color={BUSINESS_COLORS.status.success}
+                  color={nodeColor}
+                  transparent
+                  opacity={0.6}
+                />
+              </Torus>
+            </group>
+          );
+
+        case "server":
+          return (
+            <group {...commonProps}>
+              <Box args={[0.6, 1, 0.4]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.main}
+                  metalness={0.3}
+                  roughness={0.4}
+                  emissive={hasActiveThreat ? threatColor : undefined}
+                  emissiveIntensity={hasActiveThreat ? 0.3 : 0}
+                />
+              </Box>
+              {/* 服务器指示灯 */}
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Sphere
+                  key={i}
+                  args={[0.03]}
+                  position={[0.35, 0.3 - i * 0.2, 0.25]}
+                >
+                  <meshBasicMaterial
+                    color={
+                      i < Math.ceil(node.load / 40)
+                        ? nodeColor
+                        : BUSINESS_COLORS.neutral[500]
+                    }
+                  />
+                </Sphere>
+              ))}
+            </group>
+          );
+
+        case "firewall":
+          return (
+            <group {...commonProps}>
+              <Box args={[1.4, 0.4, 0.3]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.status.warning}
+                  metalness={0.1}
+                  roughness={0.7}
+                  emissive={BUSINESS_COLORS.status.warning}
+                  emissiveIntensity={0.2}
+                />
+              </Box>
+              {/* 防护屏障 */}
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Sphere key={i} args={[1.5 + i * 0.3]} position={[0, 0, 0]}>
+                  <meshBasicMaterial
+                    color={nodeColor}
+                    transparent
+                    opacity={0.05 - i * 0.01}
+                    side={THREE.DoubleSide}
+                  />
+                </Sphere>
+              ))}
+            </group>
+          );
+
+        case "router":
+          return (
+            <group {...commonProps}>
+              <Cylinder args={[0.5, 0.7, 0.4, 8]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.light}
+                  metalness={0.4}
+                  roughness={0.3}
+                />
+              </Cylinder>
+              {/* 路由天线 */}
+              {Array.from({ length: 4 }).map((_, i) => {
+                const angle = (i / 4) * Math.PI * 2;
+                return (
+                  <group key={i} rotation={[0, angle, 0]}>
+                    <Cylinder args={[0.02, 0.02, 0.8]} position={[0.6, 0.4, 0]}>
+                      <meshBasicMaterial color={nodeColor} />
+                    </Cylinder>
+                  </group>
+                );
+              })}
+            </group>
+          );
+
+        case "database":
+          return (
+            <group {...commonProps}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Cylinder
+                  key={i}
+                  args={[0.5, 0.5, 0.2]}
+                  position={[0, -0.3 + i * 0.25, 0]}
+                >
+                  <meshStandardMaterial
+                    color={BUSINESS_COLORS.neutral[700]}
+                    metalness={0.6}
+                    roughness={0.2}
+                    emissive={
+                      i === 0 && node.dataFlow > 0.5
+                        ? BUSINESS_COLORS.primary.accent
+                        : undefined
+                    }
+                    emissiveIntensity={0.3}
+                  />
+                </Cylinder>
+              ))}
+            </group>
+          );
+
+        case "cloud":
+          return (
+            <group {...commonProps}>
+              {/* 云朵形状 */}
+              <Sphere args={[0.4]} position={[0, 0, 0]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.lightest}
                   transparent
                   opacity={0.8}
                 />
-              </mesh>
-            );
-          })}
-        </>
-      )}
+              </Sphere>
+              <Sphere args={[0.3]} position={[-0.3, 0, 0]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.lightest}
+                  transparent
+                  opacity={0.8}
+                />
+              </Sphere>
+              <Sphere args={[0.3]} position={[0.3, 0, 0]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.primary.lightest}
+                  transparent
+                  opacity={0.8}
+                />
+              </Sphere>
+            </group>
+          );
 
-      {/* 状态指示器 */}
-      <Sphere args={[0.08]} position={[0, type === "core" ? -0.8 : -0.5, 0]}>
-        <meshBasicMaterial
-          color={threatColor}
-          emissive={threatColor}
-          emissiveIntensity={0.5}
-        />
-      </Sphere>
+        case "endpoint":
+        default:
+          return (
+            <group {...commonProps}>
+              <Sphere args={[0.3, 16, 16]}>
+                <meshStandardMaterial
+                  color={BUSINESS_COLORS.neutral[500]}
+                  metalness={0.1}
+                  roughness={0.8}
+                  emissive={hasActiveThreat ? threatColor : undefined}
+                  emissiveIntensity={hasActiveThreat ? 0.4 : 0}
+                />
+              </Sphere>
+              {/* 连接指示器 */}
+              {node.connections.slice(0, 4).map((_, i) => {
+                const angle = (i / 4) * Math.PI * 2;
+                return (
+                  <Sphere
+                    key={i}
+                    args={[0.05]}
+                    position={[Math.cos(angle) * 0.5, 0, Math.sin(angle) * 0.5]}
+                  >
+                    <meshBasicMaterial color={nodeColor} />
+                  </Sphere>
+                );
+              })}
+            </group>
+          );
+      }
+    };
 
-      {/* 威胁警告效果 */}
-      {threat && (
-        <>
+    return (
+      <group ref={groupRef} position={node.position}>
+        {renderNodeGeometry()}
+
+        {/* 状态指示器 */}
+        <Sphere args={[0.08]} position={[0, -0.7, 0]}>
+          <meshBasicMaterial
+            color={nodeColor}
+            emissive={nodeColor}
+            emissiveIntensity={0.5}
+          />
+        </Sphere>
+
+        {/* 威胁等级指示器 */}
+        {node.threatLevel !== "safe" && (
+          <Cone args={[0.1, 0.2]} position={[0, 0.8, 0]}>
+            <meshBasicMaterial
+              color={threatColor}
+              emissive={threatColor}
+              emissiveIntensity={pulsing ? 0.8 : 0.4}
+            />
+          </Cone>
+        )}
+
+        {/* 负载环形指示器 */}
+        {node.load > 0 && (
+          <mesh position={[0, 0.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry
+              args={[0.2, 0.25, 16, 1, 0, (node.load / 100) * Math.PI * 2]}
+            />
+            <meshBasicMaterial
+              color={
+                node.load > 90
+                  ? BUSINESS_COLORS.threat.critical
+                  : node.load > 70
+                    ? BUSINESS_COLORS.status.warning
+                    : BUSINESS_COLORS.status.success
+              }
+              transparent
+              opacity={0.8}
+            />
+          </mesh>
+        )}
+
+        {/* 选中效果 */}
+        {isSelected && (
           <Sphere args={[1.5]} position={[0, 0, 0]}>
             <meshBasicMaterial
-              color={BUSINESS_COLORS.status.error}
+              color={BUSINESS_COLORS.primary.main}
               transparent
               opacity={0.1}
               side={THREE.DoubleSide}
             />
           </Sphere>
-          {/* 威胁警告脉冲 */}
-          <Sphere args={[2.0]} position={[0, 0, 0]}>
+        )}
+
+        {/* 威胁警告效果 */}
+        {hasActiveThreat && (
+          <Sphere args={[2]} position={[0, 0, 0]}>
             <meshBasicMaterial
-              color={BUSINESS_COLORS.status.error}
+              color={BUSINESS_COLORS.threat.critical}
               transparent
               opacity={0.05}
               side={THREE.DoubleSide}
             />
           </Sphere>
-        </>
-      )}
+        )}
 
-      {/* 状态指示器增强版 */}
-      <Sphere args={[0.15]} position={[0, type === "core" ? 1.5 : 1.0, 0]}>
-        <meshBasicMaterial color={threatColor} transparent opacity={0.8} />
-      </Sphere>
+        {/* 环绕粒子效果 */}
+        {node.type === "core" && (
+          <>
+            {Array.from({ length: 8 }).map((_, i) => {
+              const angle = (i / 8) * Math.PI * 2;
+              const radius = 1.5;
+              return (
+                <EnhancedParticle
+                  key={i}
+                  position={[
+                    Math.cos(angle) * radius,
+                    Math.sin(i * 0.5) * 0.3,
+                    Math.sin(angle) * radius,
+                  ]}
+                  color={BUSINESS_COLORS.primary.light}
+                  size={0.03}
+                  behavior="orbit"
+                  speed={0.5}
+                  intensity={0.8}
+                />
+              );
+            })}
+          </>
+        )}
 
-      {/* 负载环形指示器 */}
-      {load > 0 && (
-        <mesh
-          position={[0, type === "core" ? 1.8 : 1.3, 0]}
-          rotation={[Math.PI / 2, 0, 0]}
-        >
-          <ringGeometry
-            args={[0.2, 0.25, 16, 1, 0, (load / 100) * Math.PI * 2]}
-          />
-          <meshBasicMaterial color={loadColor} transparent opacity={0.7} />
-        </mesh>
-      )}
+        {/* 数据流粒子 */}
+        {node.dataFlow > 0.3 && (
+          <>
+            {Array.from({ length: Math.ceil(node.dataFlow * 3) }).map(
+              (_, i) => (
+                <EnhancedParticle
+                  key={`data-${i}`}
+                  position={[
+                    (Math.random() - 0.5) * 2,
+                    0.5 + Math.random() * 0.5,
+                    (Math.random() - 0.5) * 2,
+                  ]}
+                  color={BUSINESS_COLORS.scene3d.particles.data}
+                  size={0.02}
+                  behavior="data"
+                  speed={1 + Math.random()}
+                  intensity={0.6}
+                />
+              ),
+            )}
+          </>
+        )}
+      </group>
+    );
+  },
+);
 
-      {/* 环绕粒子 */}
-      {type === "core" && (
-        <>
-          {Array.from({ length: 8 }).map((_, i) => {
-            const angle = (i / 8) * Math.PI * 2;
-            const radius = 1.5;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            return (
-              <AnimatedParticle
-                key={i}
-                position={[x, 0, z]}
-                color={BUSINESS_COLORS.primary.blue}
-                speed={0.5}
-                size={0.025}
-                pulseIntensity={0.3}
-              />
-            );
-          })}
-        </>
-      )}
+// 动态安全防护罩系统
+const DynamicSecurityShield = React.memo(
+  ({
+    config,
+    threatEvents = [],
+  }: {
+    config: SecurityShieldConfig;
+    threatEvents?: ThreatEvent[];
+  }) => {
+    const shieldRef = useRef<THREE.Group>(null);
+    const innerShieldRef = useRef<THREE.Mesh>(null);
+    const outerShieldRef = useRef<THREE.Mesh>(null);
 
-      {/* 数据流效果 */}
-      {connections > 0 && status === "online" && (
-        <>
-          {Array.from({ length: Math.min(connections, 3) }).map((_, i) => {
-            const angle = (i / 3) * Math.PI * 2;
-            const radius = 1.2;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            return (
-              <AnimatedParticle
-                key={`flow-${i}`}
-                position={[x, 0.5, z]}
-                color={BUSINESS_COLORS.primary.lightBlue}
-                speed={1 + i * 0.3}
-                size={0.015}
-                opacity={0.6}
-                pulseIntensity={0.5}
-              />
-            );
-          })}
-        </>
-      )}
-    </group>
-  );
-}
+    const activeThreatCount = threatEvents.filter((t) => t.active).length;
+    const shieldIntensity = Math.max(
+      0.1,
+      config.strength - activeThreatCount * 0.1,
+    );
 
-// 安全防护罩组件 - 增强版本
-function EnhancedSecurityShield() {
-  const shieldRef = useRef<THREE.Mesh>(null);
-  const innerShieldRef = useRef<THREE.Mesh>(null);
+    useFrame((state) => {
+      if (!shieldRef.current) return;
 
-  useFrame((state) => {
-    if (shieldRef.current) {
-      shieldRef.current.rotation.y = state.clock.elapsedTime * 0.1;
-      shieldRef.current.material.opacity =
-        0.1 + Math.sin(state.clock.elapsedTime * 2) * 0.05;
-    }
+      const time = state.clock.elapsedTime;
 
-    if (innerShieldRef.current) {
-      innerShieldRef.current.rotation.y = -state.clock.elapsedTime * 0.15;
-      innerShieldRef.current.material.opacity =
-        0.05 + Math.sin(state.clock.elapsedTime * 3) * 0.03;
-    }
-  });
+      // 主体旋转
+      shieldRef.current.rotation.y = time * 0.1;
 
-  return (
-    <group>
-      {/* 外层防护罩 */}
-      <mesh ref={shieldRef} position={[0, 1, 0]}>
-        <sphereGeometry args={[4.5, 32, 32]} />
-        <meshBasicMaterial
-          color={BUSINESS_COLORS.primary.blue}
-          transparent
-          opacity={0.1}
-          side={THREE.DoubleSide}
-          wireframe={true}
-        />
-      </mesh>
+      // 根据威胁调整效果
+      if (
+        innerShieldRef.current &&
+        innerShieldRef.current.material instanceof THREE.MeshBasicMaterial
+      ) {
+        innerShieldRef.current.material.opacity =
+          shieldIntensity * (0.1 + Math.sin(time * 2) * 0.05);
+      }
 
-      {/* 内层防护罩 */}
-      <mesh ref={innerShieldRef} position={[0, 1, 0]}>
-        <sphereGeometry args={[3.8, 24, 24]} />
-        <meshBasicMaterial
-          color={BUSINESS_COLORS.primary.lightBlue}
-          transparent
-          opacity={0.05}
-          side={THREE.DoubleSide}
-          wireframe={true}
-        />
-      </mesh>
+      if (
+        outerShieldRef.current &&
+        outerShieldRef.current.material instanceof THREE.MeshBasicMaterial
+      ) {
+        outerShieldRef.current.material.opacity =
+          shieldIntensity * (0.05 + Math.sin(time * 3) * 0.03);
+      }
 
-      {/* 防护节点 */}
-      {Array.from({ length: 12 }).map((_, i) => {
-        const phi = Math.acos(-1 + (2 * i) / 12);
-        const theta = Math.sqrt(12 * Math.PI) * phi;
-        const radius = 4.5;
-
-        return (
-          <AnimatedParticle
-            key={i}
-            position={[
-              radius * Math.cos(theta) * Math.sin(phi),
-              radius * Math.cos(phi) + 1,
-              radius * Math.sin(theta) * Math.sin(phi),
-            ]}
-            color={BUSINESS_COLORS.primary.blue}
-            speed={0.3}
-            size={0.03}
-            opacity={0.8}
-            pulseIntensity={0.4}
-          />
-        );
-      })}
-    </group>
-  );
-}
-
-// 扫描波效果 - 增强版本
-function EnhancedScanWave() {
-  const waveRefs = useRef<THREE.Mesh[]>([]);
-
-  useFrame((state) => {
-    waveRefs.current.forEach((wave, index) => {
-      if (wave) {
-        const offset = index * 0.5;
-        const scale =
-          1 + Math.sin(state.clock.elapsedTime * 1.5 + offset) * 0.8;
-        wave.scale.setScalar(scale);
-
-        if (wave.material instanceof THREE.MeshBasicMaterial) {
-          wave.material.opacity = Math.max(0, 0.4 - (scale - 1) * 0.6);
-        }
+      // 威胁响应
+      if (activeThreatCount > 0) {
+        const pulseIntensity = 1 + Math.sin(time * 6) * 0.3;
+        shieldRef.current.scale.setScalar(pulseIntensity);
+      } else {
+        shieldRef.current.scale.setScalar(1);
       }
     });
-  });
 
-  return (
-    <group>
-      {Array.from({ length: 3 }).map((_, i) => (
-        <mesh
-          key={i}
-          ref={(el) => {
-            if (el) waveRefs.current[i] = el;
-          }}
-          position={[0, 0.1 + i * 0.05, 0]}
-          rotation={[Math.PI / 2, 0, 0]}
-        >
-          <ringGeometry args={[2, 2.3, 32]} />
+    if (!config.enabled) return null;
+
+    return (
+      <group ref={shieldRef}>
+        {/* 内层防护罩 */}
+        <mesh ref={innerShieldRef} position={[0, 1, 0]}>
+          <sphereGeometry args={[4, 32, 32]} />
           <meshBasicMaterial
-            color={BUSINESS_COLORS.primary.lightBlue}
+            color={
+              activeThreatCount > 0
+                ? BUSINESS_COLORS.threat.high
+                : BUSINESS_COLORS.primary.main
+            }
             transparent
-            opacity={0.3}
+            opacity={0.1}
             side={THREE.DoubleSide}
+            wireframe
           />
         </mesh>
-      ))}
-    </group>
-  );
-}
 
-// 主要的商务风格3D网络安全模型 - 增强版本
-export function BusinessSecurityModel({
-  interactive = true,
-  showTraffic = true,
-  threatSimulation = false,
-  modelComplexity = "high",
-}: {
-  interactive?: boolean;
-  showTraffic?: boolean;
-  threatSimulation?: boolean;
-  modelComplexity?: "low" | "medium" | "high";
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-  const { camera } = useThree();
-  const [threatActive, setThreatActive] = useState(false);
-  const [networkActivity, setNetworkActivity] = useState(0.5);
+        {/* 外层防护罩 */}
+        <mesh ref={outerShieldRef} position={[0, 1, 0]}>
+          <sphereGeometry args={[5, 24, 24]} />
+          <meshBasicMaterial
+            color={
+              activeThreatCount > 0
+                ? BUSINESS_COLORS.threat.critical
+                : BUSINESS_COLORS.primary.light
+            }
+            transparent
+            opacity={0.05}
+            side={THREE.DoubleSide}
+            wireframe
+          />
+        </mesh>
 
-  // 模拟威胁检测
-  useEffect(() => {
-    if (threatSimulation) {
-      const interval = setInterval(() => {
-        setThreatActive(Math.random() > 0.8);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [threatSimulation]);
+        {/* 防护节点 */}
+        {Array.from({ length: 12 }).map((_, i) => {
+          const phi = Math.acos(-1 + (2 * i) / 12);
+          const theta = Math.sqrt(12 * Math.PI) * phi;
+          const radius = 4.2;
 
-  // 网络活动模拟
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNetworkActivity(Math.random() * 0.6 + 0.2);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
+          return (
+            <EnhancedParticle
+              key={i}
+              position={[
+                radius * Math.cos(theta) * Math.sin(phi),
+                radius * Math.cos(phi) + 1,
+                radius * Math.sin(theta) * Math.sin(phi),
+              ]}
+              color={
+                activeThreatCount > 0
+                  ? BUSINESS_COLORS.threat.medium
+                  : BUSINESS_COLORS.primary.main
+              }
+              size={0.04}
+              behavior="pulse"
+              speed={activeThreatCount > 0 ? 2 : 0.8}
+              intensity={shieldIntensity}
+            />
+          );
+        })}
 
-  // 缓慢旋转动画
-  useFrame((state) => {
-    if (groupRef.current && interactive) {
-      groupRef.current.rotation.y =
-        Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
-    }
-  });
+        {/* 防护波纹 */}
+        {config.activeDefenses.map((defense, i) => (
+          <mesh
+            key={defense}
+            position={[0, 1, 0]}
+            rotation={[Math.PI / 2, 0, (i * Math.PI) / 4]}
+          >
+            <ringGeometry args={[3 + i * 0.5, 3.2 + i * 0.5, 32]} />
+            <meshBasicMaterial
+              color={BUSINESS_COLORS.status.success}
+              transparent
+              opacity={0.3 * shieldIntensity}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        ))}
+      </group>
+    );
+  },
+);
 
-  // 网络节点位置和状态
-  const networkNodes = useMemo(() => {
-    const baseNodes = [
-      {
-        position: [0, 0, 0] as [number, number, number],
-        type: "core",
-        label: "核心服务器",
-        status: "online" as const,
-        threat: threatActive,
-        load: 45 + Math.random() * 20,
-        connections: 4,
-      },
-      {
-        position: [2, 1, 2] as [number, number, number],
-        type: "server",
-        label: "应用服务器",
-        status: "online" as const,
-        load: 65 + Math.random() * 15,
-        connections: 2,
-      },
-      {
-        position: [-2, 1, 2] as [number, number, number],
-        type: "database",
-        label: "数据库集群",
-        status: "online" as const,
-        load: 35 + Math.random() * 25,
-        connections: 3,
-      },
-      {
-        position: [2, 1, -2] as [number, number, number],
-        type: "server",
-        label: "Web服务器",
-        status: "online" as const,
-        load: 50 + Math.random() * 30,
-        connections: 2,
-      },
-      {
-        position: [-2, 1, -2] as [number, number, number],
-        type: "server",
-        label: "文件服务器",
-        status: "warning" as const,
-        load: 80 + Math.random() * 15,
-        connections: 1,
-      },
-      {
-        position: [0, 2, 3] as [number, number, number],
-        type: "firewall",
-        label: "防火墙集群",
-        status: "online" as const,
-        load: 25 + Math.random() * 20,
-        connections: 4,
-      },
-      {
-        position: [3, 0.5, 0] as [number, number, number],
-        type: "endpoint",
-        label: "终端设备群A",
-        status: "online" as const,
-        load: 20 + Math.random() * 15,
-        connections: 1,
-      },
-      {
-        position: [-3, 0.5, 0] as [number, number, number],
-        type: "endpoint",
-        label: "终端设备群B",
-        status: "online" as const,
-        load: 15 + Math.random() * 20,
-        connections: 1,
-      },
-    ];
+// 威胁可视化系统
+const ThreatVisualization = React.memo(
+  ({
+    threats,
+    showTrails = true,
+  }: {
+    threats: ThreatEvent[];
+    showTrails?: boolean;
+  }) => {
+    const groupRef = useRef<THREE.Group>(null);
 
-    // 根据复杂度调整节点数量
-    if (modelComplexity === "high") {
-      baseNodes.push(
+    return (
+      <group ref={groupRef}>
+        {threats.map((threat) => (
+          <group key={threat.id}>
+            {/* 威胁源指示器 */}
+            <Cone args={[0.15, 0.3]} position={threat.source}>
+              <meshBasicMaterial
+                color={BUSINESS_COLORS.threat[threat.severity]}
+                emissive={BUSINESS_COLORS.threat[threat.severity]}
+                emissiveIntensity={threat.active ? 0.6 : 0.2}
+              />
+            </Cone>
+
+            {/* 威胁目标指示器 */}
+            <Sphere args={[0.1]} position={threat.target}>
+              <meshBasicMaterial
+                color={BUSINESS_COLORS.threat[threat.severity]}
+                emissive={BUSINESS_COLORS.threat[threat.severity]}
+                emissiveIntensity={threat.active ? 0.8 : 0.3}
+              />
+            </Sphere>
+
+            {/* 威胁攻击路径 */}
+            {threat.active && (
+              <AdvancedDataFlow
+                start={threat.source}
+                end={threat.target}
+                color={BUSINESS_COLORS.threat[threat.severity]}
+                speed={2}
+                intensity={1}
+                flowType="threat"
+                particleCount={threat.severity === "critical" ? 5 : 3}
+              />
+            )}
+
+            {/* 威胁影响范围 */}
+            {threat.active && threat.severity === "critical" && (
+              <Sphere args={[1.5]} position={threat.target}>
+                <meshBasicMaterial
+                  color={BUSINESS_COLORS.threat.critical}
+                  transparent
+                  opacity={0.1}
+                  side={THREE.DoubleSide}
+                />
+              </Sphere>
+            )}
+          </group>
+        ))}
+      </group>
+    );
+  },
+);
+
+// 主网络安全模型组件
+export const BusinessSecurityModel = React.memo(
+  ({
+    nodes = [],
+    threatEvents = [],
+    shieldConfig = {
+      enabled: true,
+      strength: 1,
+      coverage: 1,
+      activeDefenses: [],
+    },
+    showDataFlows = true,
+    showThreatVisualization = true,
+    interactionMode = "view",
+    onNodeSelect,
+  }: {
+    nodes?: NetworkNode[];
+    threatEvents?: ThreatEvent[];
+    shieldConfig?: SecurityShieldConfig;
+    showDataFlows?: boolean;
+    showThreatVisualization?: boolean;
+    interactionMode?: "view" | "edit" | "monitor";
+    onNodeSelect?: (nodeId: string) => void;
+  }) => {
+    const groupRef = useRef<THREE.Group>(null);
+    const { camera, scene } = useThree();
+    const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
+
+    // 默认节点配置
+    const defaultNodes: NetworkNode[] = useMemo(
+      () => [
         {
-          position: [0, -1, -3] as [number, number, number],
-          type: "router",
-          label: "边界路由器",
-          status: "online" as const,
-          load: 30 + Math.random() * 20,
-          connections: 3,
+          id: "core-01",
+          position: [0, 0, 0],
+          type: "core",
+          status: "online",
+          load: 45,
+          connections: ["fw-01", "srv-01", "srv-02", "db-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.8,
         },
         {
-          position: [1.5, 2.5, 1.5] as [number, number, number],
+          id: "fw-01",
+          position: [0, 2, 3],
+          type: "firewall",
+          status: "online",
+          load: 32,
+          connections: ["core-01", "ep-01", "ep-02", "router-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.6,
+        },
+        {
+          id: "srv-01",
+          position: [3, 1, 1],
           type: "server",
-          label: "备份服务器",
-          status: "online" as const,
-          load: 10 + Math.random() * 15,
-          connections: 1,
+          status: "online",
+          load: 78,
+          connections: ["core-01", "db-01"],
+          threatLevel: "low",
+          lastActivity: new Date(),
+          dataFlow: 0.9,
         },
-      );
-    }
+        {
+          id: "srv-02",
+          position: [-3, 1, 1],
+          type: "server",
+          status: "warning",
+          load: 89,
+          connections: ["core-01", "db-01"],
+          threatLevel: "medium",
+          lastActivity: new Date(),
+          dataFlow: 0.7,
+        },
+        {
+          id: "db-01",
+          position: [0, -1, -3],
+          type: "database",
+          status: "online",
+          load: 34,
+          connections: ["srv-01", "srv-02", "core-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.5,
+        },
+        {
+          id: "router-01",
+          position: [2, 0, 4],
+          type: "router",
+          status: "online",
+          load: 56,
+          connections: ["fw-01", "ep-01", "ep-02"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.4,
+        },
+        {
+          id: "ep-01",
+          position: [4, 0, 2],
+          type: "endpoint",
+          status: "online",
+          load: 23,
+          connections: ["router-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.3,
+        },
+        {
+          id: "ep-02",
+          position: [-4, 0, 2],
+          type: "endpoint",
+          status: "online",
+          load: 18,
+          connections: ["router-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.2,
+        },
+        {
+          id: "cloud-01",
+          position: [0, 3, -2],
+          type: "cloud",
+          status: "online",
+          load: 12,
+          connections: ["core-01"],
+          threatLevel: "safe",
+          lastActivity: new Date(),
+          dataFlow: 0.4,
+        },
+      ],
+      [],
+    );
 
-    return baseNodes;
-  }, [threatActive, modelComplexity]);
+    const activeNodes = nodes.length > 0 ? nodes : defaultNodes;
 
-  // 数据流连接
-  const dataFlows = useMemo(() => {
-    const baseFlows = [
-      {
-        start: [0, 0, 0] as [number, number, number],
-        end: [2, 1, 2] as [number, number, number],
-        color: BUSINESS_COLORS.primary.lightBlue,
-        speed: 1.5 * networkActivity,
-      },
-      {
-        start: [0, 0, 0] as [number, number, number],
-        end: [-2, 1, 2] as [number, number, number],
-        color: BUSINESS_COLORS.primary.blue,
-        speed: 2 * networkActivity,
-      },
-      {
-        start: [0, 2, 3] as [number, number, number],
-        end: [3, 0.5, 0] as [number, number, number],
-        color: BUSINESS_COLORS.status.success,
-        speed: 1 * networkActivity,
-      },
-      {
-        start: [0, 2, 3] as [number, number, number],
-        end: [-3, 0.5, 0] as [number, number, number],
-        color: BUSINESS_COLORS.status.info,
-        speed: 1.2 * networkActivity,
-      },
-    ];
+    // 生成连接线
+    const connections = useMemo(() => {
+      const result: Array<{
+        from: [number, number, number];
+        to: [number, number, number];
+        encrypted: boolean;
+      }> = [];
 
-    if (modelComplexity === "high") {
-      baseFlows.push({
-        start: [0, 0, 0] as [number, number, number],
-        end: [0, -1, -3] as [number, number, number],
-        color: BUSINESS_COLORS.primary.navy,
-        speed: 0.8 * networkActivity,
+      activeNodes.forEach((node) => {
+        node.connections.forEach((connectionId) => {
+          const targetNode = activeNodes.find((n) => n.id === connectionId);
+          if (targetNode) {
+            result.push({
+              from: node.position,
+              to: targetNode.position,
+              encrypted:
+                node.type === "firewall" || targetNode.type === "firewall",
+            });
+          }
+        });
       });
-    }
 
-    return baseFlows;
-  }, [networkActivity, modelComplexity]);
+      return result;
+    }, [activeNodes]);
 
-  // 连接线
-  const connections = useMemo(() => {
-    const baseConnections = [
-      { from: [0, 0, 0], to: [2, 1, 2] },
-      { from: [0, 0, 0], to: [-2, 1, 2] },
-      { from: [0, 0, 0], to: [2, 1, -2] },
-      { from: [0, 0, 0], to: [-2, 1, -2] },
-      { from: [0, 0, 0], to: [0, 2, 3] },
-      { from: [0, 2, 3], to: [3, 0.5, 0] },
-      { from: [0, 2, 3], to: [-3, 0.5, 0] },
-    ];
+    // 处理节点选择
+    const handleNodeSelect = useCallback(
+      (nodeId: string) => {
+        if (interactionMode === "view") return;
 
-    if (modelComplexity === "high") {
-      baseConnections.push(
-        { from: [0, 0, 0], to: [0, -1, -3] },
-        { from: [0, -1, -3], to: [3, 0.5, 0] },
-        { from: [0, -1, -3], to: [-3, 0.5, 0] },
-        { from: [2, 1, 2], to: [1.5, 2.5, 1.5] },
-      );
-    }
+        setSelectedNodes((prev) => {
+          const newSelection = prev.includes(nodeId)
+            ? prev.filter((id) => id !== nodeId)
+            : [...prev, nodeId];
 
-    return baseConnections;
-  }, [modelComplexity]);
+          onNodeSelect?.(nodeId);
+          return newSelection;
+        });
+      },
+      [interactionMode, onNodeSelect],
+    );
 
-  return (
-    <group ref={groupRef} position={[0, -1, 0]}>
-      {/* 环境光和定向光 */}
-      <ambientLight intensity={0.4} color="#ffffff" />
-      <directionalLight
-        position={[10, 10, 5]}
-        intensity={0.8}
-        color="#ffffff"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-      />
-      <pointLight
-        position={[0, 5, 0]}
-        intensity={0.5}
-        color={BUSINESS_COLORS.primary.blue}
-        distance={20}
-      />
+    // 场景动画
+    useFrame((state) => {
+      if (groupRef.current) {
+        groupRef.current.rotation.y =
+          Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
+      }
+    });
 
-      {/* 额外的动态光源 */}
-      <pointLight
-        position={[5, 3, 5]}
-        intensity={0.3 + Math.sin(Date.now() * 0.002) * 0.1}
-        color={BUSINESS_COLORS.primary.lightBlue}
-        distance={15}
-      />
-
-      {/* 网络连接线 */}
-      {connections.map((connection, index) => (
-        <EnhancedLineConnection
-          key={index}
-          start={connection.from}
-          end={connection.to}
-          color={BUSINESS_COLORS.primary.lightBlue}
-          animated={showTraffic}
-          intensity={networkActivity}
+    return (
+      <group ref={groupRef} position={[0, -1, 0]}>
+        {/* 环境光照 */}
+        <ambientLight intensity={0.4} color="#ffffff" />
+        <directionalLight
+          position={[10, 10, 5]}
+          intensity={0.8}
+          color="#ffffff"
+          castShadow
+          shadow-mapSize-width={4096}
+          shadow-mapSize-height={4096}
         />
-      ))}
+        <pointLight
+          position={[0, 8, 0]}
+          intensity={0.6}
+          color={BUSINESS_COLORS.scene3d.lighting.point}
+          distance={25}
+        />
 
-      {/* 数据流粒子 */}
-      {showTraffic &&
-        dataFlows.map((flow, index) => (
-          <EnhancedDataFlow
+        {/* 动态彩色光源 */}
+        <pointLight
+          position={[5, 3, 5]}
+          intensity={0.3}
+          color={BUSINESS_COLORS.scene3d.lighting.accent}
+          distance={15}
+        />
+
+        {/* ��络连接线 */}
+        {connections.map((connection, index) => (
+          <AdvancedDataFlow
             key={index}
-            start={flow.start}
-            end={flow.end}
-            color={flow.color}
-            speed={flow.speed}
-            particleCount={modelComplexity === "high" ? 3 : 2}
+            start={connection.from}
+            end={connection.to}
+            color={
+              connection.encrypted
+                ? BUSINESS_COLORS.status.success
+                : BUSINESS_COLORS.primary.light
+            }
+            speed={0.8}
+            intensity={0.6}
+            flowType={connection.encrypted ? "encrypted" : "standard"}
+            particleCount={2}
           />
         ))}
 
-      {/* 网络节点 */}
-      {networkNodes.map((node, index) => (
-        <EnhancedNetworkNode
-          key={index}
-          position={node.position}
-          type={node.type}
-          label={node.label}
-          status={node.status}
-          threat={node.threat}
-          load={node.load}
-          connections={node.connections}
-        />
-      ))}
-
-      {/* 安全防护罩 */}
-      <EnhancedSecurityShield />
-
-      {/* 扫描波效果 */}
-      <EnhancedScanWave />
-
-      {/* 环境粒子效果 */}
-      {modelComplexity !== "low" &&
-        Array.from({ length: modelComplexity === "high" ? 30 : 20 }).map(
-          (_, i) => {
-            const x = (Math.random() - 0.5) * 20;
-            const y = (Math.random() - 0.5) * 8;
-            const z = (Math.random() - 0.5) * 20;
+        {/* 数据流可视化 */}
+        {showDataFlows &&
+          activeNodes.map((node, index) => {
+            const targetNode = activeNodes[(index + 1) % activeNodes.length];
             return (
-              <AnimatedParticle
-                key={i}
-                position={[x, y, z]}
-                color={BUSINESS_COLORS.primary.blue}
-                speed={0.2 + Math.random() * 0.3}
-                size={0.01 + Math.random() * 0.01}
-                opacity={0.3 + Math.random() * 0.3}
-                pulseIntensity={0.2}
+              <AdvancedDataFlow
+                key={`flow-${node.id}`}
+                start={node.position}
+                end={targetNode.position}
+                color={BUSINESS_COLORS.scene3d.particles.data}
+                speed={1.5}
+                intensity={node.dataFlow}
+                flowType="standard"
+                particleCount={Math.ceil(node.dataFlow * 3)}
               />
             );
-          },
+          })}
+
+        {/* 网络节点 */}
+        {activeNodes.map((node) => (
+          <AdvancedNetworkNode
+            key={node.id}
+            node={node}
+            isSelected={selectedNodes.includes(node.id)}
+            onSelect={handleNodeSelect}
+            threatEvents={threatEvents}
+          />
+        ))}
+
+        {/* 动态安全防护罩 */}
+        <DynamicSecurityShield
+          config={shieldConfig}
+          threatEvents={threatEvents}
+        />
+
+        {/* 威胁可视化 */}
+        {showThreatVisualization && (
+          <ThreatVisualization threats={threatEvents} showTrails={true} />
         )}
 
-      {/* 威胁检测效果 */}
-      {threatActive && (
-        <group>
-          {/* 威胁警告光束 */}
-          <mesh position={[0, 5, 0]} rotation={[Math.PI, 0, 0]}>
-            <coneGeometry args={[0.2, 10, 8]} />
-            <meshBasicMaterial
-              color={BUSINESS_COLORS.status.error}
-              transparent
-              opacity={0.3}
-            />
-          </mesh>
-
-          {/* 威胁扫描环 */}
-          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[5, 5.5, 32]} />
-            <meshBasicMaterial
-              color={BUSINESS_COLORS.status.error}
-              transparent
-              opacity={0.6}
-            />
-          </mesh>
-        </group>
-      )}
-
-      {/* 雾效 */}
-      <fog
-        attach="fog"
-        args={[BUSINESS_COLORS.ui.background.secondary, 8, 30]}
-      />
-    </group>
-  );
-}
-
-// 简化的商务风格Shield组件
-export function BusinessShield({
-  animated = true,
-  status = "protected",
-}: {
-  animated?: boolean;
-  status?: "protected" | "vulnerable" | "scanning";
-}) {
-  const meshRef = useRef<THREE.Group>(null);
-  const [intensity, setIntensity] = useState(1);
-
-  const statusColors = {
-    protected: BUSINESS_COLORS.status.success,
-    vulnerable: BUSINESS_COLORS.status.error,
-    scanning: BUSINESS_COLORS.status.warning,
-  };
-
-  useFrame((state) => {
-    if (meshRef.current && animated) {
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.2;
-
-      if (status === "scanning") {
-        setIntensity(0.5 + Math.sin(state.clock.elapsedTime * 4) * 0.5);
-      } else {
-        setIntensity(1);
-      }
-    }
-  });
-
-  return (
-    <group ref={meshRef}>
-      <Sphere args={[2, 32, 32]}>
-        <meshStandardMaterial
-          color={statusColors[status]}
-          transparent
-          opacity={0.3 * intensity}
-          emissive={statusColors[status]}
-          emissiveIntensity={0.1 * intensity}
-        />
-      </Sphere>
-
-      {/* 防护层 */}
-      <Sphere args={[2.2, 16, 16]}>
-        <meshBasicMaterial
-          color={statusColors[status]}
-          transparent
-          opacity={0.1 * intensity}
-          wireframe
-        />
-      </Sphere>
-
-      {/* 中心核心 */}
-      <Sphere args={[0.5]}>
-        <meshStandardMaterial
-          color={statusColors[status]}
-          emissive={statusColors[status]}
-          emissiveIntensity={0.5 * intensity}
-        />
-      </Sphere>
-    </group>
-  );
-}
-
-// 网络拓扑组件
-export function BusinessNetworkTopology({
-  scale = 1,
-  showLabels = true,
-}: {
-  scale?: number;
-  showLabels?: boolean;
-}) {
-  const groupRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = state.clock.elapsedTime * 0.05;
-    }
-  });
-
-  return (
-    <group ref={groupRef} scale={scale}>
-      {/* 核心交换机 */}
-      <EnhancedNetworkNode
-        position={[0, 0, 0]}
-        type="core"
-        label="核心交换机"
-        status="online"
-        load={45}
-        connections={6}
-      />
-
-      {/* 分布式服务器 */}
-      {Array.from({ length: 6 }).map((_, i) => {
-        const angle = (i / 6) * Math.PI * 2;
-        const radius = 3;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-
-        return (
-          <EnhancedNetworkNode
-            key={i}
-            position={[x, 0, z]}
-            type="server"
-            label={`服务器 ${i + 1}`}
-            status="online"
-            load={30 + Math.random() * 40}
-            connections={2}
+        {/* 环境粒子效果 */}
+        {Array.from({ length: 25 }).map((_, i) => (
+          <EnhancedParticle
+            key={`ambient-${i}`}
+            position={[
+              (Math.random() - 0.5) * 20,
+              (Math.random() - 0.5) * 10,
+              (Math.random() - 0.5) * 20,
+            ]}
+            color={BUSINESS_COLORS.scene3d.particles.default}
+            size={0.01 + Math.random() * 0.01}
+            behavior="float"
+            speed={0.3 + Math.random() * 0.2}
+            intensity={0.4 + Math.random() * 0.3}
           />
-        );
-      })}
+        ))}
 
-      {/* 连接线 */}
-      {Array.from({ length: 6 }).map((_, i) => {
-        const angle = (i / 6) * Math.PI * 2;
-        const radius = 3;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
+        {/* 场景雾效 */}
+        <fog
+          attach="fog"
+          args={[BUSINESS_COLORS.scene3d.background.primary, 10, 40]}
+        />
+      </group>
+    );
+  },
+);
 
-        return (
-          <EnhancedLineConnection
-            key={i}
-            start={[0, 0, 0]}
-            end={[x, 0, z]}
-            color={BUSINESS_COLORS.primary.blue}
-            animated={true}
-          />
-        );
-      })}
+// 导出其他组件
+export const BusinessShield = React.memo(
+  ({ status = "protected" }: { status?: string }) => (
+    <DynamicSecurityShield
+      config={{
+        enabled: true,
+        strength: 1,
+        coverage: 1,
+        activeDefenses: ["firewall", "ids", "antivirus"],
+      }}
+      threatEvents={[]}
+    />
+  ),
+);
+
+export const BusinessNetworkTopology = React.memo(
+  ({ scale = 1 }: { scale?: number }) => (
+    <group scale={scale}>
+      <BusinessSecurityModel />
     </group>
-  );
-}
+  ),
+);
+
+export default BusinessSecurityModel;
