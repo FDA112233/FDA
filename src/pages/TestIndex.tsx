@@ -11,10 +11,13 @@ export default function TestIndex() {
     >
       <div className="max-w-4xl mx-auto">
         <div
-          className="bg-white rounded-lg p-8 shadow-lg"
+          className="rounded-xl p-8 backdrop-blur-md border border-blue-200/30"
           style={{
-            backgroundColor: BUSINESS_COLORS.ui.background.panel,
-            boxShadow: BUSINESS_COLORS.shadows.lg,
+            background: `linear-gradient(135deg,
+              rgba(var(--brand-lightest), 0.1) 0%,
+              rgba(var(--brand-accent), 0.05) 50%,
+              rgba(var(--brand-light), 0.1) 100%)`,
+            boxShadow: `0 20px 40px rgba(var(--brand-primary), 0.15), ${BUSINESS_COLORS.shadows.lg}`,
           }}
         >
           <h1
