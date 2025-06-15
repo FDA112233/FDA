@@ -352,22 +352,55 @@
 @layer components {
   /* 统一的组件样式 */
 
-  /* 卡片组件基础样式 */
+  /* 卡片组件基础样式 - 多彩渐变设计 */
   .card {
-    background-color: rgb(var(--background-panel));
+    background: var(--background-panel);
     border: 1px solid rgb(var(--border-primary));
     border-radius: var(--radius-lg);
     box-shadow:
       0 1px 3px 0 rgba(var(--shadow-color), var(--shadow-opacity-light)),
-      0 1px 2px 0 rgba(var(--shadow-color), 0.06);
+      0 1px 2px 0 rgba(var(--shadow-color), 0.06),
+      0 0 0 1px rgba(var(--brand-primary), 0.05);
     transition: all var(--duration-normal) var(--easing-ease-in-out);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      rgba(var(--brand-accent), 0.02) 0%,
+      rgba(var(--brand-primary), 0.01) 50%,
+      rgba(var(--brand-light), 0.02) 100%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--easing-ease-in-out);
+    pointer-events: none;
   }
 
   .card:hover {
     box-shadow:
-      0 4px 6px -1px rgba(var(--shadow-color), var(--shadow-opacity-light)),
-      0 2px 4px -1px rgba(var(--shadow-color), 0.06);
-    transform: translateY(-1px);
+      0 8px 25px -5px rgba(var(--shadow-color), var(--shadow-opacity-medium)),
+      0 4px 12px -2px rgba(var(--shadow-color), 0.08),
+      0 0 0 1px rgba(var(--brand-primary), 0.1),
+      0 0 20px rgba(var(--brand-primary), 0.05);
+    transform: translateY(-2px) scale(1.01);
+    border-color: rgba(var(--brand-primary), 0.2);
+  }
+
+  .card:hover::before {
+    opacity: 1;
+  }
+
+  .card:active {
+    transform: translateY(-1px) scale(1.005);
+    transition-duration: var(--duration-fast);
   }
 
   /* 卡片变体 */
