@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { X, CheckCircle, AlertTriangle, Info, XCircle } from "lucide-react";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
 interface ToastProps {
   id: string;
@@ -18,11 +19,31 @@ const toastIcons = {
   info: Info,
 };
 
-const toastStyles = {
-  success: "border-neon-green bg-neon-green/10 text-neon-green",
-  error: "border-threat-critical bg-threat-critical/10 text-threat-critical",
-  warning: "border-threat-medium bg-threat-medium/10 text-threat-medium",
-  info: "border-neon-blue bg-neon-blue/10 text-neon-blue",
+const toastConfigs = {
+  success: {
+    mainColor: BUSINESS_COLORS.status.success,
+    accentColor: BUSINESS_COLORS.threat.safe,
+    gradient: `linear-gradient(135deg, ${BUSINESS_COLORS.status.success}20 0%, ${BUSINESS_COLORS.threat.safe}10 100%)`,
+    glowColor: BUSINESS_COLORS.status.success,
+  },
+  error: {
+    mainColor: BUSINESS_COLORS.status.error,
+    accentColor: BUSINESS_COLORS.threat.critical,
+    gradient: `linear-gradient(135deg, ${BUSINESS_COLORS.status.error}20 0%, ${BUSINESS_COLORS.threat.critical}10 100%)`,
+    glowColor: BUSINESS_COLORS.status.error,
+  },
+  warning: {
+    mainColor: BUSINESS_COLORS.status.warning,
+    accentColor: BUSINESS_COLORS.threat.medium,
+    gradient: `linear-gradient(135deg, ${BUSINESS_COLORS.status.warning}20 0%, ${BUSINESS_COLORS.threat.medium}10 100%)`,
+    glowColor: BUSINESS_COLORS.status.warning,
+  },
+  info: {
+    mainColor: BUSINESS_COLORS.status.info,
+    accentColor: BUSINESS_COLORS.primary.accent,
+    gradient: `linear-gradient(135deg, ${BUSINESS_COLORS.status.info}20 0%, ${BUSINESS_COLORS.primary.accent}10 100%)`,
+    glowColor: BUSINESS_COLORS.status.info,
+  },
 };
 
 export function Toast({
