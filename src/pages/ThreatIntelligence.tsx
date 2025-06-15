@@ -231,7 +231,8 @@ export default function ThreatIntelligence() {
               className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
-                color: "white",
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
             >
@@ -591,7 +592,7 @@ export default function ThreatIntelligence() {
               }}
             >
               <Filter className="w-4 h-4" />
-              <span className="text-sm">筛选</span>
+              <span className="text-sm">筛���</span>
             </button>
           </div>
         }

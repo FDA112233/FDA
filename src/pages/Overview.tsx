@@ -202,7 +202,7 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* 系统优势 */}
+      {/* 系统���势 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         <InfoCard
           title="为什么选择 CyberGuard？"
@@ -293,7 +293,8 @@ export default function Overview() {
               className="px-8 py-3 rounded-lg font-medium transition-all duration-200"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
-                color: "white",
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
             >

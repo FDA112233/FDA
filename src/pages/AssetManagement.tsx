@@ -73,7 +73,7 @@ export default function AssetManagement() {
       },
       {
         id: "asset-002",
-        name: "CEO工作站",
+        name: "CEO工��站",
         type: "workstation",
         ip: "192.168.1.205",
         os: "Windows 11 Pro",
@@ -253,7 +253,8 @@ export default function AssetManagement() {
               className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
-                color: "white",
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
             >
@@ -350,7 +351,7 @@ export default function AssetManagement() {
       <BusinessCard className="mb-6">
         <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="flex flex-col md:flex-row gap-4 flex-1">
-            {/* 搜索框 */}
+            {/* 搜���框 */}
             <div className="relative flex-1 max-w-md">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"

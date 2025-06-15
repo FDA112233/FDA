@@ -189,7 +189,8 @@ export default function Reports() {
               className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
-                color: "white",
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
               onMouseEnter={(e) => {
@@ -392,7 +393,7 @@ export default function Reports() {
           },
           {
             key: "name",
-            label: "报告���称",
+            label: "报告名称",
             render: (value, row) => (
               <div>
                 <p className="font-medium text-sm">{value}</p>

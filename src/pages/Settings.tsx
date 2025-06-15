@@ -1004,7 +1004,8 @@ export default function Settings() {
               className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
               style={{
                 backgroundColor: BUSINESS_COLORS.primary.blue,
-                color: "white",
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
             >

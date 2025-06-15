@@ -38,7 +38,7 @@ export default function TestIndex() {
               className="text-sm"
               style={{ color: BUSINESS_COLORS.ui.text.muted }}
             >
-              您已成功登录后台管理界面
+              您��成功登录后台管理界面
             </p>
           </div>
 
@@ -112,7 +112,8 @@ export default function TestIndex() {
             className="px-6 py-2 rounded-lg font-medium transition-all duration-200"
             style={{
               backgroundColor: BUSINESS_COLORS.status.error,
-              color: "white",
+              color: `rgb(var(--brand-lightest))`,
+              textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-1px)";
