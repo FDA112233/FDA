@@ -35,20 +35,50 @@ function MetricCard({
   description,
   isUpdating = false,
 }: MetricCardProps) {
-  const getThreatColor = (level?: string) => {
+  const getThreatStyle = (level?: string) => {
     switch (level) {
       case "critical":
-        return "text-threat-critical border-threat-critical/30 bg-threat-critical/10";
+        return {
+          background: `linear-gradient(135deg, rgba(var(--threat-critical), 0.15) 0%, rgba(var(--error), 0.1) 100%)`,
+          border: `1px solid rgba(var(--threat-critical), 0.4)`,
+          color: `rgb(var(--threat-critical))`,
+          boxShadow: `0 8px 32px rgba(var(--threat-critical), 0.2)`,
+        };
       case "high":
-        return "text-threat-high border-threat-high/30 bg-threat-high/10";
+        return {
+          background: `linear-gradient(135deg, rgba(var(--threat-high), 0.15) 0%, rgba(var(--warning), 0.1) 100%)`,
+          border: `1px solid rgba(var(--threat-high), 0.4)`,
+          color: `rgb(var(--threat-high))`,
+          boxShadow: `0 8px 32px rgba(var(--threat-high), 0.2)`,
+        };
       case "medium":
-        return "text-threat-medium border-threat-medium/30 bg-threat-medium/10";
+        return {
+          background: `linear-gradient(135deg, rgba(var(--threat-medium), 0.15) 0%, rgba(var(--warning), 0.1) 100%)`,
+          border: `1px solid rgba(var(--threat-medium), 0.4)`,
+          color: `rgb(var(--threat-medium))`,
+          boxShadow: `0 8px 32px rgba(var(--threat-medium), 0.2)`,
+        };
       case "low":
-        return "text-threat-low border-threat-low/30 bg-threat-low/10";
+        return {
+          background: `linear-gradient(135deg, rgba(var(--threat-low), 0.15) 0%, rgba(var(--success), 0.1) 100%)`,
+          border: `1px solid rgba(var(--threat-low), 0.4)`,
+          color: `rgb(var(--threat-low))`,
+          boxShadow: `0 8px 32px rgba(var(--threat-low), 0.2)`,
+        };
       case "info":
-        return "text-threat-info border-threat-info/30 bg-threat-info/10";
+        return {
+          background: `linear-gradient(135deg, rgba(var(--info), 0.15) 0%, rgba(var(--brand-accent), 0.1) 100%)`,
+          border: `1px solid rgba(var(--info), 0.4)`,
+          color: `rgb(var(--info))`,
+          boxShadow: `0 8px 32px rgba(var(--info), 0.2)`,
+        };
       default:
-        return "text-neon-blue border-neon-blue/30 bg-neon-blue/10";
+        return {
+          background: BACKEND_COLORS.backgrounds.card,
+          border: BACKEND_COLORS.borders.primary,
+          color: BACKEND_COLORS.text.primary,
+          boxShadow: BACKEND_COLORS.shadows.medium,
+        };
     }
   };
 
