@@ -12,6 +12,7 @@ import {
   useRealTimeData,
   generateThreatMetrics,
 } from "@/hooks/useRealTimeData";
+import { BACKEND_COLORS } from "@/lib/backendTheme";
 
 interface MetricCardProps {
   title: string;
