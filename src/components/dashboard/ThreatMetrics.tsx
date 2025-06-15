@@ -144,9 +144,21 @@ function MetricCard({
             {change !== undefined && (
               <div className="flex items-center space-x-2">
                 {trend === "up" ? (
-                  <TrendingUp className="w-4 h-4 text-threat-critical" />
+                  <TrendingUp
+                    className="w-4 h-4"
+                    style={{
+                      color: `rgb(var(--error))`,
+                      filter: `drop-shadow(0 0 6px rgba(var(--error), 0.6))`,
+                    }}
+                  />
                 ) : (
-                  <TrendingDown className="w-4 h-4 text-neon-green" />
+                  <TrendingDown
+                    className="w-4 h-4"
+                    style={{
+                      color: `rgb(var(--success))`,
+                      filter: `drop-shadow(0 0 6px rgba(var(--success), 0.6))`,
+                    }}
+                  />
                 )}
                 <span
                   className={cn(
