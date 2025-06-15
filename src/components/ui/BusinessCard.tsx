@@ -95,11 +95,11 @@ export function BusinessCard({
     },
     glass: {
       background:
-        "bg-gradient-to-br from-white/60 to-blue-50/40 backdrop-blur-md",
-      border: "border-white/30",
+        "bg-gradient-to-br from-blue-50/60 to-cyan-50/40 backdrop-blur-md",
+      border: "border-blue-200/30",
       shadow: "shadow-lg shadow-blue-500/10",
       hoverShadow:
-        "hover:shadow-xl hover:shadow-blue-500/20 hover:from-white/70 hover:to-blue-50/50",
+        "hover:shadow-xl hover:shadow-blue-500/20 hover:from-blue-50/70 hover:to-cyan-50/50",
     },
   };
 
@@ -136,7 +136,7 @@ export function BusinessCard({
         hoverable && !disabled && "hover:-translate-y-1 hover:scale-[1.02]",
         glow && "ring-2 ring-blue-500/20",
         pulse && "animate-pulse",
-        gradient && "bg-gradient-to-br from-white to-gray-50",
+        gradient && "bg-gradient-to-br from-blue-50 to-cyan-50",
         onClick && !disabled && "cursor-pointer",
         disabled && "opacity-50 cursor-not-allowed",
         loading && "animate-pulse",
