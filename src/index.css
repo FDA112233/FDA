@@ -1082,7 +1082,7 @@
     animation: scale-in var(--duration-normal) var(--easing-ease-out);
   }
 
-  /* 滑入动��� */
+  /* 滑入动画 */
   .slide-in {
     animation: slide-in var(--duration-normal) var(--easing-ease-out);
   }
@@ -1116,9 +1116,116 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
+
+  /* 点击脉冲效果 */
+  .click-pulse {
+    position: relative;
+  }
+
+  .click-pulse:active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(var(--brand-primary), 0.3);
+    transform: translate(-50%, -50%);
+    animation: clickPulse 0.6s ease-out;
+  }
+
+  /* 渐变边框效果 */
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(135deg,
+      rgba(var(--brand-primary), 0.1) 0%,
+      rgba(var(--brand-accent), 0.05) 100%);
+    border: 1px solid transparent;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg,
+      rgba(var(--brand-primary), 0.5) 0%,
+      rgba(var(--brand-accent), 0.3) 50%,
+      rgba(var(--brand-light), 0.5) 100%);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: subtract;
+    z-index: -1;
+  }
+
+  /* 多彩阴影效果 */
+  .colorful-shadow {
+    box-shadow:
+      0 4px 8px rgba(var(--brand-primary), 0.15),
+      0 8px 16px rgba(var(--brand-accent), 0.1),
+      0 16px 32px rgba(var(--brand-light), 0.05);
+  }
+
+  /* 浮动动画效果 */
+  .float-animation {
+    animation: floatUp 3s ease-in-out infinite;
+  }
+
+  .float-animation:nth-child(2n) {
+    animation-delay: 1s;
+  }
+
+  .float-animation:nth-child(3n) {
+    animation-delay: 2s;
+  }
 }
 
-/* 关键帧动画定义 */
+/* 增强的关键帧动画定义 */
+@keyframes clickPulse {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+@keyframes floatUp {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes backgroundShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes progressShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* 原有关键帧动画定义 */
 @keyframes spin {
   from {
     transform: rotate(0deg);
