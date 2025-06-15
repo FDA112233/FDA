@@ -101,7 +101,13 @@ export default function Overview() {
               boxShadow: BUSINESS_COLORS.shadows.xl,
             }}
           >
-            <Shield className="w-10 h-10 text-white" />
+            <Shield
+              className="w-10 h-10"
+              style={{
+                color: `rgb(var(--brand-lightest))`,
+                filter: `drop-shadow(0 0 12px rgba(var(--brand-accent), 0.7))`,
+              }}
+            />
           </div>
         </div>
         <h1
