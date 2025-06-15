@@ -6,7 +6,7 @@
 
 // 核心色彩定义 - 基于深蓝主色调
 const CORE_COLORS = {
-  // 主品牌色系 - 深蓝到浅蓝渐变
+  // ���品牌色系 - 深蓝到浅蓝渐变
   brand: {
     darkest: "#0c1e3a", // 最深蓝 - 背景深色
     dark: "#1e3a8a", // 深蓝 - 主色
@@ -112,7 +112,9 @@ export const BUSINESS_COLORS = {
       primary: CORE_COLORS.neutral.darkest, // 主要文本 - 深色
       secondary: "#475569", // 次要文本 - 中灰
       muted: CORE_COLORS.neutral.light, // 弱化文本 - 浅灰
-      inverse: CORE_COLORS.neutral.white, // 反色文本 - 白色
+      inverse: CORE_COLORS.brand.lightest, // 反色文本 - 浅蓝色替代白色
+      brightPrimary: CORE_COLORS.brand.lightest, // 明亮主色 - 用于替代白色
+      glowAccent: CORE_COLORS.brand.accent, // 发光强调色
       accent: CORE_COLORS.brand.primary, // 强调文本 - 蓝色
       disabled: CORE_COLORS.neutral.lighter, // 禁用文本 - 浅灰
     },
