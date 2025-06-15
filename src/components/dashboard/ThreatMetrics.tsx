@@ -82,12 +82,16 @@ function MetricCard({
     }
   };
 
+  const threatStyle = getThreatStyle(threatLevel);
+
   return (
     <div
-      className={cn(
-        "metric-card border-2 transition-all duration-300 hover:scale-105",
-        getThreatColor(threatLevel),
-      )}
+      className="p-6 rounded-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:-translate-y-1 relative overflow-hidden"
+      style={{
+        background: threatStyle.background,
+        border: threatStyle.border,
+        boxShadow: threatStyle.boxShadow,
+      }}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
