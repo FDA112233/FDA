@@ -281,21 +281,70 @@ export function ThreatMetrics() {
   ];
 
   return (
-    <div className="space-y-4">
-      {/* 控制按钮 */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">实时威胁监控</h2>
+    <div
+      className="space-y-6 p-6 rounded-xl backdrop-blur-md relative overflow-hidden"
+      style={{
+        background: BACKEND_COLORS.backgrounds.panel,
+        border: `1px solid ${BACKEND_COLORS.borders.primary}`,
+        boxShadow: BACKEND_COLORS.shadows.large,
+      }}
+    >
+      {/* 背景装饰 */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-0 right-0 w-64 h-64 opacity-5"
+          style={{
+            background: `radial-gradient(circle at center, rgb(var(--brand-primary)) 0%, transparent 70%)`,
+          }}
+        />
+      </div>
+
+      {/* 控制区域 */}
+      <div className="flex items-center justify-between relative z-10">
+        <h2
+          className="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent"
+          style={{
+            backgroundImage: `linear-gradient(45deg,
+              ${BACKEND_COLORS.text.primary} 0%,
+              ${BACKEND_COLORS.text.accent} 100%)`,
+            textShadow: `0 0 20px rgba(var(--brand-primary), 0.3)`,
+          }}
+        >
+          实时威胁监控
+        </h2>
+
         <button
           onClick={updateData}
           disabled={isUpdating}
-          className="neon-button flex items-center space-x-2 px-4 py-2"
+          className="flex items-center space-x-3 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            background: isUpdating
+              ? BACKEND_COLORS.buttons.secondary.background
+              : BACKEND_COLORS.buttons.primary.background,
+            color: BACKEND_COLORS.buttons.primary.text,
+            border: `1px solid ${BACKEND_COLORS.borders.accent}`,
+            boxShadow: isUpdating
+              ? BACKEND_COLORS.buttons.secondary.shadow
+              : BACKEND_COLORS.buttons.primary.shadow,
+          }}
         >
-          <RefreshCw className={cn("w-4 h-4", isUpdating && "animate-spin")} />
-          <span>{isUpdating ? "更新中..." : "手动刷新"}</span>
+          <RefreshCw
+            className={cn(
+              "w-5 h-5 transition-transform duration-300",
+              isUpdating && "animate-spin",
+            )}
+            style={{
+              filter: `drop-shadow(0 0 6px ${BACKEND_COLORS.text.glow}60)`,
+            }}
+          />
+          <span className="font-medium">
+            {isUpdating ? "更新中..." : "手动刷新"}
+          </span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 指标卡片网格 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
         {metrics.map((metric, index) => (
           <MetricCard key={index} {...metric} isUpdating={isUpdating} />
         ))}
