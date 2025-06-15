@@ -293,7 +293,13 @@ export function NetworkAnalysis({ className }: NetworkAnalysisProps) {
     <div className={cn("cyber-card p-6", className)}>
       {/* 头部控制 */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white flex items-center space-x-2">
+        <h3
+          className="text-xl font-semibold flex items-center space-x-2"
+          style={{
+            color: `rgb(var(--brand-lightest))`,
+            textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+          }}
+        >
           <Activity className="w-6 h-6 text-neon-blue" />
           <span>网络流量分析</span>
           {isUpdating && (
@@ -306,7 +312,8 @@ export function NetworkAnalysis({ className }: NetworkAnalysisProps) {
           <select
             value={selectedTimeRange}
             onChange={(e) => setSelectedTimeRange(e.target.value)}
-            className="px-3 py-1 bg-matrix-surface border border-matrix-border rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-neon-blue"
+            className="px-3 py-1 bg-matrix-surface border border-matrix-border rounded text-sm focus:outline-none focus:ring-2 focus:ring-neon-blue"
+            style={{ color: `rgb(var(--brand-lightest))` }}
           >
             {timeRanges.map((range) => (
               <option key={range.value} value={range.value}>
@@ -329,7 +336,7 @@ export function NetworkAnalysis({ className }: NetworkAnalysisProps) {
                 "flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap",
                 selectedChart === type.value
                   ? "bg-neon-blue/20 border border-neon-blue text-neon-blue"
-                  : "bg-matrix-surface border border-matrix-border text-muted-foreground hover:text-white",
+                  : "bg-matrix-surface border border-matrix-border text-muted-foreground hover:text-blue-100",
               )}
             >
               <Icon className="w-4 h-4" />
@@ -349,28 +356,60 @@ export function NetworkAnalysis({ className }: NetworkAnalysisProps) {
             <Users className="w-4 h-4 text-neon-blue" />
             <span className="text-xs text-muted-foreground">并发用户</span>
           </div>
-          <p className="text-lg font-semibold text-white mt-1">1,247</p>
+          <p
+            className="text-lg font-semibold mt-1"
+            style={{
+              color: `rgb(var(--brand-lightest))`,
+              textShadow: `0 0 8px rgba(var(--brand-lightest), 0.3)`,
+            }}
+          >
+            1,247
+          </p>
         </div>
         <div className="bg-matrix-surface rounded-lg p-3">
           <div className="flex items-center space-x-2">
             <Shield className="w-4 h-4 text-neon-green" />
             <span className="text-xs text-muted-foreground">防护成功率</span>
           </div>
-          <p className="text-lg font-semibold text-white mt-1">98.5%</p>
+          <p
+            className="text-lg font-semibold mt-1"
+            style={{
+              color: `rgb(var(--success))`,
+              textShadow: `0 0 8px rgba(var(--success), 0.3)`,
+            }}
+          >
+            98.5%
+          </p>
         </div>
         <div className="bg-matrix-surface rounded-lg p-3">
           <div className="flex items-center space-x-2">
             <Wifi className="w-4 h-4 text-threat-medium" />
             <span className="text-xs text-muted-foreground">平均延迟</span>
           </div>
-          <p className="text-lg font-semibold text-white mt-1">12ms</p>
+          <p
+            className="text-lg font-semibold mt-1"
+            style={{
+              color: `rgb(var(--info))`,
+              textShadow: `0 0 8px rgba(var(--info), 0.3)`,
+            }}
+          >
+            12ms
+          </p>
         </div>
         <div className="bg-matrix-surface rounded-lg p-3">
           <div className="flex items-center space-x-2">
             <TrendingUp className="w-4 h-4 text-neon-purple" />
             <span className="text-xs text-muted-foreground">峰值流量</span>
           </div>
-          <p className="text-lg font-semibold text-white mt-1">2.1 Gbps</p>
+          <p
+            className="text-lg font-semibold mt-1"
+            style={{
+              color: `rgb(var(--brand-accent))`,
+              textShadow: `0 0 8px rgba(var(--brand-accent), 0.3)`,
+            }}
+          >
+            2.1 Gbps
+          </p>
         </div>
       </div>
     </div>
