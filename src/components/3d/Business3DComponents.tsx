@@ -120,11 +120,20 @@ function BuildingMesh({
 
       {hovered && (
         <Html position={[0, height / 2 + 2, 0]} center>
-          <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg p-2 text-center shadow-lg pointer-events-none">
-            <div className="text-sm font-semibold text-gray-800">
+          <div
+            className="backdrop-blur-md border border-blue-300/30 rounded-lg p-2 text-center shadow-lg pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg,
+                   rgba(59, 130, 246, 0.1) 0%,
+                   rgba(6, 182, 212, 0.05) 50%,
+                   rgba(147, 197, 253, 0.1) 100%)`,
+              boxShadow: "0 8px 32px rgba(59, 130, 246, 0.2)",
+            }}
+          >
+            <div className="text-sm font-semibold text-blue-900">
               {district}
             </div>
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-blue-700">
               高度: {height.toFixed(1)}m
             </div>
           </div>
