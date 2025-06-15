@@ -69,7 +69,13 @@ export default function Index() {
               boxShadow: BUSINESS_COLORS.shadows.lg,
             }}
           >
-            <Shield className="w-6 h-6 text-white" />
+            <Shield
+              className="w-6 h-6"
+              style={{
+                color: `rgb(var(--brand-lightest))`,
+                filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+              }}
+            />
           </div>
           <div>
             <h1
@@ -187,7 +193,7 @@ export default function Index() {
           {/* 最新告警 */}
           <div>
             <InfoCard
-              title="最新安全告警"
+              title="最新安全告��"
               description="需要立即关注的安全事件"
               headerActions={
                 <div className="flex items-center space-x-2">
@@ -249,7 +255,7 @@ export default function Index() {
                     color: BUSINESS_COLORS.primary.blue,
                   }}
                 >
-                  查看全��告警
+                  查看全部告警
                 </button>
               </div>
             </InfoCard>

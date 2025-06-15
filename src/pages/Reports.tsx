@@ -168,7 +168,13 @@ export default function Reports() {
                 boxShadow: BUSINESS_COLORS.shadows.lg,
               }}
             >
-              <FileText className="w-6 h-6 text-white" />
+              <FileText
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
             </div>
             <div>
               <h1

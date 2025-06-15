@@ -126,7 +126,7 @@ export default function Alerts() {
     setAlerts(mockAlerts);
   }, []);
 
-  // 过滤告警
+  // 过滤告���
   const filteredAlerts = alerts.filter((alert) => {
     const matchesSearch =
       alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -200,7 +200,13 @@ export default function Alerts() {
                 boxShadow: BUSINESS_COLORS.shadows.lg,
               }}
             >
-              <AlertTriangle className="w-6 h-6 text-white" />
+              <AlertTriangle
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
             </div>
             <div>
               <h1
@@ -443,7 +449,7 @@ export default function Alerts() {
           },
           {
             key: "timestamp",
-            label: "���间",
+            label: "时间",
             render: (value) => (
               <div>
                 <p className="text-sm">

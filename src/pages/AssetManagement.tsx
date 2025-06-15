@@ -73,7 +73,7 @@ export default function AssetManagement() {
       },
       {
         id: "asset-002",
-        name: "CEO工��站",
+        name: "CEO工作站",
         type: "workstation",
         ip: "192.168.1.205",
         os: "Windows 11 Pro",
@@ -220,7 +220,13 @@ export default function AssetManagement() {
                 boxShadow: BUSINESS_COLORS.shadows.lg,
               }}
             >
-              <Server className="w-6 h-6 text-white" />
+              <Server
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
             </div>
             <div>
               <h1
@@ -351,7 +357,7 @@ export default function AssetManagement() {
       <BusinessCard className="mb-6">
         <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
           <div className="flex flex-col md:flex-row gap-4 flex-1">
-            {/* 搜���框 */}
+            {/* 搜索框 */}
             <div className="relative flex-1 max-w-md">
               <Search
                 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"

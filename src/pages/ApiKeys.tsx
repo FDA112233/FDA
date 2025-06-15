@@ -154,7 +154,13 @@ export default function ApiKeys() {
                 boxShadow: BUSINESS_COLORS.shadows.lg,
               }}
             >
-              <Key className="w-6 h-6 text-white" />
+              <Key
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
             </div>
             <div>
               <h1
