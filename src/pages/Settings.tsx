@@ -62,7 +62,7 @@ export default function Settings() {
     {
       id: "alerts",
       title: "告警配置",
-      description: "通知���道和告警规则",
+      description: "通知渠道和告警规则",
       icon: Bell,
     },
     {
@@ -226,6 +226,12 @@ export default function Settings() {
                     backgroundColor: BUSINESS_COLORS.ui.background.tertiary,
                   }}
                 >
+                  rounded-full shadow transform transition-all duration-200
+                  peer-checked:translate-x-5 translate-x-0.5 mt-0.5" style=
+                  {{
+                    background: `linear-gradient(135deg, rgb(var(--brand-lightest)) 0%, rgb(var(--brand-light)) 100%)`,
+                    boxShadow: `0 2px 8px rgba(var(--brand-primary), 0.3)`,
+                  }}
                   <div className="w-5 h-5 bg-white rounded-full shadow transform transition-transform peer-checked:translate-x-5 translate-x-0.5 mt-0.5" />
                 </div>
               </label>
