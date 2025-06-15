@@ -93,24 +93,56 @@ function MetricCard({
         boxShadow: threatStyle.boxShadow,
       }}
     >
-      <div className="flex items-start justify-between">
+      {/* 背景装饰效果 */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-0 right-0 w-32 h-32 opacity-10"
+          style={{
+            background: `radial-gradient(circle at center, ${threatStyle.color} 0%, transparent 70%)`,
+          }}
+        />
+      </div>
+
+      <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
-            <Icon className="w-5 h-5" />
-            <h3 className="text-sm font-medium text-muted-foreground">
+          <div className="flex items-center space-x-3 mb-3">
+            <Icon
+              className="w-6 h-6 transition-all duration-300"
+              style={{
+                color: threatStyle.color,
+                filter: `drop-shadow(0 0 8px ${threatStyle.color}60)`,
+              }}
+            />
+            <h3
+              className="text-sm font-medium"
+              style={{ color: BACKEND_COLORS.text.secondary }}
+            >
               {title}
             </h3>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-3xl font-bold glow-text">{value}</p>
+          <div className="space-y-2">
+            <p
+              className="text-3xl font-bold transition-all duration-300"
+              style={{
+                color: threatStyle.color,
+                textShadow: `0 0 16px ${threatStyle.color}40`,
+              }}
+            >
+              {value}
+            </p>
 
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p
+                className="text-xs"
+                style={{ color: BACKEND_COLORS.text.muted }}
+              >
+                {description}
+              </p>
             )}
 
             {change !== undefined && (
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2">
                 {trend === "up" ? (
                   <TrendingUp className="w-4 h-4 text-threat-critical" />
                 ) : (
