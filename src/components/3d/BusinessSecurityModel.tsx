@@ -248,27 +248,16 @@ function NetworkNode({
         </Sphere>
       )}
 
-      {/* 悬浮标签 */}
-      <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
-        <Html
-          position={[0, type === "core" ? 1.5 : 1, 0]}
-          center
-          distanceFactor={8}
-          occlude
-        >
-          <div
-            className="px-2 py-1 rounded-lg text-xs font-medium pointer-events-none"
-            style={{
-              backgroundColor: `${threatColor}20`,
-              color: threatColor,
-              border: `1px solid ${threatColor}40`,
-              backdropFilter: "blur(4px)",
-            }}
-          >
-            {label}
-          </div>
-        </Html>
-      </Billboard>
+      {/* 悬浮标签 - 简化版本 */}
+      <Text
+        position={[0, type === "core" ? 1.8 : 1.3, 0]}
+        fontSize={0.2}
+        color={threatColor}
+        anchorX="center"
+        anchorY="middle"
+      >
+        {label}
+      </Text>
 
       {/* 环绕粒子 */}
       {type === "core" && (
