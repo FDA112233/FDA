@@ -58,46 +58,48 @@ export function BusinessCard({
 
   const variants = {
     default: {
-      background: "bg-white",
-      border: "border-gray-200",
-      shadow: "shadow-sm",
-      hoverShadow: "hover:shadow-lg",
+      background: "bg-gradient-to-br from-slate-50 to-blue-50/50",
+      border: "border-slate-200",
+      shadow: "shadow-sm shadow-blue-500/10",
+      hoverShadow: "hover:shadow-lg hover:shadow-blue-500/20",
     },
     primary: {
-      background: "bg-blue-50",
+      background: "bg-gradient-to-br from-blue-50 to-cyan-50",
       border: "border-blue-200",
-      shadow: "shadow-sm",
-      hoverShadow: "hover:shadow-lg hover:shadow-blue-100",
+      shadow: "shadow-sm shadow-blue-500/20",
+      hoverShadow: "hover:shadow-lg hover:shadow-blue-500/30",
     },
     success: {
-      background: "bg-green-50",
+      background: "bg-gradient-to-br from-green-50 to-emerald-50",
       border: "border-green-200",
-      shadow: "shadow-sm",
-      hoverShadow: "hover:shadow-lg hover:shadow-green-100",
+      shadow: "shadow-sm shadow-green-500/20",
+      hoverShadow: "hover:shadow-lg hover:shadow-green-500/30",
     },
     warning: {
-      background: "bg-yellow-50",
+      background: "bg-gradient-to-br from-yellow-50 to-orange-50",
       border: "border-yellow-200",
-      shadow: "shadow-sm",
-      hoverShadow: "hover:shadow-lg hover:shadow-yellow-100",
+      shadow: "shadow-sm shadow-yellow-500/20",
+      hoverShadow: "hover:shadow-lg hover:shadow-yellow-500/30",
     },
     error: {
-      background: "bg-red-50",
+      background: "bg-gradient-to-br from-red-50 to-pink-50",
       border: "border-red-200",
-      shadow: "shadow-sm",
-      hoverShadow: "hover:shadow-lg hover:shadow-red-100",
+      shadow: "shadow-sm shadow-red-500/20",
+      hoverShadow: "hover:shadow-lg hover:shadow-red-500/30",
     },
     elevated: {
-      background: "bg-white",
-      border: "border-gray-100",
-      shadow: "shadow-xl",
-      hoverShadow: "hover:shadow-2xl",
+      background: "bg-gradient-to-br from-slate-50 to-indigo-50/70",
+      border: "border-slate-100",
+      shadow: "shadow-xl shadow-indigo-500/15",
+      hoverShadow: "hover:shadow-2xl hover:shadow-indigo-500/25",
     },
     glass: {
-      background: "bg-white/80 backdrop-blur-sm",
-      border: "border-white/20",
-      shadow: "shadow-lg",
-      hoverShadow: "hover:shadow-xl hover:bg-white/90",
+      background:
+        "bg-gradient-to-br from-white/60 to-blue-50/40 backdrop-blur-md",
+      border: "border-white/30",
+      shadow: "shadow-lg shadow-blue-500/10",
+      hoverShadow:
+        "hover:shadow-xl hover:shadow-blue-500/20 hover:from-white/70 hover:to-blue-50/50",
     },
   };
 
@@ -190,15 +192,26 @@ export function BusinessCard({
 
       {/* 加载状态 */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-xl backdrop-blur-sm"
+          style={{
+            background: `linear-gradient(135deg,
+                 rgba(var(--brand-primary), 0.1) 0%,
+                 rgba(var(--brand-accent), 0.05) 50%,
+                 rgba(var(--brand-light), 0.1) 100%)`,
+          }}
+        >
           <div className="flex space-x-1">
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-2 h-2 rounded-full animate-bounce"
+                className="w-3 h-3 rounded-full animate-bounce"
                 style={{
-                  backgroundColor: BUSINESS_COLORS.primary.blue,
-                  animationDelay: `${i * 0.1}s`,
+                  background: `linear-gradient(45deg,
+                    ${[BUSINESS_COLORS.primary.main, BUSINESS_COLORS.primary.accent, BUSINESS_COLORS.primary.light][i]},
+                    ${[BUSINESS_COLORS.primary.light, BUSINESS_COLORS.primary.main, BUSINESS_COLORS.primary.accent][i]})`,
+                  animationDelay: `${i * 0.2}s`,
+                  boxShadow: `0 4px 8px rgba(var(--brand-primary), 0.3)`,
                 }}
               />
             ))}
