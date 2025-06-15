@@ -106,7 +106,13 @@ export default function Login() {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <CheckCircle className="w-6 h-6 text-white" />
+                <CheckCircle
+                  className="w-6 h-6"
+                  style={{
+                    color: `rgb(var(--brand-lightest))`,
+                    filter: `drop-shadow(0 0 8px rgba(var(--success), 0.6))`,
+                  }}
+                />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-1">实时监控</h3>
@@ -121,7 +127,13 @@ export default function Login() {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <Building className="w-6 h-6 text-white" />
+                <Building
+                  className="w-6 h-6"
+                  style={{
+                    color: `rgb(var(--brand-lightest))`,
+                    filter: `drop-shadow(0 0 8px rgba(var(--info), 0.6))`,
+                  }}
+                />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-1">企业级安全</h3>
@@ -136,10 +148,16 @@ export default function Login() {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <Globe className="w-6 h-6 text-white" />
+                <Globe
+                  className="w-6 h-6"
+                  style={{
+                    color: `rgb(var(--brand-lightest))`,
+                    filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                  }}
+                />
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-1">威胁情报</h3>
+                <h3 className="font-semibold text-lg mb-1">威胁��报</h3>
                 <p className="text-blue-100 text-sm">
                   全球威胁情报网络，提供最新的安全态势信息
                 </p>
@@ -151,7 +169,13 @@ export default function Login() {
                 className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               >
-                <Shield className="w-6 h-6 text-white" />
+                <Shield
+                  className="w-6 h-6"
+                  style={{
+                    color: `rgb(var(--brand-lightest))`,
+                    filter: `drop-shadow(0 0 8px rgba(var(--warning), 0.6))`,
+                  }}
+                />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-1">合规管理</h3>
@@ -192,7 +216,13 @@ export default function Login() {
                 boxShadow: BUSINESS_COLORS.shadows.lg,
               }}
             >
-              <Shield className="w-8 h-8 text-white" />
+              <Shield
+                className="w-8 h-8"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 12px rgba(var(--brand-accent), 0.7))`,
+                }}
+              />
             </div>
             <h1
               className="text-2xl font-bold mb-1"
@@ -217,7 +247,13 @@ export default function Login() {
                     boxShadow: `0 0 30px ${BUSINESS_COLORS.primary.blue}40`,
                   }}
                 >
-                  <Shield className="w-8 h-8 text-white animate-float" />
+                  <Shield
+                    className="w-8 h-8 animate-float"
+                    style={{
+                      color: `rgb(var(--brand-lightest))`,
+                      filter: `drop-shadow(0 0 12px rgba(var(--brand-accent), 0.7))`,
+                    }}
+                  />
                 </div>
               </div>
               <h2
