@@ -161,31 +161,67 @@ function MetricCard({
                   />
                 )}
                 <span
-                  className={cn(
-                    "text-sm font-medium",
-                    trend === "up" ? "text-threat-critical" : "text-neon-green",
-                  )}
+                  className="text-sm font-medium"
+                  style={{
+                    color:
+                      trend === "up"
+                        ? `rgb(var(--error))`
+                        : `rgb(var(--success))`,
+                  }}
                 >
                   {change > 0 ? "+" : ""}
                   {change}%
                 </span>
-                <span className="text-xs text-muted-foreground">较昨日</span>
+                <span
+                  className="text-xs"
+                  style={{ color: BACKEND_COLORS.text.muted }}
+                >
+                  较昨日
+                </span>
               </div>
             )}
           </div>
         </div>
 
-        <div className="w-12 h-12 rounded-lg bg-current/10 flex items-center justify-center relative">
-          <Icon className="w-6 h-6" />
+        {/* 右侧装饰图标 */}
+        <div
+          className="w-14 h-14 rounded-xl flex items-center justify-center relative group"
+          style={{
+            background: `linear-gradient(135deg, ${threatStyle.color}20 0%, ${threatStyle.color}10 100%)`,
+            border: `1px solid ${threatStyle.color}30`,
+          }}
+        >
+          <Icon
+            className="w-7 h-7 transition-all duration-300 group-hover:scale-110"
+            style={{
+              color: threatStyle.color,
+              filter: `drop-shadow(0 0 8px ${threatStyle.color}50)`,
+            }}
+          />
+
           {isUpdating && (
-            <div className="absolute inset-0 border-2 border-current rounded-lg animate-pulse opacity-50" />
+            <div
+              className="absolute inset-0 border-2 rounded-xl animate-pulse"
+              style={{ borderColor: threatStyle.color }}
+            />
           )}
         </div>
       </div>
 
-      {/* 数据流动效果 */}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-current to-transparent opacity-30">
-        <div className="h-full bg-current animate-data-flow" />
+      {/* 底部数据流动效果 */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-1 rounded-b-xl overflow-hidden"
+        style={{
+          background: `linear-gradient(90deg, transparent 0%, ${threatStyle.color}40 50%, transparent 100%)`,
+        }}
+      >
+        <div
+          className="h-full animate-pulse"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, ${threatStyle.color} 50%, transparent 100%)`,
+            animation: "slideRight 3s ease-in-out infinite",
+          }}
+        />
       </div>
     </div>
   );
