@@ -136,7 +136,13 @@ export function Navigation() {
                 boxShadow: BUSINESS_COLORS.shadows.md,
               }}
             >
-              <Shield className="w-6 h-6 text-white" />
+              <Shield
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.5))`,
+                }}
+              />
             </div>
             <div>
               <h1
@@ -183,7 +189,9 @@ export function Navigation() {
                   backgroundColor: isActive
                     ? BUSINESS_COLORS.primary.blue
                     : "transparent",
-                  color: isActive ? "white" : BUSINESS_COLORS.ui.text.secondary,
+                  color: isActive
+                    ? `rgb(var(--brand-lightest))`
+                    : BUSINESS_COLORS.ui.text.secondary,
                   animationDelay: `${index * 50}ms`,
                 }}
                 onMouseEnter={(e) => {
@@ -375,7 +383,7 @@ export function Navigation() {
             }}
           >
             <LogOut className="w-4 h-4 enhanced-icon group-hover:rotate-6" />
-            <span>退出登录</span>
+            <span>退���登录</span>
           </button>
         </div>
       </nav>
