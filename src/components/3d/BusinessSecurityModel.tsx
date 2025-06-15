@@ -370,7 +370,7 @@ export function BusinessSecurityModel({
       {
         position: [-2, 1, 2] as [number, number, number],
         type: "server",
-        label: "数据库服务器",
+        label: "数据���服务器",
         status: "online" as const,
       },
       {
@@ -472,22 +472,26 @@ export function BusinessSecurityModel({
       />
 
       {/* 网络连接线 */}
-      {connections.map((connection, index) => {
-        const points = [];
-        points.push(new THREE.Vector3(...connection.from));
-        points.push(new THREE.Vector3(...connection.to));
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-        return (
-          <line key={index} geometry={geometry}>
-            <lineBasicMaterial
+      {connections.map((connection, index) => (
+        <group key={index}>
+          <mesh>
+            <cylinderGeometry
+              args={[
+                0.005,
+                0.005,
+                new THREE.Vector3(...connection.from).distanceTo(
+                  new THREE.Vector3(...connection.to),
+                ),
+              ]}
+            />
+            <meshBasicMaterial
               color={BUSINESS_COLORS.primary.lightBlue}
               transparent
               opacity={0.6}
             />
-          </line>
-        );
-      })}
+          </mesh>
+        </group>
+      ))}
 
       {/* 数据流粒子 */}
       {dataFlows.map((flow, index) => (
@@ -654,7 +658,7 @@ export function BusinessShield({
         );
       })}
 
-      {/* 状态指示粒子 */}
+      {/* ��态指示粒子 */}
       {Array.from({ length: 8 }).map((_, i) => {
         const angle = (i / 8) * Math.PI * 2;
         const radius = 3;
