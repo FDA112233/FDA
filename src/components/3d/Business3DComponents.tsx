@@ -144,7 +144,7 @@ function BuildingMesh({
 }
 
 /**
- * 企业数据中心组��
+ * 企业数据中心组件
  * Enterprise Data Centers Component
  */
 export function EnterpriseDataCenters() {
@@ -456,11 +456,22 @@ export function SecurityRadar() {
 
       {/* 信息显示 */}
       <Html position={[0, 3, 0]} transform>
-        <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg p-4 text-center shadow-lg pointer-events-none">
-          <div className="text-lg font-bold text-gray-800">安全雷达</div>
-          <div className="text-sm text-gray-600 mt-1">360° 威胁检测</div>
-          <div className="text-2xl font-bold text-red-600 mt-2">3</div>
-          <div className="text-xs text-gray-600">活跃威胁</div>
+        <div
+          className="backdrop-blur-md border border-red-300/30 rounded-lg p-4 text-center shadow-lg pointer-events-none"
+          style={{
+            background: `linear-gradient(135deg,
+                 rgba(239, 68, 68, 0.1) 0%,
+                 rgba(220, 38, 38, 0.05) 50%,
+                 rgba(254, 202, 202, 0.1) 100%)`,
+            boxShadow: "0 8px 32px rgba(239, 68, 68, 0.2)",
+          }}
+        >
+          <div className="text-lg font-bold text-red-900">安全雷达</div>
+          <div className="text-sm text-red-700 mt-1">360° 威胁检测</div>
+          <div className="text-2xl font-bold text-red-600 mt-2 animate-pulse">
+            3
+          </div>
+          <div className="text-xs text-red-700">活跃威胁</div>
         </div>
       </Html>
     </group>
