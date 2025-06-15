@@ -72,7 +72,15 @@ export function NetworkChart() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <Activity className="w-5 h-5 text-neon-blue" />
-            <h3 className="text-lg font-semibold text-white">网络流量趋势</h3>
+            <h3
+              className="text-lg font-semibold"
+              style={{
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+              }}
+            >
+              网络流量趋势
+            </h3>
           </div>
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
