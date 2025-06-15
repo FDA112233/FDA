@@ -34,6 +34,41 @@ function AnimatedParticle({
   );
 }
 
+// 连接线组件 - 稳定版本（无drei Line依赖）
+function LineConnection({
+  start,
+  end,
+  color,
+}: {
+  start: [number, number, number];
+  end: [number, number, number];
+  color: string;
+}) {
+  const startVec = useMemo(() => new THREE.Vector3(...start), [start]);
+  const endVec = useMemo(() => new THREE.Vector3(...end), [end]);
+  const distance = useMemo(
+    () => startVec.distanceTo(endVec),
+    [startVec, endVec],
+  );
+  const direction = useMemo(
+    () => endVec.clone().sub(startVec).normalize(),
+    [startVec, endVec],
+  );
+  const center = useMemo(
+    () => startVec.clone().add(endVec).divideScalar(2),
+    [startVec, endVec],
+  );
+
+  return (
+    <group position={center.toArray()} lookAt={endVec}>
+      <mesh>
+        <cylinderGeometry args={[0.008, 0.008, distance]} />
+        <meshBasicMaterial color={color} transparent opacity={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
 // 数据流粒子 - 稳定版本（无Trail依赖）
 function DataFlow({
   start,
@@ -370,7 +405,7 @@ export function BusinessSecurityModel({
       {
         position: [-2, 1, 2] as [number, number, number],
         type: "server",
-        label: "数据���服务器",
+        label: "数据库服务器",
         status: "online" as const,
       },
       {
@@ -658,7 +693,7 @@ export function BusinessShield({
         );
       })}
 
-      {/* ��态指示粒子 */}
+      {/* 状态指示粒子 */}
       {Array.from({ length: 8 }).map((_, i) => {
         const angle = (i / 8) * Math.PI * 2;
         const radius = 3;
