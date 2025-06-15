@@ -144,7 +144,7 @@ function BuildingMesh({
 }
 
 /**
- * 企业数据中心组件
+ * 企业数据中心组��
  * Enterprise Data Centers Component
  */
 export function EnterpriseDataCenters() {
@@ -366,7 +366,16 @@ function NetworkNode({
 
       {active && (
         <Html position={[0, size + 1, 0]} center>
-          <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg p-2 text-center shadow-lg pointer-events-none">
+          <div
+            className="backdrop-blur-md border border-cyan-300/30 rounded-lg p-2 text-center shadow-lg pointer-events-none"
+            style={{
+              background: `linear-gradient(135deg,
+                   rgba(6, 182, 212, 0.15) 0%,
+                   rgba(59, 130, 246, 0.1) 50%,
+                   rgba(16, 185, 129, 0.1) 100%)`,
+              boxShadow: "0 8px 32px rgba(6, 182, 212, 0.25)",
+            }}
+          >
             <div className="text-sm font-semibold text-gray-800">{label}</div>
             <div className="text-xs text-gray-600">{type}</div>
           </div>
