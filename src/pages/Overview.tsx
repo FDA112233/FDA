@@ -18,6 +18,7 @@ import {
   InfoCard,
 } from "@/components/ui/BusinessCard";
 import { BUSINESS_COLORS } from "@/lib/businessColors";
+import { BACKEND_COLORS } from "@/lib/backendTheme";
 
 export default function Overview() {
   const features = [
