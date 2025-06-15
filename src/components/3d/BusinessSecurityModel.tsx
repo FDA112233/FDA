@@ -270,16 +270,10 @@ function NetworkNode({
         </Sphere>
       )}
 
-      {/* 悬浮标签 - 简化版本 */}
-      <Text
-        position={[0, type === "core" ? 1.8 : 1.3, 0]}
-        fontSize={0.2}
-        color={threatColor}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {label}
-      </Text>
+      {/* 状态指示器增强版 - 无文字，纯视觉 */}
+      <Sphere args={[0.15]} position={[0, type === "core" ? 1.5 : 1.0, 0]}>
+        <meshBasicMaterial color={threatColor} transparent opacity={0.8} />
+      </Sphere>
 
       {/* 环绕粒子 */}
       {type === "core" && (
