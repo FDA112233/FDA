@@ -34,7 +34,7 @@ function AnimatedParticle({
   );
 }
 
-// 连接线组件 - 稳定版本（无drei Line依赖）
+// 连接线组件 - 简化版本（无复杂旋转）
 function LineConnection({
   start,
   end,
@@ -44,27 +44,22 @@ function LineConnection({
   end: [number, number, number];
   color: string;
 }) {
-  const startVec = useMemo(() => new THREE.Vector3(...start), [start]);
-  const endVec = useMemo(() => new THREE.Vector3(...end), [end]);
-  const distance = useMemo(
-    () => startVec.distanceTo(endVec),
-    [startVec, endVec],
-  );
-  const direction = useMemo(
-    () => endVec.clone().sub(startVec).normalize(),
-    [startVec, endVec],
-  );
-  const center = useMemo(
-    () => startVec.clone().add(endVec).divideScalar(2),
-    [startVec, endVec],
-  );
-
+  // 简单的粒子连接效果，避免复杂的几何体旋转
   return (
-    <group position={center.toArray()} lookAt={endVec}>
-      <mesh>
-        <cylinderGeometry args={[0.008, 0.008, distance]} />
-        <meshBasicMaterial color={color} transparent opacity={0.6} />
-      </mesh>
+    <group>
+      {Array.from({ length: 8 }).map((_, i) => {
+        const t = i / 7;
+        const x = start[0] + (end[0] - start[0]) * t;
+        const y = start[1] + (end[1] - start[1]) * t;
+        const z = start[2] + (end[2] - start[2]) * t;
+
+        return (
+          <mesh key={i} position={[x, y, z]}>
+            <sphereGeometry args={[0.02, 6, 6]} />
+            <meshBasicMaterial color={color} transparent opacity={0.6} />
+          </mesh>
+        );
+      })}
     </group>
   );
 }
@@ -473,7 +468,7 @@ export function BusinessSecurityModel({
     [],
   );
 
-  // 连接��
+  // 连接线
   const connections = useMemo(
     () => [
       { from: [0, 0, 0], to: [2, 1, 2] },
