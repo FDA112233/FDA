@@ -213,7 +213,13 @@ function TechStatusOverview({
               boxShadow: `0 0 20px ${TECH_COLORS.primary.cyber}66`,
             }}
           >
-            <Brain className="w-6 h-6 text-white" />
+            <Brain
+              className="w-6 h-6"
+              style={{
+                color: `rgb(var(--brand-lightest))`,
+                filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+              }}
+            />
           </div>
           <div>
             <h2
@@ -368,7 +374,7 @@ function NetworkPerformanceChart({ data }: { data: NetworkStatus[] }) {
               stroke={TECH_COLORS.primary.matrix}
               strokeWidth={2}
               dot={{ fill: TECH_COLORS.primary.matrix, strokeWidth: 2, r: 3 }}
-              name="网络延迟"
+              name="网���延迟"
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -713,7 +719,7 @@ function NetworkTopology() {
         {[
           { node: "核心路由器", status: "online", connections: 12 },
           { node: "分布交换机", status: "online", connections: 8 },
-          { node: "接��节点", status: "warning", connections: 24 },
+          { node: "接入节点", status: "warning", connections: 24 },
           { node: "边缘设备", status: "online", connections: 6 },
           { node: "安全网关", status: "online", connections: 4 },
         ].map((item, index) => (
@@ -770,7 +776,7 @@ function SystemLogs() {
         level: ["INFO", "WARN", "ERROR"][Math.floor(Math.random() * 3)],
         message: [
           "数据流量检测正常",
-          "威胁扫描完成",
+          "威胁���描完成",
           "连接状态更新",
           "安全策略生效",
           "性能优化执行",
