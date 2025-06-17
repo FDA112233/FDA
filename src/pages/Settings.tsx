@@ -413,7 +413,7 @@ export default function Settings() {
     <div className="space-y-6">
       <InfoCard
         title="告警通知配置"
-        description="设置告警规则、通知渠道和响应策略"
+        description="设置告警规则、通知渠道和响应��略"
       >
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -620,7 +620,7 @@ export default function Settings() {
   const renderMonitoringSettings = () => (
     <div className="space-y-6">
       <InfoCard
-        title="系统监控配置"
+        title="系统���控配置"
         description="性能监控、日志记录和数据保留策略"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -861,10 +861,418 @@ export default function Settings() {
     </div>
   );
 
+  // API设置
+  const renderApiSettings = () => {
+    const [apiUrl, setApiUrl] = useState(
+      localStorage.getItem("cyberguard_api_url") ||
+        "http://jq41030xx76.vicp.fun",
+    );
+    const [isTestingConnection, setIsTestingConnection] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState<
+      "idle" | "testing" | "success" | "error"
+    >("idle");
+    const [connectionMessage, setConnectionMessage] = useState("");
+
+    const handleSaveApiUrl = () => {
+      try {
+        // 验证URL格式
+        new URL(apiUrl);
+        localStorage.setItem("cyberguard_api_url", apiUrl);
+        setIsDirty(true);
+        console.log("API地址已保存:", apiUrl);
+        setConnectionMessage("API地址已保存，重启应用后生效");
+      } catch (error) {
+        setConnectionMessage("请输入有效的URL地址");
+        setConnectionStatus("error");
+      }
+    };
+
+    const handleTestConnection = async () => {
+      setIsTestingConnection(true);
+      setConnectionStatus("testing");
+      setConnectionMessage("正在测试连接...");
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+        const response = await fetch(`${apiUrl}/health`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          setConnectionStatus("success");
+          setConnectionMessage("连接成功！API服务器可正常访问");
+          console.log("✅ API连接测试成功");
+        } else {
+          setConnectionStatus("error");
+          setConnectionMessage(`连接失败: HTTP ${response.status}`);
+        }
+      } catch (error) {
+        setConnectionStatus("error");
+        if (error instanceof Error) {
+          if (error.name === "AbortError") {
+            setConnectionMessage("连接超时，请检查网络和服务器状态");
+          } else {
+            setConnectionMessage(`连接失败: ${error.message}`);
+          }
+        } else {
+          setConnectionMessage("连接失败，请检查API地址");
+        }
+        console.warn("API连接测试失败:", error);
+      } finally {
+        setIsTestingConnection(false);
+      }
+    };
+
+    const resetToDefault = () => {
+      setApiUrl("http://jq41030xx76.vicp.fun");
+      setConnectionStatus("idle");
+      setConnectionMessage("");
+    };
+
+    return (
+      <div className="space-y-6">
+        <InfoCard
+          title="API服务器配置"
+          description="配置后端API服务器地址和连接参数"
+        >
+          <div className="space-y-6">
+            {/* API地址配置 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div>
+                  <label
+                    className="flex items-center space-x-2 text-sm font-medium mb-3"
+                    style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span>API服务器地址</span>
+                  </label>
+                  <input
+                    type="url"
+                    value={apiUrl}
+                    onChange={(e) => {
+                      setApiUrl(e.target.value);
+                      setConnectionStatus("idle");
+                      setConnectionMessage("");
+                    }}
+                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200"
+                    style={{
+                      borderColor: BUSINESS_COLORS.ui.border.primary,
+                      backgroundColor: BUSINESS_COLORS.ui.background.card,
+                      color: BUSINESS_COLORS.ui.text.primary,
+                    }}
+                    placeholder="https://api.example.com"
+                  />
+                  <p
+                    className="text-xs mt-2"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    输入完整的API服务器地址，包含协议（http://或https://）
+                  </p>
+                </div>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleSaveApiUrl}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: BUSINESS_COLORS.primary.blue,
+                      color: `rgb(var(--brand-lightest))`,
+                      boxShadow: BUSINESS_COLORS.shadows.sm,
+                    }}
+                  >
+                    <Save className="w-4 h-4" />
+                    <span className="text-sm font-medium">保存地址</span>
+                  </button>
+
+                  <button
+                    onClick={handleTestConnection}
+                    disabled={isTestingConnection}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 disabled:opacity-50"
+                    style={{
+                      backgroundColor: BUSINESS_COLORS.status.info,
+                      color: `rgb(var(--brand-lightest))`,
+                      boxShadow: BUSINESS_COLORS.shadows.sm,
+                    }}
+                  >
+                    <Activity
+                      className={`w-4 h-4 ${isTestingConnection ? "animate-spin" : ""}`}
+                    />
+                    <span className="text-sm font-medium">
+                      {isTestingConnection ? "测试中..." : "测试连接"}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={resetToDefault}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: BUSINESS_COLORS.neutral.silver,
+                      color: BUSINESS_COLORS.ui.text.primary,
+                      boxShadow: BUSINESS_COLORS.shadows.sm,
+                    }}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    <span className="text-sm font-medium">重置默认</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {/* 连接状态显示 */}
+                <div>
+                  <label
+                    className="flex items-center space-x-2 text-sm font-medium mb-3"
+                    style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                  >
+                    <Activity className="w-4 h-4" />
+                    <span>连接状态</span>
+                  </label>
+                  <div
+                    className="p-4 rounded-lg border"
+                    style={{
+                      backgroundColor:
+                        connectionStatus === "success"
+                          ? `${BUSINESS_COLORS.status.success}20`
+                          : connectionStatus === "error"
+                            ? `${BUSINESS_COLORS.status.error}20`
+                            : BUSINESS_COLORS.ui.background.tertiary,
+                      borderColor:
+                        connectionStatus === "success"
+                          ? BUSINESS_COLORS.status.success
+                          : connectionStatus === "error"
+                            ? BUSINESS_COLORS.status.error
+                            : BUSINESS_COLORS.ui.border.primary,
+                    }}
+                  >
+                    <div className="flex items-center space-x-3">
+                      {connectionStatus === "testing" && (
+                        <RefreshCw
+                          className="w-5 h-5 animate-spin"
+                          style={{ color: BUSINESS_COLORS.status.info }}
+                        />
+                      )}
+                      {connectionStatus === "success" && (
+                        <CheckCircle
+                          className="w-5 h-5"
+                          style={{ color: BUSINESS_COLORS.status.success }}
+                        />
+                      )}
+                      {connectionStatus === "error" && (
+                        <AlertTriangle
+                          className="w-5 h-5"
+                          style={{ color: BUSINESS_COLORS.status.error }}
+                        />
+                      )}
+                      {connectionStatus === "idle" && (
+                        <Globe
+                          className="w-5 h-5"
+                          style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                        />
+                      )}
+                      <div>
+                        <p
+                          className="text-sm font-medium"
+                          style={{
+                            color:
+                              connectionStatus === "success"
+                                ? BUSINESS_COLORS.status.success
+                                : connectionStatus === "error"
+                                  ? BUSINESS_COLORS.status.error
+                                  : BUSINESS_COLORS.ui.text.primary,
+                          }}
+                        >
+                          {connectionStatus === "idle" && "未测试"}
+                          {connectionStatus === "testing" && "测试中..."}
+                          {connectionStatus === "success" && "连接成功"}
+                          {connectionStatus === "error" && "连接失败"}
+                        </p>
+                        {connectionMessage && (
+                          <p
+                            className="text-xs mt-1"
+                            style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                          >
+                            {connectionMessage}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 预设API地址 */}
+                <div>
+                  <label
+                    className="flex items-center space-x-2 text-sm font-medium mb-3"
+                    style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                  >
+                    <Database className="w-4 h-4" />
+                    <span>快速选择</span>
+                  </label>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        name: "默认服务器",
+                        url: "http://jq41030xx76.vicp.fun",
+                      },
+                      { name: "本地开发", url: "http://localhost:8080" },
+                      {
+                        name: "测试环境",
+                        url: "http://test-api.cyberguard.com",
+                      },
+                    ].map((preset) => (
+                      <button
+                        key={preset.name}
+                        onClick={() => {
+                          setApiUrl(preset.url);
+                          setConnectionStatus("idle");
+                          setConnectionMessage("");
+                        }}
+                        className="w-full flex items-center justify-between p-3 rounded-lg border transition-all duration-200 hover:scale-105"
+                        style={{
+                          backgroundColor:
+                            apiUrl === preset.url
+                              ? `${BUSINESS_COLORS.primary.blue}20`
+                              : BUSINESS_COLORS.ui.background.card,
+                          borderColor:
+                            apiUrl === preset.url
+                              ? BUSINESS_COLORS.primary.blue
+                              : BUSINESS_COLORS.ui.border.primary,
+                          color: BUSINESS_COLORS.ui.text.primary,
+                        }}
+                      >
+                        <div className="text-left">
+                          <p className="text-sm font-medium">{preset.name}</p>
+                          <p
+                            className="text-xs"
+                            style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                          >
+                            {preset.url}
+                          </p>
+                        </div>
+                        {apiUrl === preset.url && (
+                          <CheckCircle
+                            className="w-4 h-4"
+                            style={{ color: BUSINESS_COLORS.primary.blue }}
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 高级设置 */}
+            <div
+              className="pt-4 border-t"
+              style={{ borderColor: BUSINESS_COLORS.ui.border.primary }}
+            >
+              <button
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="flex items-center space-x-2 text-sm font-medium mb-4 transition-colors duration-200"
+                style={{ color: BUSINESS_COLORS.primary.blue }}
+              >
+                <SettingsIcon className="w-4 h-4" />
+                <span>高级设置</span>
+                <div
+                  className={`transform transition-transform duration-200 ${
+                    showAdvanced ? "rotate-180" : ""
+                  }`}
+                >
+                  ▼
+                </div>
+              </button>
+
+              {showAdvanced && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                    >
+                      连接超时 (秒)
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: BUSINESS_COLORS.ui.border.primary,
+                        backgroundColor: BUSINESS_COLORS.ui.background.card,
+                        color: BUSINESS_COLORS.ui.text.primary,
+                      }}
+                      defaultValue={5}
+                      min={1}
+                      max={30}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                    >
+                      重试次数
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: BUSINESS_COLORS.ui.border.primary,
+                        backgroundColor: BUSINESS_COLORS.ui.background.card,
+                        color: BUSINESS_COLORS.ui.text.primary,
+                      }}
+                      defaultValue={3}
+                      min={0}
+                      max={10}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                    >
+                      数据刷新间隔 (秒)
+                    </label>
+                    <input
+                      type="number"
+                      className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2"
+                      style={{
+                        borderColor: BUSINESS_COLORS.ui.border.primary,
+                        backgroundColor: BUSINESS_COLORS.ui.background.card,
+                        color: BUSINESS_COLORS.ui.text.primary,
+                      }}
+                      defaultValue={5}
+                      min={1}
+                      max={60}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </InfoCard>
+
+        <AlertCard
+          type="info"
+          title="配置说明"
+          message="修改API地址后需要重新启动应用才能生效。建议在修改前先测试连接确保新地址可用。如果连接失败，系统将自动使用模拟数据模式。"
+        />
+      </div>
+    );
+  };
+
   // 系统设置
   const renderSystemSettings = () => (
     <div className="space-y-6">
-      <InfoCard title="系统参数配��" description="系统性能、界面主题和全局设置">
+      <InfoCard title="系统参数配置" description="系统性能、界面主题和全局设置">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
