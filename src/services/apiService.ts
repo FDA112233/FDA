@@ -132,7 +132,7 @@ class HttpClient {
     return this.mockMode || !this.backendAvailable;
   }
 
-  // 通用请求方法 - 简化版本，默认使用模拟数据
+  // 通用请求方法
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
@@ -142,34 +142,78 @@ class HttpClient {
       throw new ApiError("使用模拟数据模式", 503);
     }
 
-    // 尝试真实API请求（仅在明确启用后端模式时）
     const url = buildApiUrl(endpoint);
+
+    // 创建超时控制
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
+
     const config: RequestInit = {
       ...options,
       headers: {
         ...this.defaultHeaders,
         ...options.headers,
       },
+      signal: options.signal || controller.signal,
     };
 
-    try {
-      const response = await fetch(url, config);
+    let lastError: Error;
 
-      if (!response.ok) {
-        const errorData = await this.parseErrorResponse(response);
-        throw new ApiError(
-          this.getErrorMessage(response.status, errorData),
-          response.status,
-          errorData,
-        );
+    // 重试机制
+    for (let attempt = 1; attempt <= API_CONFIG.RETRY_ATTEMPTS; attempt++) {
+      try {
+        const response = await fetch(url, config);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorData = await this.parseErrorResponse(response);
+          throw new ApiError(
+            this.getErrorMessage(response.status, errorData),
+            response.status,
+            errorData,
+          );
+        }
+
+        // 成功响应，确保后端可用状态
+        if (!this.backendAvailable) {
+          this.backendAvailable = true;
+          this.mockMode = false;
+          mockApiService.disable();
+          console.log("✅ 后端连接已恢复");
+        }
+
+        return await this.parseResponse<T>(response);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        lastError = error as Error;
+
+        // 检查是否是网络错误
+        if (
+          error instanceof TypeError ||
+          error instanceof DOMException ||
+          (error as any).name === "AbortError" ||
+          (error as any).name === "TimeoutError"
+        ) {
+          // 网络错误，切换到模拟模式
+          this.enableMockMode();
+          throw new ApiError("网络连接失败，使用模拟数据", 503);
+        }
+
+        // 如果是最后一次重试，抛出错误
+        if (attempt === API_CONFIG.RETRY_ATTEMPTS) {
+          if (error instanceof ApiError) {
+            throw error;
+          }
+          this.enableMockMode();
+          throw new ApiError("API请求失败，使用模拟数据", 503);
+        }
+
+        // 等待后重试
+        await delay(API_CONFIG.RETRY_DELAY * attempt);
       }
-
-      return await this.parseResponse<T>(response);
-    } catch (error) {
-      // 任何错误都切换到模拟模式
-      this.enableMockMode();
-      throw new ApiError("后端连接失败，切换到模拟数据", 503);
     }
+
+    throw lastError!;
   }
 
   // 解析响应数据
@@ -337,7 +381,7 @@ export const networkApi = {
     }
   },
 
-  // 获取当前网络��口数据
+  // 获取当前网络接口数据
   getCurrentInterfaces:
     async (): Promise<CurrentNetworkInterfaceMetricsList> => {
       try {
