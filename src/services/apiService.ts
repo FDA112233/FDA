@@ -47,15 +47,16 @@ class ApiError extends Error {
 class HttpClient {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
-  private backendAvailable: boolean = false; // 默认假设后端不可用
-  private mockMode: boolean = true; // 默认使用模拟模式
+  private backendAvailable: boolean = true; // 假设后端可用
+  private mockMode: boolean = false; // 尝试使用真实API
+  private healthCheckInProgress: boolean = false;
 
   constructor() {
     this.baseUrl = API_CONFIG.BASE_URL;
     this.defaultHeaders = { ...DEFAULT_HEADERS };
-    // 立即启用模拟数据模式
-    mockApiService.enable();
-    console.log("🔧 API 服务初始化为模拟数据模式");
+    console.log(`🚀 API 服务初始化，连接到: ${this.baseUrl}`);
+    // 尝试连接到真实后端
+    this.performInitialHealthCheck();
   }
 
   // 设置认证令牌
@@ -258,7 +259,7 @@ export const metricsApi = {
     }
   },
 
-  // 获��系统指标摘要
+  // 获取系统指标摘要
   getSummary: async (): Promise<SystemMetricsSummary> => {
     try {
       return await httpClient.get(API_ENDPOINTS.METRICS.SUMMARY);
@@ -416,7 +417,7 @@ export const systemApi = {
     }
   },
 
-  // 收集��务状态
+  // 收集服务状态
   collectServices: async (): Promise<ServiceStatusSimple[]> => {
     try {
       return await httpClient.post(API_ENDPOINTS.SYSTEM.SERVICES_COLLECT);
