@@ -54,9 +54,10 @@ class HttpClient {
   constructor() {
     this.baseUrl = API_CONFIG.BASE_URL;
     this.defaultHeaders = { ...DEFAULT_HEADERS };
-    console.log(`🚀 API 服务初始化，连接到: ${this.baseUrl}`);
-    // 尝试连接到真实后端
-    this.performInitialHealthCheck();
+    console.log(`🚀 API 服务初始化，目标服务器: ${this.baseUrl}`);
+    // 默认启用模拟模式，避免启动时的网络请求
+    this.enableMockMode();
+    console.log("🔧 已启用模拟数据模式，可手动尝试连接真实后端");
   }
 
   // 设置认证令牌
