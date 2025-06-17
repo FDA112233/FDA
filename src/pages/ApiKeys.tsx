@@ -14,6 +14,7 @@ import {
   Users,
   Globe,
   Zap,
+  Settings,
 } from "lucide-react";
 import {
   BusinessCard,
@@ -580,7 +581,7 @@ export default function ApiStatusMonitor() {
           },
           {
             key: "lastChecked",
-            label: "最后检查",
+            label: "最��检查",
             render: (value) => (
               <div className="text-right">
                 {value ? (
