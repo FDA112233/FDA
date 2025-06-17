@@ -1,4 +1,4 @@
-// API 服务层 - 处理所有后端 API 调用
+// API 服��层 - 处理所有后端 API 调用
 
 import {
   API_CONFIG,
@@ -47,10 +47,14 @@ class ApiError extends Error {
 class HttpClient {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
+  private backendAvailable: boolean = true;
+  private lastHealthCheck: number = 0;
+  private healthCheckInterval: number = 30000; // 30秒检查一次
 
   constructor() {
     this.baseUrl = API_CONFIG.BASE_URL;
     this.defaultHeaders = { ...DEFAULT_HEADERS };
+    this.checkBackendHealth();
   }
 
   // 设置认证令牌
