@@ -69,11 +69,28 @@ class HttpClient {
     delete this.defaultHeaders.Authorization;
   }
 
-  // 手动检查后端连接（只在用户明确要求时执行）
+  // 初始健康检查
+  private async performInitialHealthCheck(): Promise<void> {
+    if (this.healthCheckInProgress) return;
+
+    this.healthCheckInProgress = true;
+
+    try {
+      console.log("🔍 正在检查后端连接...");
+      const success = await this.tryConnectToBackend();
+      if (!success) {
+        console.warn("⚠️ 后端连接失败，切换到模拟数据模式");
+      }
+    } finally {
+      this.healthCheckInProgress = false;
+    }
+  }
+
+  // 尝试连接后端
   async tryConnectToBackend(): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
 
       const response = await fetch(buildApiUrl("/health"), {
         method: "GET",
@@ -91,7 +108,10 @@ class HttpClient {
         return true;
       }
     } catch (error) {
-      // 静默处理连接失败
+      console.warn(
+        "连接后端失败:",
+        error instanceof Error ? error.message : "未知错误",
+      );
     }
 
     this.backendAvailable = false;
@@ -317,7 +337,7 @@ export const networkApi = {
     }
   },
 
-  // 获取当前网络接口数据
+  // 获取当前网络��口数据
   getCurrentInterfaces:
     async (): Promise<CurrentNetworkInterfaceMetricsList> => {
       try {
