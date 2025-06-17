@@ -84,11 +84,18 @@ export default function Settings() {
       icon: Database,
     },
     {
+      id: "api",
+      title: "API配置",
+      description: "后端API地址和连接设置",
+      icon: Globe,
+      badge: "新增",
+      isNew: true,
+    },
+    {
       id: "system",
       title: "系统配置",
       description: "系统参数和性能优化",
       icon: SettingsIcon,
-      isNew: true,
     },
   ];
 
@@ -117,6 +124,8 @@ export default function Settings() {
         return renderMonitoringSettings();
       case "database":
         return renderDatabaseSettings();
+      case "api":
+        return renderApiSettings();
       case "system":
         return renderSystemSettings();
       default:
@@ -286,7 +295,7 @@ export default function Settings() {
       <AlertCard
         type="warning"
         title="安全建议"
-        message="建议启用所有安全功能以提高系统防护能力。更改安全设置可能影响系统访问，请谨慎操作。"
+        message="建议启用所有安全功能以提高系统���护能力。更改安全设置可能影响系统访问，请谨慎操作。"
       />
     </div>
   );
@@ -855,7 +864,7 @@ export default function Settings() {
   // 系统设置
   const renderSystemSettings = () => (
     <div className="space-y-6">
-      <InfoCard title="系统参数配置" description="系统性能、界面主题和全局设置">
+      <InfoCard title="系统参数配��" description="系统性能、界面主题和全局设置">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
