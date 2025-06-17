@@ -197,34 +197,14 @@ function StatCard({
 
 // 系统状态组件
 function SystemStatus() {
-  const [systemData, setSystemData] = useState({
-    cpu: 23,
-    memory: 67,
-    disk: 45,
-    network: 89,
-    uptime: "15天 7小时",
-    lastUpdate: new Date(),
-  });
+  const { formatted, loading, error, lastUpdated } = useSystemMetrics();
+  const { summary } = useNetworkMetrics();
+  const systemStatus = useSystemStatus();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSystemData((prev) => ({
-        ...prev,
-        cpu: Math.max(10, Math.min(90, prev.cpu + (Math.random() - 0.5) * 10)),
-        memory: Math.max(
-          30,
-          Math.min(95, prev.memory + (Math.random() - 0.5) * 5),
-        ),
-        network: Math.max(
-          50,
-          Math.min(100, prev.network + (Math.random() - 0.5) * 8),
-        ),
-        lastUpdate: new Date(),
-      }));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // 计算网络利用率（基于总流量的估算）
+  const networkUtilization = summary?.totalTraffic
+    ? Math.min(100, (summary.totalTraffic / (1024 * 1024 * 1024)) * 10) // 简化算法
+    : 0;
 
   const getStatusColor = (
     value: number,
@@ -275,7 +255,7 @@ function SystemStatus() {
             className="text-sm"
             style={{ color: BACKEND_COLORS.text.secondary }}
           >
-            ��统正常
+            系统正常
           </span>
         </div>
       </div>
