@@ -208,12 +208,12 @@ export default function ApiStatusMonitor() {
 
     // 设置所有端点为检查中状态
     setEndpoints((prev) =>
-      prev.map((endpoint) => ({ ...endpoint, status: "checking" as const }))
+      prev.map((endpoint) => ({ ...endpoint, status: "checking" as const })),
     );
 
     try {
       const results = await Promise.all(
-        endpoints.map((endpoint) => checkEndpoint(endpoint))
+        endpoints.map((endpoint) => checkEndpoint(endpoint)),
       );
 
       setEndpoints(results);
@@ -229,17 +229,47 @@ export default function ApiStatusMonitor() {
   const getStatusIcon = (status: ApiEndpoint["status"]) => {
     switch (status) {
       case "online":
-        return <CheckCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.success }} />;
+        return (
+          <CheckCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.success }}
+          />
+        );
       case "offline":
-        return <XCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.error }} />;
+        return (
+          <XCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.error }}
+          />
+        );
       case "slow":
-        return <Clock className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.warning }} />;
+        return (
+          <Clock
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.warning }}
+          />
+        );
       case "error":
-        return <AlertTriangle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.error }} />;
+        return (
+          <AlertTriangle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.error }}
+          />
+        );
       case "checking":
-        return <RefreshCw className="w-4 h-4 animate-spin" style={{ color: BUSINESS_COLORS.neutral.silver }} />;
+        return (
+          <RefreshCw
+            className="w-4 h-4 animate-spin"
+            style={{ color: BUSINESS_COLORS.neutral.silver }}
+          />
+        );
       default:
-        return <XCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.neutral.silver }} />;
+        return (
+          <XCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.neutral.silver }}
+          />
+        );
     }
   };
 
@@ -303,8 +333,11 @@ export default function ApiStatusMonitor() {
   const stats = {
     total: endpoints.length,
     online: endpoints.filter((e) => e.status === "online").length,
-    offline: endpoints.filter((e) => e.status === "offline" || e.status === "error").length,
-    avgUptime: endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length,
+    offline: endpoints.filter(
+      (e) => e.status === "offline" || e.status === "error",
+    ).length,
+    avgUptime:
+      endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length,
   };
 
   // 自动检查
@@ -372,7 +405,9 @@ export default function ApiStatusMonitor() {
               boxShadow: BUSINESS_COLORS.shadows.md,
             }}
           >
-            <RefreshCw className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
+            />
             <span className="text-sm font-medium">
               {isChecking ? "检查中..." : "立即检查"}
             </span>
@@ -498,7 +533,9 @@ export default function ApiStatusMonitor() {
                 </div>
                 <div
                   className="w-full bg-gray-600 rounded-full h-1.5 mt-1"
-                  style={{ backgroundColor: BUSINESS_COLORS.ui.background.tertiary }}
+                  style={{
+                    backgroundColor: BUSINESS_COLORS.ui.background.tertiary,
+                  }}
                 >
                   <div
                     className="h-1.5 rounded-full transition-all duration-300"
@@ -608,25 +645,37 @@ export default function ApiStatusMonitor() {
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
-                  <CheckCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.success }} />
+                  <CheckCircle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.success }}
+                  />
                   <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                     正常: 响应时间 {"<="} 1秒，状态码 200
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.warning }} />
+                  <Clock
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.warning }}
+                  />
                   <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                    缓慢: 响应时间 > 1秒，状态码 200
+                    缓慢: 响应时间 {">"} 1秒，状态码 200
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <XCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.error }} />
+                  <XCircle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.error }}
+                  />
                   <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                     离线: 网络连接失败或超时
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <AlertTriangle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.error }} />
+                  <AlertTriangle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.error }}
+                  />
                   <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                     错误: 状态码非 200
                   </span>
