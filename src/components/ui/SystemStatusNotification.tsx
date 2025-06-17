@@ -125,28 +125,55 @@ export function SystemStatusNotification({
         {/* 内容 */}
         {!isMinimized && (
           <div className="p-4 space-y-3">
-            <div className="flex items-start space-x-3">
-              <AlertTriangle
-                className="w-5 h-5 mt-0.5 flex-shrink-0"
-                style={{
-                  color: `rgb(var(--warning))`,
-                  filter: `drop-shadow(0 0 6px rgba(var(--warning), 0.6))`,
-                }}
-              />
-              <div className="space-y-2">
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: BACKEND_COLORS.text.secondary }}
-                >
-                  后端服务器暂时不可用，系统正在使用模拟数据进行演示。
-                </p>
-                <p
-                  className="text-xs"
-                  style={{ color: BACKEND_COLORS.text.muted }}
-                >
-                  当后端服务恢复时，系统将自动切换到真实数据。
-                </p>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <AlertTriangle
+                  className="w-5 h-5 mt-0.5 flex-shrink-0"
+                  style={{
+                    color: `rgb(var(--warning))`,
+                    filter: `drop-shadow(0 0 6px rgba(var(--warning), 0.6))`,
+                  }}
+                />
+                <div className="space-y-2">
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: BACKEND_COLORS.text.secondary }}
+                  >
+                    {isMockMode
+                      ? "正在使用模拟数据进行演示"
+                      : "连接到真实后端服务器"}
+                  </p>
+                  <p
+                    className="text-xs"
+                    style={{ color: BACKEND_COLORS.text.muted }}
+                  >
+                    API 地址: http://jq41030xx76.vicp.fun
+                  </p>
+                </div>
               </div>
+
+              {isMockMode && (
+                <button
+                  onClick={handleTryConnect}
+                  disabled={isConnecting}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 disabled:opacity-50"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(var(--success), 0.2) 0%, rgba(var(--info), 0.1) 100%)`,
+                    border: `1px solid rgba(var(--success), 0.3)`,
+                  }}
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 ${isConnecting ? "animate-spin" : ""}`}
+                    style={{ color: `rgb(var(--success))` }}
+                  />
+                  <span
+                    className="text-sm font-medium"
+                    style={{ color: `rgb(var(--success))` }}
+                  >
+                    {isConnecting ? "连接中..." : "尝试连接后端"}
+                  </span>
+                </button>
+              )}
             </div>
 
             {/* 状态指示器 */}
