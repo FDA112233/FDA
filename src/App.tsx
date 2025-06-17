@@ -208,6 +208,7 @@ function App() {
         <AppLayout />
         <ToastContainer />
         <SystemStatusNotification />
+        <ApiConnectionTest />
         <DebugAuth />
       </BrowserRouter>
     </AuthProvider>
