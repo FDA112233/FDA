@@ -1,4 +1,4 @@
-// API 服��层 - 处理所有后端 API 调用
+// API 服务层 - 处理所有后端 API 调用
 
 import {
   API_CONFIG,
@@ -65,6 +65,50 @@ class HttpClient {
   // 移除认证令牌
   removeAuthToken(): void {
     delete this.defaultHeaders.Authorization;
+  }
+
+  // 检查后端健康状态
+  private async checkBackendHealth(): Promise<void> {
+    const now = Date.now();
+
+    // 如果最近检查过且后端可用，跳过检查
+    if (
+      this.backendAvailable &&
+      now - this.lastHealthCheck < this.healthCheckInterval
+    ) {
+      return;
+    }
+
+    this.lastHealthCheck = now;
+
+    try {
+      const response = await fetch(buildApiUrl("/health"), {
+        method: "GET",
+        headers: this.defaultHeaders,
+        signal: AbortSignal.timeout(5000), // 5秒超时
+      });
+
+      if (response.ok) {
+        if (!this.backendAvailable) {
+          console.log("✅ 后端服务器已恢复连接");
+          mockApiService.disable();
+        }
+        this.backendAvailable = true;
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      if (this.backendAvailable) {
+        console.warn("⚠️ 后端服务器不可用，切换到模拟数据模式");
+        mockApiService.enable();
+      }
+      this.backendAvailable = false;
+    }
+  }
+
+  // 检查是否应该使用模拟数据
+  private shouldUseMockData(): boolean {
+    return !this.backendAvailable || mockApiService.isActive();
   }
 
   // 通用请求方法
