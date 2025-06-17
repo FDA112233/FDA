@@ -338,7 +338,7 @@ export default function ApiStatusMonitor() {
         return <Globe className="w-5 h-5" />;
       case "系统监控":
         return <Database className="w-5 h-5" />;
-      case "认证服��":
+      case "认证服务":
         return <Shield className="w-5 h-5" />;
       case "系统管理":
         return <Zap className="w-5 h-5" />;
@@ -360,7 +360,7 @@ export default function ApiStatusMonitor() {
 
   // 移除自动检查功能，避免产生大量网络错误
   useEffect(() => {
-    // 不自动运行检查，只在用户手动点击时运行
+    // 不自动运行检查��只在用户手动点击时运行
     console.log("🔧 API状态监控已加载，点击'立即检查'按钮开始检测");
   }, []);
 
@@ -404,9 +404,11 @@ export default function ApiStatusMonitor() {
           <button
             onClick={checkAllEndpoints}
             disabled={isChecking}
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50"
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 hover:scale-105"
             style={{
-              backgroundColor: BUSINESS_COLORS.primary.blue,
+              backgroundColor: isChecking
+                ? BUSINESS_COLORS.neutral.silver
+                : BUSINESS_COLORS.primary.blue,
               color: `rgb(var(--brand-lightest))`,
               textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
               boxShadow: BUSINESS_COLORS.shadows.md,
@@ -416,7 +418,7 @@ export default function ApiStatusMonitor() {
               className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
             />
             <span className="text-sm font-medium">
-              {isChecking ? "检查中..." : "立即检查"}
+              {isChecking ? "检查中..." : "开始检测"}
             </span>
           </button>
         </div>
