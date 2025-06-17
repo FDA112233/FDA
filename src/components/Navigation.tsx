@@ -125,8 +125,8 @@ export function Navigation() {
           onClick={() => setIsMobileMenuOpen(true)}
           className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-xl backdrop-blur-md border transition-all duration-300 hover:scale-110 click-pulse"
           style={{
-            background: `linear-gradient(135deg, 
-              rgba(var(--brand-primary), 0.2) 0%, 
+            background: `linear-gradient(135deg,
+              rgba(var(--brand-primary), 0.2) 0%,
               rgba(var(--brand-accent), 0.1) 100%)`,
             borderColor: `rgba(var(--brand-primary), 0.3)`,
             color: `rgb(var(--brand-lightest))`,
@@ -142,8 +142,8 @@ export function Navigation() {
         <div
           className="fixed inset-0 z-40 mobile-menu-overlay backdrop-blur-sm"
           style={{
-            background: `linear-gradient(135deg, 
-              rgba(var(--neutral-900), 0.8) 0%, 
+            background: `linear-gradient(135deg,
+              rgba(var(--neutral-900), 0.8) 0%,
               rgba(var(--brand-darkest), 0.9) 100%)`,
           }}
           onClick={closeMobileMenu}
@@ -157,9 +157,9 @@ export function Navigation() {
           isMobile && !isMobileMenuOpen && "-translate-x-full",
         )}
         style={{
-          background: `linear-gradient(180deg, 
-            rgba(var(--neutral-900), 0.95) 0%, 
-            rgba(var(--brand-darkest), 0.9) 50%, 
+          background: `linear-gradient(180deg,
+            rgba(var(--neutral-900), 0.95) 0%,
+            rgba(var(--brand-darkest), 0.9) 50%,
             rgba(var(--neutral-800), 0.95) 100%)`,
           borderColor: `rgba(var(--brand-primary), 0.2)`,
           boxShadow: `20px 0 40px rgba(var(--brand-primary), 0.1)`,
@@ -227,8 +227,8 @@ export function Navigation() {
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 relative overflow-hidden"
               style={{
-                background: `linear-gradient(135deg, 
-                  rgb(var(--brand-primary)) 0%, 
+                background: `linear-gradient(135deg,
+                  rgb(var(--brand-primary)) 0%,
                   rgb(var(--brand-accent)) 100%)`,
                 boxShadow: `0 8px 32px rgba(var(--brand-primary), 0.4)`,
               }}
@@ -254,9 +254,9 @@ export function Navigation() {
               <h1
                 className="text-xl font-bold bg-gradient-to-r bg-clip-text text-transparent transition-all duration-300 group-hover:scale-105"
                 style={{
-                  backgroundImage: `linear-gradient(45deg, 
-                    rgb(var(--brand-lightest)) 0%, 
-                    rgb(var(--brand-accent)) 50%, 
+                  backgroundImage: `linear-gradient(45deg,
+                    rgb(var(--brand-lightest)) 0%,
+                    rgb(var(--brand-accent)) 50%,
                     rgb(var(--brand-light)) 100%)`,
                 }}
               >
@@ -266,7 +266,7 @@ export function Navigation() {
                 className="text-xs transition-colors duration-300"
                 style={{ color: `rgb(var(--brand-light))` }}
               >
-                网络安全管理平台
+                网��安全管理平台
               </p>
             </div>
           </div>
@@ -421,7 +421,7 @@ export function Navigation() {
                 className="transition-colors duration-300 group-hover:scale-105"
                 style={{ color: `rgb(var(--success))` }}
               >
-                系��在线
+                系统在线
               </span>
             </div>
 
@@ -599,7 +599,7 @@ export function Navigation() {
                 filter: `drop-shadow(0 0 4px rgba(var(--error), 0.4))`,
               }}
             />
-            <span className="font-medium">���出登录</span>
+            <span className="font-medium">退出登录</span>
 
             {/* 按钮内部光效 */}
             <div
@@ -612,35 +612,6 @@ export function Navigation() {
           </button>
         </div>
       </nav>
-
-      {/* 添加必要的 CSS 动画 */}
-      <style jsx>{`
-        @keyframes slideRight {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-
-        .mobile-nav-transition {
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-menu-overlay {
-          animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </>
   );
 }
