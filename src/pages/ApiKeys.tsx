@@ -1,508 +1,721 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Key,
-  Plus,
-  Copy,
-  Eye,
-  EyeOff,
-  Trash2,
-  Edit3,
-  Calendar,
-  Clock,
-  Shield,
   Activity,
+  CheckCircle,
+  XCircle,
+  Clock,
+  RefreshCw,
+  AlertTriangle,
+  Wifi,
+  WifiOff,
+  Server,
+  Database,
+  Shield,
+  Users,
+  Globe,
+  Zap,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  BusinessCard,
+  StatusCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
+import { API_CONFIG, API_ENDPOINTS } from "@/lib/apiConfig";
 
-interface ApiKey {
+interface ApiEndpoint {
   id: string;
   name: string;
-  key: string;
+  url: string;
+  method: string;
+  category: string;
   description: string;
-  permissions: string[];
-  status: "active" | "expired" | "revoked";
-  createdAt: string;
-  expiresAt: string;
-  lastUsed: string;
-  usageCount: number;
-  rateLimit: number;
+  status: "online" | "offline" | "slow" | "error" | "checking";
+  responseTime?: number;
+  lastChecked?: string;
+  uptime: number;
+  errorCount: number;
+  avgResponseTime: number;
 }
 
-const mockApiKeys: ApiKey[] = [
-  {
-    id: "1",
-    name: "Dashboard Integration",
-    key: "ak_live_1234567890abcdef",
-    description: "用于仪表板数据集成的API密钥",
-    permissions: ["read:alerts", "read:metrics", "read:reports"],
-    status: "active",
-    createdAt: "2024-01-01",
-    expiresAt: "2024-12-31",
-    lastUsed: "2024-01-15 14:30:25",
-    usageCount: 1247,
-    rateLimit: 1000,
-  },
-  {
-    id: "2",
-    name: "Mobile App API",
-    key: "ak_live_abcdef1234567890",
-    description: "移动应用程序访问API",
-    permissions: ["read:alerts", "write:alerts", "read:assets"],
-    status: "active",
-    createdAt: "2024-01-05",
-    expiresAt: "2024-06-30",
-    lastUsed: "2024-01-15 10:15:33",
-    usageCount: 856,
-    rateLimit: 500,
-  },
-  {
-    id: "3",
-    name: "Third Party Integration",
-    key: "ak_live_xyz789012345",
-    description: "第三方系统集成密钥（已过期）",
-    permissions: ["read:logs", "read:metrics"],
-    status: "expired",
-    createdAt: "2023-06-15",
-    expiresAt: "2024-01-01",
-    lastUsed: "2023-12-28 16:45:22",
-    usageCount: 2134,
-    rateLimit: 200,
-  },
-];
+export default function ApiStatusMonitor() {
+  const [endpoints, setEndpoints] = useState<ApiEndpoint[]>([]);
+  const [isChecking, setIsChecking] = useState(false);
+  const [lastGlobalCheck, setLastGlobalCheck] = useState<Date | null>(null);
 
-const availablePermissions = [
-  { id: "read:alerts", label: "读取告警", category: "告警管理" },
-  { id: "write:alerts", label: "管理告警", category: "告警管理" },
-  { id: "read:metrics", label: "读取指标", category: "数据查询" },
-  { id: "read:reports", label: "读取报告", category: "报告管理" },
-  { id: "write:reports", label: "生成报告", category: "报告管理" },
-  { id: "read:assets", label: "读取资产", category: "资产管理" },
-  { id: "write:assets", label: "管理资产", category: "资产管理" },
-  { id: "read:logs", label: "读取日志", category: "日志查询" },
-  { id: "read:users", label: "读取用户", category: "用户管理" },
-  { id: "write:users", label: "管理用户", category: "用户管理" },
-  { id: "admin", label: "管理员权限", category: "系统管理" },
-];
+  // 初始化API端点数据
+  useEffect(() => {
+    const initialEndpoints: ApiEndpoint[] = [
+      {
+        id: "health",
+        name: "健康检查",
+        url: "/health",
+        method: "GET",
+        category: "核心服务",
+        description: "系统健康状态检查",
+        status: "checking",
+        uptime: 99.9,
+        errorCount: 1,
+        avgResponseTime: 45,
+      },
+      {
+        id: "metrics-summary",
+        name: "系统指标摘要",
+        url: "/api/v1/metrics/summary/",
+        method: "GET",
+        category: "监控数据",
+        description: "获取系统指标摘要信息",
+        status: "checking",
+        uptime: 98.5,
+        errorCount: 12,
+        avgResponseTime: 120,
+      },
+      {
+        id: "metrics-current",
+        name: "当前系统指标",
+        url: "/api/v1/metrics/current/",
+        method: "GET",
+        category: "监控数据",
+        description: "获取当前实时系统指标",
+        status: "checking",
+        uptime: 97.8,
+        errorCount: 25,
+        avgResponseTime: 180,
+      },
+      {
+        id: "network-interfaces",
+        name: "网络接口状态",
+        url: "/api/v1/metrics/network-interfaces/current/",
+        method: "GET",
+        category: "网络监控",
+        description: "获取当前网络接口状态",
+        status: "checking",
+        uptime: 99.2,
+        errorCount: 8,
+        avgResponseTime: 95,
+      },
+      {
+        id: "processes",
+        name: "进程监控",
+        url: "/api/v1/system/processes",
+        method: "GET",
+        category: "系统监控",
+        description: "获取系统进程信息",
+        status: "checking",
+        uptime: 96.5,
+        errorCount: 35,
+        avgResponseTime: 250,
+      },
+      {
+        id: "network-connections",
+        name: "网络连接",
+        url: "/api/v1/system/network",
+        method: "GET",
+        category: "网络监控",
+        description: "获取网络连接状态",
+        status: "checking",
+        uptime: 95.1,
+        errorCount: 48,
+        avgResponseTime: 320,
+      },
+      {
+        id: "services",
+        name: "服务状态",
+        url: "/api/v1/system/services",
+        method: "GET",
+        category: "系统监控",
+        description: "获取系统服务状态",
+        status: "checking",
+        uptime: 98.9,
+        errorCount: 5,
+        avgResponseTime: 85,
+      },
+      {
+        id: "auth-me",
+        name: "用户认证",
+        url: "/api/v1/auth/auth/me",
+        method: "GET",
+        category: "认证服务",
+        description: "获取当前用户信息",
+        status: "checking",
+        uptime: 99.7,
+        errorCount: 2,
+        avgResponseTime: 65,
+      },
+      {
+        id: "log-levels",
+        name: "日志管理",
+        url: "/api/v1/logs/log-levels",
+        method: "GET",
+        category: "系统管理",
+        description: "获取日志级别配置",
+        status: "checking",
+        uptime: 99.1,
+        errorCount: 6,
+        avgResponseTime: 75,
+      },
+    ];
 
-export default function ApiKeys() {
-  const [apiKeys, setApiKeys] = useState<ApiKey[]>(mockApiKeys);
-  const [selectedKey, setSelectedKey] = useState<ApiKey | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showKey, setShowKey] = useState<Record<string, boolean>>({});
-  const [isCreating, setIsCreating] = useState(false);
+    setEndpoints(initialEndpoints);
+  }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "text-neon-green bg-neon-green/20";
-      case "expired":
-        return "text-threat-medium bg-threat-medium/20";
-      case "revoked":
-        return "text-threat-critical bg-threat-critical/20";
-      default:
-        return "text-muted-foreground bg-muted/20";
+  // 检查单个端点状态
+  const checkEndpoint = async (endpoint: ApiEndpoint): Promise<ApiEndpoint> => {
+    const startTime = Date.now();
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 减少超时时间
+
+      const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint.url}`, {
+        method: endpoint.method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      const responseTime = Date.now() - startTime;
+
+      let status: ApiEndpoint["status"];
+      if (response.ok) {
+        status = responseTime > 1000 ? "slow" : "online";
+      } else {
+        status = "error";
+      }
+
+      return {
+        ...endpoint,
+        status,
+        responseTime,
+        lastChecked: new Date().toISOString(),
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+
+      // 静默处理错误，不输出到控制台
+      return {
+        ...endpoint,
+        status: "offline",
+        responseTime,
+        lastChecked: new Date().toISOString(),
+      };
     }
   };
 
-  const getStatusText = (status: string) => {
+  // 检查所有端点状态
+  const checkAllEndpoints = async () => {
+    if (isChecking) return; // 防止重复检查
+
+    setIsChecking(true);
+    console.log(`🔍 开始检查 ${endpoints.length} 个API端点`);
+
+    // 设置所有端点为检查中状态
+    setEndpoints((prev) =>
+      prev.map((endpoint) => ({ ...endpoint, status: "checking" as const })),
+    );
+
+    try {
+      // 依次检查，避免并发太多请求
+      const results = [];
+      for (const endpoint of endpoints) {
+        const result = await checkEndpoint(endpoint);
+        results.push(result);
+
+        // 更新单个结果
+        setEndpoints((prev) =>
+          prev.map((ep) => (ep.id === result.id ? result : ep)),
+        );
+
+        // 短暂延迟避免请求过快
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+
+      setLastGlobalCheck(new Date());
+      console.log(
+        `✅ 检查完成: ${results.filter((r) => r.status === "online").length}/${results.length} 在线`,
+      );
+    } catch (error) {
+      console.warn("API状态检查过程中断:", error);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  // 获取状态图标
+  const getStatusIcon = (status: ApiEndpoint["status"]) => {
     switch (status) {
-      case "active":
-        return "活跃";
-      case "expired":
-        return "已过期";
-      case "revoked":
-        return "已撤销";
+      case "online":
+        return (
+          <CheckCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.success }}
+          />
+        );
+      case "offline":
+        return (
+          <XCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.error }}
+          />
+        );
+      case "slow":
+        return (
+          <Clock
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.warning }}
+          />
+        );
+      case "error":
+        return (
+          <AlertTriangle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.status.error }}
+          />
+        );
+      case "checking":
+        return (
+          <RefreshCw
+            className="w-4 h-4 animate-spin"
+            style={{ color: BUSINESS_COLORS.neutral.silver }}
+          />
+        );
+      default:
+        return (
+          <XCircle
+            className="w-4 h-4"
+            style={{ color: BUSINESS_COLORS.neutral.silver }}
+          />
+        );
+    }
+  };
+
+  // 获取状态颜色
+  const getStatusColor = (status: ApiEndpoint["status"]) => {
+    switch (status) {
+      case "online":
+        return BUSINESS_COLORS.status.success;
+      case "offline":
+        return BUSINESS_COLORS.status.error;
+      case "slow":
+        return BUSINESS_COLORS.status.warning;
+      case "error":
+        return BUSINESS_COLORS.status.error;
+      case "checking":
+        return BUSINESS_COLORS.neutral.silver;
+      default:
+        return BUSINESS_COLORS.neutral.silver;
+    }
+  };
+
+  // 获取状态文本
+  const getStatusText = (status: ApiEndpoint["status"]) => {
+    switch (status) {
+      case "online":
+        return "正常";
+      case "offline":
+        return "离线";
+      case "slow":
+        return "缓慢";
+      case "error":
+        return "错误";
+      case "checking":
+        return "检查中";
       default:
         return "未知";
     }
   };
 
-  const maskApiKey = (key: string) => {
-    return key.slice(0, 8) + "..." + key.slice(-4);
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    if (window.showToast) {
-      window.showToast({
-        title: "已复制",
-        description: "API密钥已复制到剪贴板",
-        type: "success",
-      });
+  // 获取分类图标
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case "核心服务":
+        return <Server className="w-5 h-5" />;
+      case "监控数据":
+        return <Activity className="w-5 h-5" />;
+      case "网络监控":
+        return <Globe className="w-5 h-5" />;
+      case "系统监控":
+        return <Database className="w-5 h-5" />;
+      case "认证服务":
+        return <Shield className="w-5 h-5" />;
+      case "系统管理":
+        return <Zap className="w-5 h-5" />;
+      default:
+        return <Server className="w-5 h-5" />;
     }
   };
 
-  const toggleKeyVisibility = (keyId: string) => {
-    setShowKey((prev) => ({ ...prev, [keyId]: !prev[keyId] }));
+  // 统计数据
+  const stats = {
+    total: endpoints.length,
+    online: endpoints.filter((e) => e.status === "online").length,
+    offline: endpoints.filter(
+      (e) => e.status === "offline" || e.status === "error",
+    ).length,
+    avgUptime:
+      endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length,
   };
 
-  const revokeKey = (keyId: string) => {
-    setApiKeys((prev) =>
-      prev.map((key) =>
-        key.id === keyId ? { ...key, status: "revoked" as const } : key,
-      ),
-    );
-    if (window.showToast) {
-      window.showToast({
-        title: "密钥已撤销",
-        description: "API密钥已成功撤销",
-        type: "warning",
-      });
-    }
-  };
-
-  const deleteKey = (keyId: string) => {
-    setApiKeys((prev) => prev.filter((key) => key.id !== keyId));
-    if (window.showToast) {
-      window.showToast({
-        title: "密钥已删除",
-        description: "API密钥已从系统中删除",
-        type: "error",
-      });
-    }
-  };
-
-  const isExpiringSoon = (expiresAt: string) => {
-    const expiry = new Date(expiresAt);
-    const now = new Date();
-    const daysUntilExpiry = Math.ceil(
-      (expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
-  };
-
-  const isExpired = (expiresAt: string) => {
-    return new Date(expiresAt) < new Date();
-  };
+  // 移除自动检查功能，避免产生大量网络错误
+  useEffect(() => {
+    // 不自动运行检查，只在用户手动点击时运行
+    console.log("🔧 API状态监控已加载，点击'立即检查'按钮开始检测");
+  }, []);
 
   return (
-    <div className="ml-64 p-8 min-h-screen matrix-bg">
+    <div
+      className="p-8 pt-16 lg:pt-8 min-h-screen"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white glow-text mb-2">
-          API密钥管理
-        </h1>
-        <p className="text-muted-foreground">
-          管理和监控API访问密钥，控制第三方应用程序的访问权限
-        </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.lg,
+              }}
+            >
+              <Activity
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
+            </div>
+            <div>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+              >
+                API状态监控
+              </h1>
+              <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
+                检测所有API端点的运行状态和性能指标（点击"开始检测"进行检查）
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={checkAllEndpoints}
+            disabled={isChecking}
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 hover:scale-105"
+            style={{
+              backgroundColor: isChecking
+                ? BUSINESS_COLORS.neutral.silver
+                : BUSINESS_COLORS.primary.blue,
+              color: `rgb(var(--brand-lightest))`,
+              textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+              boxShadow: BUSINESS_COLORS.shadows.md,
+            }}
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${isChecking ? "animate-spin" : ""}`}
+            />
+            <span className="text-sm font-medium">
+              {isChecking ? "检查中..." : "开始检测"}
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* 统计面板 */}
+      {/* 全局状态卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="cyber-card p-6 border-l-4 border-l-neon-blue">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">总密钥数</p>
-              <p className="text-2xl font-bold text-white">{apiKeys.length}</p>
-            </div>
-            <Key className="w-8 h-8 text-neon-blue" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-neon-green">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">活跃密钥</p>
-              <p className="text-2xl font-bold text-neon-green">
-                {apiKeys.filter((k) => k.status === "active").length}
-              </p>
-            </div>
-            <Activity className="w-8 h-8 text-neon-green" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-threat-medium">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">即将过期</p>
-              <p className="text-2xl font-bold text-threat-medium">
-                {
-                  apiKeys.filter(
-                    (k) => k.status === "active" && isExpiringSoon(k.expiresAt),
-                  ).length
-                }
-              </p>
-            </div>
-            <Calendar className="w-8 h-8 text-threat-medium" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-threat-critical">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">已撤销</p>
-              <p className="text-2xl font-bold text-threat-critical">
-                {
-                  apiKeys.filter(
-                    (k) => k.status === "revoked" || k.status === "expired",
-                  ).length
-                }
-              </p>
-            </div>
-            <Shield className="w-8 h-8 text-threat-critical" />
-          </div>
-        </div>
+        <StatusCard
+          title="总端点数"
+          value={stats.total}
+          icon={<Server className="w-5 h-5" />}
+          status="info"
+        />
+
+        <StatusCard
+          title="在线服务"
+          value={stats.online}
+          icon={<CheckCircle className="w-5 h-5" />}
+          status="success"
+        />
+
+        <StatusCard
+          title="离线/错误"
+          value={stats.offline}
+          icon={<XCircle className="w-5 h-5" />}
+          status="error"
+        />
+
+        <StatusCard
+          title="平均可用性"
+          value={`${stats.avgUptime.toFixed(1)}%`}
+          icon={<Activity className="w-5 h-5" />}
+          status="info"
+        />
       </div>
 
-      {/* 操作栏 */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-white">API密钥列表</h2>
-          <p className="text-sm text-muted-foreground">
-            显示 {apiKeys.length} 个API密钥
-          </p>
-        </div>
-        <button
-          onClick={() => setIsCreating(true)}
-          className="neon-button flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>创建新密钥</span>
-        </button>
-      </div>
-
-      {/* API密钥列表 */}
-      <div className="space-y-4">
-        {apiKeys.map((apiKey) => (
-          <div key={apiKey.id} className="cyber-card p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-3">
-                  <h3 className="text-lg font-semibold text-white">
-                    {apiKey.name}
-                  </h3>
-                  <span
-                    className={cn(
-                      "px-2 py-1 rounded text-xs",
-                      getStatusColor(apiKey.status),
-                    )}
+      {/* API端点状态列表 */}
+      <DataTableCard
+        title="API端点监控"
+        description={`共监控 ${endpoints.length} 个API端点 ${lastGlobalCheck ? `• 上次检查: ${lastGlobalCheck.toLocaleString()}` : ""}`}
+        data={endpoints}
+        columns={[
+          {
+            key: "name",
+            label: "服务名称",
+            render: (value, row) => (
+              <div className="flex items-center space-x-3">
+                {getCategoryIcon(row.category)}
+                <div>
+                  <p className="font-medium text-sm">{value}</p>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
                   >
-                    {getStatusText(apiKey.status)}
-                  </span>
-                  {isExpiringSoon(apiKey.expiresAt) &&
-                    apiKey.status === "active" && (
-                      <span className="px-2 py-1 rounded text-xs bg-threat-medium/20 text-threat-medium">
-                        即将过期
-                      </span>
-                    )}
+                    {row.description}
+                  </p>
                 </div>
-
-                <p className="text-muted-foreground mb-4">
-                  {apiKey.description}
+              </div>
+            ),
+          },
+          {
+            key: "url",
+            label: "端点地址",
+            render: (value, row) => (
+              <div>
+                <code
+                  className="text-sm font-mono px-2 py-1 rounded"
+                  style={{
+                    backgroundColor: BUSINESS_COLORS.ui.background.tertiary,
+                    color: BUSINESS_COLORS.ui.text.primary,
+                  }}
+                >
+                  {row.method} {value}
+                </code>
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {row.category}
                 </p>
-
-                {/* API密钥显示 */}
-                <div className="bg-matrix-surface rounded-lg p-3 mb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Key className="w-4 h-4 text-neon-blue" />
-                      <code className="text-neon-blue font-mono">
-                        {showKey[apiKey.id]
-                          ? apiKey.key
-                          : maskApiKey(apiKey.key)}
-                      </code>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => toggleKeyVisibility(apiKey.id)}
-                        className="p-1 text-muted-foreground hover:text-white transition-colors"
-                      >
-                        {showKey[apiKey.id] ? (
-                          <EyeOff className="w-4 h-4" />
-                        ) : (
-                          <Eye className="w-4 h-4" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(apiKey.key)}
-                        className="p-1 text-muted-foreground hover:text-white transition-colors"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+              </div>
+            ),
+          },
+          {
+            key: "status",
+            label: "状态",
+            render: (value, row) => (
+              <div className="flex items-center space-x-2">
+                {getStatusIcon(value)}
+                <span className="text-sm font-medium">
+                  {getStatusText(value)}
+                </span>
+                {row.responseTime && (
+                  <span
+                    className="text-xs"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    ({row.responseTime}ms)
+                  </span>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "uptime",
+            label: "可用性",
+            render: (value) => (
+              <div className="text-right">
+                <div
+                  className="text-sm font-medium"
+                  style={{
+                    color:
+                      value >= 99
+                        ? BUSINESS_COLORS.status.success
+                        : value >= 95
+                          ? BUSINESS_COLORS.status.warning
+                          : BUSINESS_COLORS.status.error,
+                  }}
+                >
+                  {value.toFixed(1)}%
                 </div>
-
-                {/* 权限标签 */}
-                <div className="mb-4">
-                  <p className="text-sm text-muted-foreground mb-2">权限:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {apiKey.permissions.map((permission) => (
-                      <span
-                        key={permission}
-                        className="px-2 py-1 bg-neon-blue/20 text-neon-blue rounded text-xs font-mono"
-                      >
-                        {permission}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 使用统计 */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">创建时间</p>
-                    <p className="text-white font-mono">{apiKey.createdAt}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">过期时间</p>
-                    <p
-                      className={cn(
-                        "font-mono",
-                        isExpired(apiKey.expiresAt)
-                          ? "text-threat-critical"
-                          : isExpiringSoon(apiKey.expiresAt)
-                            ? "text-threat-medium"
-                            : "text-white",
-                      )}
-                    >
-                      {apiKey.expiresAt}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">最后使用</p>
-                    <p className="text-white font-mono">{apiKey.lastUsed}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">使用次数</p>
-                    <p className="text-white font-mono">
-                      {apiKey.usageCount.toLocaleString()}
-                    </p>
-                  </div>
+                <div
+                  className="w-full bg-gray-600 rounded-full h-1.5 mt-1"
+                  style={{
+                    backgroundColor: BUSINESS_COLORS.ui.background.tertiary,
+                  }}
+                >
+                  <div
+                    className="h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${value}%`,
+                      backgroundColor:
+                        value >= 99
+                          ? BUSINESS_COLORS.status.success
+                          : value >= 95
+                            ? BUSINESS_COLORS.status.warning
+                            : BUSINESS_COLORS.status.error,
+                    }}
+                  />
                 </div>
               </div>
-
-              {/* 操作按钮 */}
-              <div className="flex items-center space-x-2 ml-6">
-                <button
-                  onClick={() => setSelectedKey(apiKey)}
-                  className="p-2 text-neon-blue hover:bg-neon-blue/10 rounded transition-colors"
-                  title="查看详情"
+            ),
+          },
+          {
+            key: "avgResponseTime",
+            label: "平均响应时间",
+            render: (value) => (
+              <div className="text-right">
+                <span
+                  className="text-sm font-mono"
+                  style={{
+                    color:
+                      value <= 100
+                        ? BUSINESS_COLORS.status.success
+                        : value <= 500
+                          ? BUSINESS_COLORS.status.warning
+                          : BUSINESS_COLORS.status.error,
+                  }}
                 >
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 text-neon-green hover:bg-neon-green/10 rounded transition-colors"
-                  title="编辑密钥"
+                  {value}ms
+                </span>
+              </div>
+            ),
+          },
+          {
+            key: "errorCount",
+            label: "24h错误次数",
+            render: (value) => (
+              <div className="text-right">
+                <span
+                  className="text-sm font-medium"
+                  style={{
+                    color:
+                      value === 0
+                        ? BUSINESS_COLORS.status.success
+                        : value <= 10
+                          ? BUSINESS_COLORS.status.warning
+                          : BUSINESS_COLORS.status.error,
+                  }}
                 >
-                  <Edit3 className="w-4 h-4" />
-                </button>
-                {apiKey.status === "active" && (
-                  <button
-                    onClick={() => revokeKey(apiKey.id)}
-                    className="p-2 text-threat-medium hover:bg-threat-medium/10 rounded transition-colors"
-                    title="撤销密钥"
+                  {value}
+                </span>
+              </div>
+            ),
+          },
+          {
+            key: "lastChecked",
+            label: "最后检查",
+            render: (value) => (
+              <div className="text-right">
+                {value ? (
+                  <>
+                    <p className="text-sm">
+                      {new Date(value).toLocaleTimeString("zh-CN")}
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    >
+                      {new Date(value).toLocaleDateString("zh-CN")}
+                    </p>
+                  </>
+                ) : (
+                  <span
+                    className="text-sm"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
                   >
-                    <Shield className="w-4 h-4" />
-                  </button>
+                    未检查
+                  </span>
                 )}
-                <button
-                  onClick={() => deleteKey(apiKey.id)}
-                  className="p-2 text-threat-critical hover:bg-threat-critical/10 rounded transition-colors"
-                  title="删除密钥"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              </div>
+            ),
+          },
+        ]}
+      />
+
+      {/* 监控说明 */}
+      <BusinessCard className="mt-8">
+        <div>
+          <h3
+            className="text-lg font-semibold mb-4"
+            style={{ color: BUSINESS_COLORS.ui.text.primary }}
+          >
+            监控说明
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4
+                className="font-medium mb-2"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
+                状态定义
+              </h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.success }}
+                  />
+                  <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                    正常: 响应时间 {"<="} 1秒，状态码 200
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Clock
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.warning }}
+                  />
+                  <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                    缓慢: 响应时间 {">"} 1秒，状态码 200
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <XCircle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.error }}
+                  />
+                  <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                    离线: 网络连接失败或超时
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle
+                    className="w-4 h-4"
+                    style={{ color: BUSINESS_COLORS.status.error }}
+                  />
+                  <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                    错误: 状态码非 200
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* 创建新密钥弹窗 */}
-      {isCreating && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setIsCreating(false)}
-          />
-          <div className="relative w-full max-w-2xl mx-4">
-            <div className="cyber-card border-2 border-neon-blue/30 p-6">
-              <h3 className="text-xl font-bold text-white mb-6">
-                创建新的API密钥
-              </h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    密钥名称
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="为这个API密钥起一个描述性的名称"
-                    className="w-full px-3 py-2 bg-matrix-surface border border-matrix-border rounded text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue"
-                  />
+            <div>
+              <h4
+                className="font-medium mb-2"
+                style={{ color: BUSINESS_COLORS.ui.text.primary }}
+              >
+                监控配置
+              </h4>
+              <div className="space-y-2 text-sm">
+                <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                  • 检查方式: 手动触发
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    描述
-                  </label>
-                  <textarea
-                    placeholder="描述这个API密钥的用途"
-                    rows={3}
-                    className="w-full px-3 py-2 bg-matrix-surface border border-matrix-border rounded text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue"
-                  />
+                <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                  • 超时设置: 3秒
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    过期时间
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full px-3 py-2 bg-matrix-surface border border-matrix-border rounded text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
-                  />
+                <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                  • 目标服务器: {API_CONFIG.BASE_URL}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    请求频率限制 (每分钟)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="1000"
-                    className="w-full px-3 py-2 bg-matrix-surface border border-matrix-border rounded text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue"
-                  />
+                <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
+                  • 检查间隔: 200ms/端点
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    权限设置
-                  </label>
-                  <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-                    {availablePermissions.map((permission) => (
-                      <label
-                        key={permission.id}
-                        className="flex items-center space-x-2 p-2 bg-matrix-surface rounded"
-                      >
-                        <input
-                          type="checkbox"
-                          className="text-neon-blue focus:ring-neon-blue"
-                        />
-                        <div>
-                          <span className="text-sm text-white">
-                            {permission.label}
-                          </span>
-                          <p className="text-xs text-muted-foreground">
-                            {permission.category}
-                          </p>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end space-x-4 mt-6">
-                <button
-                  onClick={() => setIsCreating(false)}
-                  className="px-4 py-2 text-muted-foreground hover:text-white transition-colors"
-                >
-                  取消
-                </button>
-                <button className="neon-button">创建API密钥</button>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </BusinessCard>
     </div>
   );
 }

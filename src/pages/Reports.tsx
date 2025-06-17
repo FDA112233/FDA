@@ -1,380 +1,533 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   Download,
   Calendar,
-  Filter,
+  BarChart3,
   TrendingUp,
   Shield,
   AlertTriangle,
+  Activity,
+  Clock,
+  Filter,
+  Search,
+  Plus,
   Eye,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+  BusinessCard,
+  StatusCard,
+  InfoCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
-// 模拟报告数据
-const threatTrendData = [
-  { month: "1月", threats: 234, blocked: 187, resolved: 201 },
-  { month: "2月", threats: 287, blocked: 245, resolved: 223 },
-  { month: "3月", threats: 345, blocked: 298, resolved: 267 },
-  { month: "4月", threats: 298, blocked: 267, resolved: 245 },
-  { month: "5月", threats: 412, blocked: 356, resolved: 378 },
-  { month: "6月", threats: 389, blocked: 334, resolved: 356 },
-];
-
-const threatTypeData = [
-  { name: "DDoS攻击", value: 35, color: "#ff0040" },
-  { name: "恶意软件", value: 28, color: "#ff6600" },
-  { name: "钓鱼攻击", value: 22, color: "#ffcc00" },
-  { name: "数据泄露", value: 15, color: "#39ff14" },
-];
-
-const systemPerformanceData = [
-  { time: "00:00", cpu: 45, memory: 62, network: 78 },
-  { time: "04:00", cpu: 52, memory: 58, network: 82 },
-  { time: "08:00", cpu: 78, memory: 71, network: 95 },
-  { time: "12:00", cpu: 85, memory: 79, network: 88 },
-  { time: "16:00", cpu: 72, memory: 67, network: 91 },
-  { time: "20:00", cpu: 58, memory: 54, network: 76 },
-];
-
-const reports = [
-  {
-    id: "1",
-    title: "每日安全威胁报告",
-    description: "过去24小时内的威胁检测和防护统计",
-    type: "daily",
-    generated: "2024-01-15 09:00:00",
-    status: "completed",
-  },
-  {
-    id: "2",
-    title: "周度安全态势报告",
-    description: "本周网络安全态势分析和趋势预测",
-    type: "weekly",
-    generated: "2024-01-15 06:00:00",
-    status: "completed",
-  },
-  {
-    id: "3",
-    title: "月度合规性报告",
-    description: "本月安全合规性检查和改进建议",
-    type: "monthly",
-    generated: "2024-01-01 08:00:00",
-    status: "completed",
-  },
-  {
-    id: "4",
-    title: "实时监控报告",
-    description: "当前系统实时监控数据汇总",
-    type: "realtime",
-    generated: "正在生成...",
-    status: "generating",
-  },
-];
-
-function CustomTooltip({ active, payload, label }: any) {
-  if (active && payload && payload.length) {
-    return (
-      <div className="cyber-card p-3 border border-neon-blue/30">
-        <p className="text-neon-blue font-mono text-sm mb-1">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {`${entry.dataKey}: ${entry.value}`}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
+interface SecurityReport {
+  id: string;
+  name: string;
+  type: "daily" | "weekly" | "monthly" | "incident" | "compliance";
+  status: "generating" | "completed" | "failed" | "scheduled";
+  createdAt: string;
+  createdBy: string;
+  size: string;
+  description: string;
 }
 
 export default function Reports() {
-  const [selectedPeriod, setSelectedPeriod] = useState("week");
-  const [reportType, setReportType] = useState("all");
+  const [reports, setReports] = useState<SecurityReport[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  const filteredReports = reports.filter(
-    (report) => reportType === "all" || report.type === reportType,
-  );
+  // 模拟报告数据
+  useEffect(() => {
+    const mockReports: SecurityReport[] = [
+      {
+        id: "report-001",
+        name: "每日安全摘要报告",
+        type: "daily",
+        status: "completed",
+        createdAt: "2024-01-15T08:00:00Z",
+        createdBy: "系统自动",
+        size: "2.3 MB",
+        description: "包含威胁检测、响应活动和系统状态的每日汇总",
+      },
+      {
+        id: "report-002",
+        name: "周度威胁分析报告",
+        type: "weekly",
+        status: "completed",
+        createdAt: "2024-01-14T18:00:00Z",
+        createdBy: "张安全",
+        size: "5.7 MB",
+        description: "本周威胁趋势分析、攻击模式识别和防护效果评估",
+      },
+      {
+        id: "report-003",
+        name: "合规性检查报告",
+        type: "compliance",
+        status: "generating",
+        createdAt: "2024-01-15T14:30:00Z",
+        createdBy: "李合规",
+        size: "生成中...",
+        description: "ISO 27001和等保三级合规性检查结果",
+      },
+      {
+        id: "report-004",
+        name: "安全事件调查报告",
+        type: "incident",
+        status: "completed",
+        createdAt: "2024-01-12T16:45:00Z",
+        createdBy: "王响应",
+        size: "8.2 MB",
+        description: "针对1月10日数据泄露事件的详细调查报告",
+      },
+      {
+        id: "report-005",
+        name: "月度安全态势报告",
+        type: "monthly",
+        status: "scheduled",
+        createdAt: "2024-01-20T09:00:00Z",
+        createdBy: "系统自动",
+        size: "待生成",
+        description: "月度安全态势总结、趋势分析和改进建议",
+      },
+    ];
+    setReports(mockReports);
+  }, []);
+
+  // 过滤报告
+  const filteredReports = reports.filter((report) => {
+    const matchesSearch =
+      report.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === "all" || report.type === filterType;
+    const matchesStatus =
+      filterStatus === "all" || report.status === filterStatus;
+
+    return matchesSearch && matchesType && matchesStatus;
+  });
+
+  // 获取状态颜色
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return BUSINESS_COLORS.status.success;
+      case "generating":
+        return BUSINESS_COLORS.status.processing;
+      case "failed":
+        return BUSINESS_COLORS.status.error;
+      case "scheduled":
+        return BUSINESS_COLORS.status.info;
+      default:
+        return BUSINESS_COLORS.neutral.silver;
+    }
+  };
+
+  // 获取类型图标
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case "daily":
+        return <Calendar className="w-4 h-4" />;
+      case "weekly":
+        return <BarChart3 className="w-4 h-4" />;
+      case "monthly":
+        return <TrendingUp className="w-4 h-4" />;
+      case "incident":
+        return <AlertTriangle className="w-4 h-4" />;
+      case "compliance":
+        return <Shield className="w-4 h-4" />;
+      default:
+        return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  // 统计数据
+  const reportStats = {
+    total: reports.length,
+    completed: reports.filter((r) => r.status === "completed").length,
+    generating: reports.filter((r) => r.status === "generating").length,
+    scheduled: reports.filter((r) => r.status === "scheduled").length,
+  };
 
   return (
-    <div className="min-h-screen matrix-bg">
-      <div className="ml-64 p-8">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white glow-text mb-2">
-            安全报告中心
-          </h1>
-          <p className="text-muted-foreground">
-            生成和管理安全分析报告，跟踪系统安全态势
-          </p>
-        </div>
-
-        {/* 快速统计 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="cyber-card p-6 border-l-4 border-l-neon-blue">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">本月检测威胁</p>
-                <p className="text-2xl font-bold text-neon-blue glow-text">
-                  2,847
-                </p>
-                <p className="text-xs text-neon-green">+12% 环比上月</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-neon-blue" />
+    <div
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.lg,
+              }}
+            >
+              <FileText
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
+              />
             </div>
-          </div>
-
-          <div className="cyber-card p-6 border-l-4 border-l-neon-green">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">成功拦截</p>
-                <p className="text-2xl font-bold text-neon-green glow-text">
-                  2,534
-                </p>
-                <p className="text-xs text-neon-green">89% 拦截率</p>
-              </div>
-              <Shield className="w-8 h-8 text-neon-green" />
-            </div>
-          </div>
-
-          <div className="cyber-card p-6 border-l-4 border-l-threat-medium">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">处理中告警</p>
-                <p className="text-2xl font-bold text-threat-medium glow-text">
-                  47
-                </p>
-                <p className="text-xs text-threat-high">需要关注</p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-threat-medium" />
-            </div>
-          </div>
-
-          <div className="cyber-card p-6 border-l-4 border-l-threat-info">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">监控节点</p>
-                <p className="text-2xl font-bold text-threat-info glow-text">
-                  156
-                </p>
-                <p className="text-xs text-neon-green">全部在线</p>
-              </div>
-              <Eye className="w-8 h-8 text-threat-info" />
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* 威胁趋势图表 */}
-          <div className="cyber-card p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-white">威胁趋势分析</h3>
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="px-3 py-1 bg-matrix-surface border border-matrix-border rounded text-white text-sm"
+            <div>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.inverse }}
               >
-                <option value="week">最近7天</option>
-                <option value="month">最近30天</option>
-                <option value="quarter">最近3个月</option>
-              </select>
-            </div>
-
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={threatTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                  <XAxis
-                    dataKey="month"
-                    stroke="#6b7280"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="#6b7280"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Line
-                    type="monotone"
-                    dataKey="threats"
-                    stroke="#ff0040"
-                    strokeWidth={2}
-                    name="检测威胁"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="blocked"
-                    stroke="#39ff14"
-                    strokeWidth={2}
-                    name="成功拦截"
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="resolved"
-                    stroke="#00f5ff"
-                    strokeWidth={2}
-                    name="已解决"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+                安全报告管理
+              </h1>
+              <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
+                生成、管理和分析安全报告与合规文档
+              </p>
             </div>
           </div>
 
-          {/* 威胁类型分布 */}
-          <div className="cyber-card p-6">
-            <h3 className="text-lg font-semibold text-white mb-6">
-              威胁类型分布
-            </h3>
-
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={threatTypeData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {threatTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* 系统性能监控 */}
-        <div className="cyber-card p-6 mb-8">
-          <h3 className="text-lg font-semibold text-white mb-6">
-            系统性能监控
-          </h3>
-
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={systemPerformanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#30363d" />
-                <XAxis
-                  dataKey="time"
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#6b7280"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="cpu" fill="#00f5ff" name="CPU使用率" />
-                <Bar dataKey="memory" fill="#39ff14" name="内存使用率" />
-                <Bar dataKey="network" fill="#ff6600" name="网络使用率" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 报告列表 */}
-        <div className="cyber-card">
-          <div className="p-6 border-b border-matrix-border">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">生成的报告</h3>
-              <div className="flex items-center space-x-4">
-                <select
-                  value={reportType}
-                  onChange={(e) => setReportType(e.target.value)}
-                  className="px-3 py-1 bg-matrix-surface border border-matrix-border rounded text-white text-sm"
-                >
-                  <option value="all">所有类型</option>
-                  <option value="daily">每日报告</option>
-                  <option value="weekly">周度报告</option>
-                  <option value="monthly">月度报告</option>
-                  <option value="realtime">实时报告</option>
-                </select>
-                <button className="neon-button flex items-center space-x-2">
-                  <FileText className="w-4 h-4" />
-                  <span>生成新报告</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="divide-y divide-matrix-border">
-            {filteredReports.map((report) => (
-              <div
-                key={report.id}
-                className="p-6 hover:bg-matrix-accent/50 transition-all duration-200"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <FileText className="w-5 h-5 text-neon-blue" />
-                      <h4 className="text-lg font-semibold text-white">
-                        {report.title}
-                      </h4>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-mono ${
-                          report.status === "completed"
-                            ? "bg-neon-green/20 text-neon-green"
-                            : "bg-threat-medium/20 text-threat-medium"
-                        }`}
-                      >
-                        {report.status === "completed" ? "已完成" : "生成中"}
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {report.description}
-                    </p>
-
-                    <p className="text-xs text-muted-foreground">
-                      生成时间: {report.generated}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <button className="px-3 py-1 text-xs border border-neon-blue/30 text-neon-blue rounded hover:bg-neon-blue/10 transition-colors">
-                      查看
-                    </button>
-                    {report.status === "completed" && (
-                      <button className="px-3 py-1 text-xs border border-neon-green/30 text-neon-green rounded hover:bg-neon-green/10 transition-colors flex items-center space-x-1">
-                        <Download className="w-3 h-3" />
-                        <span>下载</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* 操作按钮 */}
+          <div className="flex items-center space-x-3">
+            <button
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+                boxShadow: BUSINESS_COLORS.shadows.md,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  BUSINESS_COLORS.primary.navy;
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  BUSINESS_COLORS.primary.blue;
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              <span className="text-sm font-medium">生成报告</span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* 统计指标 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <StatusCard
+          title="总报告数"
+          value={reportStats.total}
+          icon={<FileText className="w-5 h-5" />}
+          status="info"
+        />
+
+        <StatusCard
+          title="已完成"
+          value={reportStats.completed}
+          icon={<BarChart3 className="w-5 h-5" />}
+          status="success"
+        />
+
+        <StatusCard
+          title="生成中"
+          value={reportStats.generating}
+          icon={<Activity className="w-5 h-5" />}
+          status="warning"
+        />
+
+        <StatusCard
+          title="已计划"
+          value={reportStats.scheduled}
+          icon={<Clock className="w-5 h-5" />}
+          status="info"
+        />
+      </div>
+
+      {/* 报告分类快捷入口 */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        {[
+          { type: "daily", label: "每日报告", icon: Calendar },
+          { type: "weekly", label: "周度报告", icon: BarChart3 },
+          { type: "monthly", label: "月度报告", icon: TrendingUp },
+          { type: "incident", label: "事件报告", icon: AlertTriangle },
+          { type: "compliance", label: "合规报告", icon: Shield },
+        ].map((category) => {
+          const Icon = category.icon;
+          const count = reports.filter((r) => r.type === category.type).length;
+
+          return (
+            <BusinessCard
+              key={category.type}
+              hoverable
+              onClick={() => setFilterType(category.type)}
+              className="cursor-pointer"
+            >
+              <div className="flex items-center space-x-3">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{
+                    backgroundColor: `${BUSINESS_COLORS.primary.blue}20`,
+                    color: BUSINESS_COLORS.primary.blue,
+                  }}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <p
+                    className="font-medium text-sm"
+                    style={{ color: BUSINESS_COLORS.ui.text.primary }}
+                  >
+                    {category.label}
+                  </p>
+                  <p
+                    className="text-xs"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    {count} 个报告
+                  </p>
+                </div>
+              </div>
+            </BusinessCard>
+          );
+        })}
+      </div>
+
+      {/* 搜索和过滤 */}
+      <BusinessCard className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            {/* 搜索框 */}
+            <div className="relative flex-1 max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              />
+              <input
+                type="text"
+                placeholder="搜索报告..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = BUSINESS_COLORS.primary.blue;
+                  e.target.style.boxShadow = `0 0 0 3px ${BUSINESS_COLORS.primary.blue}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor =
+                    BUSINESS_COLORS.ui.border.primary;
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+            </div>
+
+            {/* 过滤器 */}
+            <div className="flex gap-3">
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有类型</option>
+                <option value="daily">每日报告</option>
+                <option value="weekly">周度报告</option>
+                <option value="monthly">月度报告</option>
+                <option value="incident">事件报告</option>
+                <option value="compliance">合规报告</option>
+              </select>
+
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有状态</option>
+                <option value="completed">已完成</option>
+                <option value="generating">生成中</option>
+                <option value="scheduled">已计划</option>
+                <option value="failed">失败</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </BusinessCard>
+
+      {/* 报告列表 */}
+      <DataTableCard
+        title="安全报告列表"
+        description={`共 ${filteredReports.length} 个报告`}
+        data={filteredReports}
+        columns={[
+          {
+            key: "type",
+            label: "类型",
+            render: (value) => (
+              <div className="flex items-center space-x-2">
+                {getTypeIcon(value)}
+                <span className="font-medium text-sm capitalize">
+                  {value === "daily"
+                    ? "每日"
+                    : value === "weekly"
+                      ? "周度"
+                      : value === "monthly"
+                        ? "月度"
+                        : value === "incident"
+                          ? "事件"
+                          : "合规"}
+                </span>
+              </div>
+            ),
+          },
+          {
+            key: "name",
+            label: "报告名称",
+            render: (value, row) => (
+              <div>
+                <p className="font-medium text-sm">{value}</p>
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {row.description}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: "status",
+            label: "状态",
+            render: (value) => (
+              <span
+                className="px-2 py-1 rounded-full text-xs font-medium"
+                style={{
+                  backgroundColor: `${getStatusColor(value)}20`,
+                  color: getStatusColor(value),
+                  border: `1px solid ${getStatusColor(value)}40`,
+                }}
+              >
+                {value === "completed"
+                  ? "已完成"
+                  : value === "generating"
+                    ? "生成中"
+                    : value === "scheduled"
+                      ? "已计划"
+                      : "失败"}
+              </span>
+            ),
+          },
+          {
+            key: "createdBy",
+            label: "创建者",
+            render: (value) => <span className="text-sm">{value}</span>,
+          },
+          {
+            key: "createdAt",
+            label: "创建时间",
+            render: (value) => (
+              <div>
+                <p className="text-sm">
+                  {new Date(value).toLocaleDateString("zh-CN")}
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {new Date(value).toLocaleTimeString("zh-CN")}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: "size",
+            label: "大小",
+            render: (value) => (
+              <span
+                className="text-sm font-mono"
+                style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+              >
+                {value}
+              </span>
+            ),
+          },
+          {
+            key: "actions",
+            label: "操作",
+            render: (_, row) => (
+              <div className="flex items-center space-x-2">
+                {row.status === "completed" && (
+                  <button
+                    className="p-1 rounded transition-colors"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        BUSINESS_COLORS.ui.background.secondary;
+                      e.currentTarget.style.color =
+                        BUSINESS_COLORS.ui.text.primary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color =
+                        BUSINESS_COLORS.ui.text.muted;
+                    }}
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                )}
+                <button
+                  className="p-1 rounded transition-colors"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      BUSINESS_COLORS.ui.background.secondary;
+                    e.currentTarget.style.color =
+                      BUSINESS_COLORS.ui.text.primary;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = BUSINESS_COLORS.ui.text.muted;
+                  }}
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+              </div>
+            ),
+          },
+        ]}
+        actions={
+          <div className="flex items-center space-x-2">
+            <button
+              className="flex items-center space-x-2 px-3 py-1 rounded-lg transition-colors"
+              style={{
+                backgroundColor: BUSINESS_COLORS.ui.background.secondary,
+                color: BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">筛选</span>
+            </button>
+          </div>
+        }
+      />
     </div>
   );
 }

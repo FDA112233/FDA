@@ -1,436 +1,493 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Users,
-  Plus,
-  Edit3,
-  Trash2,
-  Shield,
-  Eye,
-  EyeOff,
   Search,
-  Filter,
-  MoreHorizontal,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
   UserCheck,
   UserX,
+  Shield,
+  Key,
   Clock,
+  Mail,
+  Phone,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  BusinessCard,
+  StatusCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
 interface User {
   id: string;
   username: string;
   email: string;
-  role: "admin" | "analyst" | "viewer";
-  status: "active" | "inactive" | "locked";
+  fullName: string;
+  role: "admin" | "analyst" | "operator" | "viewer";
+  status: "active" | "inactive" | "suspended" | "pending";
   lastLogin: string;
-  loginCount: number;
   createdAt: string;
   permissions: string[];
+  phone?: string;
+  department: string;
 }
 
-const mockUsers: User[] = [
-  {
-    id: "1",
-    username: "admin",
-    email: "admin@cyberguard.com",
-    role: "admin",
-    status: "active",
-    lastLogin: "2024-01-15 14:30:25",
-    loginCount: 247,
-    createdAt: "2023-06-15",
-    permissions: ["all"],
-  },
-  {
-    id: "2",
-    username: "analyst_wang",
-    email: "wang@cyberguard.com",
-    role: "analyst",
-    status: "active",
-    lastLogin: "2024-01-15 09:15:10",
-    loginCount: 156,
-    createdAt: "2023-08-20",
-    permissions: ["view_alerts", "manage_alerts", "view_reports"],
-  },
-  {
-    id: "3",
-    username: "viewer_li",
-    email: "li@cyberguard.com",
-    role: "viewer",
-    status: "inactive",
-    lastLogin: "2024-01-10 16:45:33",
-    loginCount: 89,
-    createdAt: "2023-10-05",
-    permissions: ["view_dashboard", "view_alerts"],
-  },
-  {
-    id: "4",
-    username: "security_zhao",
-    email: "zhao@cyberguard.com",
-    role: "analyst",
-    status: "locked",
-    lastLogin: "2024-01-14 11:20:15",
-    loginCount: 203,
-    createdAt: "2023-07-12",
-    permissions: ["view_alerts", "manage_alerts", "view_network"],
-  },
-];
-
 export default function UserManagement() {
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [filterRole, setFilterRole] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
 
+  // 模拟用户数据
+  useEffect(() => {
+    const mockUsers: User[] = [
+      {
+        id: "user-001",
+        username: "admin",
+        email: "admin@cyberguard.com",
+        fullName: "系统管理员",
+        role: "admin",
+        status: "active",
+        lastLogin: "2024-01-15T14:30:00Z",
+        createdAt: "2023-01-01T00:00:00Z",
+        permissions: ["all"],
+        phone: "+86 138-0013-8000",
+        department: "信息技术部",
+      },
+      {
+        id: "user-002",
+        username: "zhang.security",
+        email: "zhang@cyberguard.com",
+        fullName: "张安全",
+        role: "analyst",
+        status: "active",
+        lastLogin: "2024-01-15T13:45:00Z",
+        createdAt: "2023-03-15T00:00:00Z",
+        permissions: ["view_threats", "manage_alerts", "create_reports"],
+        phone: "+86 139-0013-9000",
+        department: "网络安全部",
+      },
+      {
+        id: "user-003",
+        username: "li.ops",
+        email: "li@cyberguard.com",
+        fullName: "李运维",
+        role: "operator",
+        status: "active",
+        lastLogin: "2024-01-15T12:20:00Z",
+        createdAt: "2023-05-20T00:00:00Z",
+        permissions: ["view_assets", "manage_systems", "view_logs"],
+        phone: "+86 135-0013-5000",
+        department: "运维部",
+      },
+      {
+        id: "user-004",
+        username: "wang.audit",
+        email: "wang@cyberguard.com",
+        fullName: "王审计",
+        role: "viewer",
+        status: "inactive",
+        lastLogin: "2024-01-10T16:00:00Z",
+        createdAt: "2023-08-10T00:00:00Z",
+        permissions: ["view_reports", "view_compliance"],
+        phone: "+86 136-0013-6000",
+        department: "审计部",
+      },
+      {
+        id: "user-005",
+        username: "chen.temp",
+        email: "chen@cyberguard.com",
+        fullName: "陈临时",
+        role: "viewer",
+        status: "pending",
+        lastLogin: "",
+        createdAt: "2024-01-14T00:00:00Z",
+        permissions: ["view_reports"],
+        department: "人力资源部",
+      },
+    ];
+    setUsers(mockUsers);
+  }, []);
+
+  // 过滤用户
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    const matchesRole = filterRole === "all" || user.role === filterRole;
     const matchesStatus =
-      statusFilter === "all" || user.status === statusFilter;
+      filterStatus === "all" || user.status === filterStatus;
+
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  // 获取角色颜色
   const getRoleColor = (role: string) => {
     switch (role) {
       case "admin":
-        return "text-threat-critical bg-threat-critical/20";
+        return BUSINESS_COLORS.threat.critical;
       case "analyst":
-        return "text-neon-blue bg-neon-blue/20";
+        return BUSINESS_COLORS.primary.blue;
+      case "operator":
+        return BUSINESS_COLORS.status.warning;
       case "viewer":
-        return "text-neon-green bg-neon-green/20";
+        return BUSINESS_COLORS.status.info;
       default:
-        return "text-muted-foreground bg-muted/20";
+        return BUSINESS_COLORS.neutral.silver;
     }
   };
 
+  // 获取状态颜色
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "text-neon-green bg-neon-green/20";
+        return BUSINESS_COLORS.status.success;
       case "inactive":
-        return "text-threat-medium bg-threat-medium/20";
-      case "locked":
-        return "text-threat-critical bg-threat-critical/20";
+        return BUSINESS_COLORS.neutral.silver;
+      case "suspended":
+        return BUSINESS_COLORS.status.error;
+      case "pending":
+        return BUSINESS_COLORS.status.warning;
       default:
-        return "text-muted-foreground bg-muted/20";
+        return BUSINESS_COLORS.neutral.silver;
     }
   };
 
-  const getRoleText = (role: string) => {
-    switch (role) {
-      case "admin":
-        return "系统管理员";
-      case "analyst":
-        return "安全分析师";
-      case "viewer":
-        return "只读用户";
-      default:
-        return "未知";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "活跃";
-      case "inactive":
-        return "非活跃";
-      case "locked":
-        return "已锁定";
-      default:
-        return "未知";
-    }
-  };
-
-  const handleUserAction = (action: string, user: User) => {
-    switch (action) {
-      case "edit":
-        setSelectedUser(user);
-        setIsModalOpen(true);
-        break;
-      case "activate":
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.id === user.id ? { ...u, status: "active" as const } : u,
-          ),
-        );
-        if (window.showToast) {
-          window.showToast({
-            title: "用户已激活",
-            description: `用户 ${user.username} 已成功激活`,
-            type: "success",
-          });
-        }
-        break;
-      case "deactivate":
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.id === user.id ? { ...u, status: "inactive" as const } : u,
-          ),
-        );
-        if (window.showToast) {
-          window.showToast({
-            title: "用户已停用",
-            description: `用户 ${user.username} 已停用`,
-            type: "warning",
-          });
-        }
-        break;
-      case "lock":
-        setUsers((prev) =>
-          prev.map((u) =>
-            u.id === user.id ? { ...u, status: "locked" as const } : u,
-          ),
-        );
-        if (window.showToast) {
-          window.showToast({
-            title: "用户已锁定",
-            description: `用户 ${user.username} 已被锁定`,
-            type: "error",
-          });
-        }
-        break;
-      case "delete":
-        setUsers((prev) => prev.filter((u) => u.id !== user.id));
-        if (window.showToast) {
-          window.showToast({
-            title: "用户已删除",
-            description: `用户 ${user.username} 已从系统中删除`,
-            type: "error",
-          });
-        }
-        break;
-    }
+  // 统计数据
+  const userStats = {
+    total: users.length,
+    active: users.filter((u) => u.status === "active").length,
+    admins: users.filter((u) => u.role === "admin").length,
+    pending: users.filter((u) => u.status === "pending").length,
   };
 
   return (
-    <div className="ml-64 p-8 min-h-screen matrix-bg">
+    <div
+      className="p-8 pt-16 lg:pt-8 min-h-screen"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white glow-text mb-2">
-          用户管理
-        </h1>
-        <p className="text-muted-foreground">
-          管理系统用户账户、权限和访问控制
-        </p>
-      </div>
-
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="cyber-card p-6 border-l-4 border-l-neon-blue">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">总用户数</p>
-              <p className="text-2xl font-bold text-neon-blue glow-text">
-                {users.length}
-              </p>
-            </div>
-            <Users className="w-8 h-8 text-neon-blue" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-neon-green">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">活跃用户</p>
-              <p className="text-2xl font-bold text-neon-green glow-text">
-                {users.filter((u) => u.status === "active").length}
-              </p>
-            </div>
-            <UserCheck className="w-8 h-8 text-neon-green" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-threat-medium">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">非活跃用户</p>
-              <p className="text-2xl font-bold text-threat-medium glow-text">
-                {users.filter((u) => u.status === "inactive").length}
-              </p>
-            </div>
-            <UserX className="w-8 h-8 text-threat-medium" />
-          </div>
-        </div>
-        <div className="cyber-card p-6 border-l-4 border-l-threat-critical">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">锁定用户</p>
-              <p className="text-2xl font-bold text-threat-critical glow-text">
-                {users.filter((u) => u.status === "locked").length}
-              </p>
-            </div>
-            <Shield className="w-8 h-8 text-threat-critical" />
-          </div>
-        </div>
-      </div>
-
-      {/* 搜索和过滤 */}
-      <div className="cyber-card p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-4 flex-1">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input
-                type="text"
-                placeholder="搜索用户名或邮箱..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.lg,
+              }}
+            >
+              <Users
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
               />
             </div>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
-            >
-              <option value="all">所有角色</option>
-              <option value="admin">系统管理员</option>
-              <option value="analyst">安全分析师</option>
-              <option value="viewer">只读用户</option>
-            </select>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
-            >
-              <option value="all">所有状态</option>
-              <option value="active">活跃</option>
-              <option value="inactive">非活跃</option>
-              <option value="locked">已锁定</option>
-            </select>
+            <div>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+              >
+                用户管理
+              </h1>
+              <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
+                管理用户账户、角色权限和访问控制
+              </p>
+            </div>
           </div>
-          <button className="neon-button flex items-center space-x-2">
+
+          <button
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
+            style={{
+              backgroundColor: BUSINESS_COLORS.primary.blue,
+              color: `rgb(var(--brand-lightest))`,
+              textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+              boxShadow: BUSINESS_COLORS.shadows.md,
+            }}
+          >
             <Plus className="w-4 h-4" />
-            <span>添加用户</span>
+            <span className="text-sm font-medium">添加用户</span>
           </button>
         </div>
       </div>
 
-      {/* 用户列表 */}
-      <div className="cyber-card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-matrix-border">
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  用户
-                </th>
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  角色
-                </th>
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  状态
-                </th>
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  最后登录
-                </th>
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  登录次数
-                </th>
-                <th className="text-left p-4 text-muted-foreground font-medium">
-                  操作
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-matrix-border/50 hover:bg-matrix-accent/30 transition-colors"
-                >
-                  <td className="p-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-neon-blue/20 rounded-full flex items-center justify-center border border-neon-blue/30">
-                        <Users className="w-5 h-5 text-neon-blue" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-white">
-                          {user.username}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs font-mono",
-                        getRoleColor(user.role),
-                      )}
-                    >
-                      {getRoleText(user.role)}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded text-xs font-mono",
-                        getStatusColor(user.status),
-                      )}
-                    >
-                      {getStatusText(user.status)}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      <span>{user.lastLogin}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-white font-mono">
-                    {user.loginCount}
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleUserAction("edit", user)}
-                        className="p-2 text-neon-blue hover:bg-neon-blue/10 rounded transition-colors"
-                        title="编辑用户"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
-                      {user.status === "active" ? (
-                        <button
-                          onClick={() => handleUserAction("deactivate", user)}
-                          className="p-2 text-threat-medium hover:bg-threat-medium/10 rounded transition-colors"
-                          title="停用用户"
-                        >
-                          <EyeOff className="w-4 h-4" />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUserAction("activate", user)}
-                          className="p-2 text-neon-green hover:bg-neon-green/10 rounded transition-colors"
-                          title="激活用户"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleUserAction("lock", user)}
-                        className="p-2 text-threat-critical hover:bg-threat-critical/10 rounded transition-colors"
-                        title="锁定用户"
-                      >
-                        <Shield className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleUserAction("delete", user)}
-                        className="p-2 text-threat-critical hover:bg-threat-critical/10 rounded transition-colors"
-                        title="删除用户"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {/* 统计指标 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <StatusCard
+          title="总用户数"
+          value={userStats.total}
+          icon={<Users className="w-5 h-5" />}
+          status="info"
+        />
+
+        <StatusCard
+          title="活跃用户"
+          value={userStats.active}
+          icon={<UserCheck className="w-5 h-5" />}
+          status="success"
+        />
+
+        <StatusCard
+          title="管理员"
+          value={userStats.admins}
+          icon={<Shield className="w-5 h-5" />}
+          status="warning"
+        />
+
+        <StatusCard
+          title="待审核"
+          value={userStats.pending}
+          icon={<Clock className="w-5 h-5" />}
+          status="warning"
+        />
       </div>
+
+      {/* 搜索和过滤 */}
+      <BusinessCard className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            <div className="relative flex-1 max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              />
+              <input
+                type="text"
+                placeholder="搜索用户名、姓名或邮箱..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <select
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有角色</option>
+                <option value="admin">管理员</option>
+                <option value="analyst">分析师</option>
+                <option value="operator">操作员</option>
+                <option value="viewer">查看者</option>
+              </select>
+
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有状态</option>
+                <option value="active">活跃</option>
+                <option value="inactive">非活跃</option>
+                <option value="suspended">已停用</option>
+                <option value="pending">待审核</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </BusinessCard>
+
+      {/* 用户列表 */}
+      <DataTableCard
+        title="用户账户列表"
+        description={`共 ${filteredUsers.length} 个用户账户`}
+        data={filteredUsers}
+        columns={[
+          {
+            key: "fullName",
+            label: "用户信息",
+            render: (value, row) => (
+              <div className="flex items-center space-x-3">
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
+                  style={{
+                    backgroundColor: `${getRoleColor(row.role)}20`,
+                    color: getRoleColor(row.role),
+                  }}
+                >
+                  {value.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-medium text-sm">{value}</p>
+                  <p
+                    className="text-xs"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    @{row.username}
+                  </p>
+                </div>
+              </div>
+            ),
+          },
+          {
+            key: "email",
+            label: "联系信息",
+            render: (value, row) => (
+              <div>
+                <div className="flex items-center space-x-2">
+                  <Mail
+                    className="w-3 h-3"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  />
+                  <span className="text-sm">{value}</span>
+                </div>
+                {row.phone && (
+                  <div className="flex items-center space-x-2 mt-1">
+                    <Phone
+                      className="w-3 h-3"
+                      style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    />
+                    <span
+                      className="text-xs"
+                      style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    >
+                      {row.phone}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "role",
+            label: "角色",
+            render: (value) => (
+              <span
+                className="px-2 py-1 rounded text-xs font-medium"
+                style={{
+                  backgroundColor: `${getRoleColor(value)}20`,
+                  color: getRoleColor(value),
+                  border: `1px solid ${getRoleColor(value)}40`,
+                }}
+              >
+                {value === "admin"
+                  ? "管理员"
+                  : value === "analyst"
+                    ? "分析师"
+                    : value === "operator"
+                      ? "操作员"
+                      : "查看者"}
+              </span>
+            ),
+          },
+          {
+            key: "status",
+            label: "状态",
+            render: (value) => (
+              <div className="flex items-center space-x-2">
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: getStatusColor(value) }}
+                />
+                <span className="text-sm">
+                  {value === "active"
+                    ? "活跃"
+                    : value === "inactive"
+                      ? "非活跃"
+                      : value === "suspended"
+                        ? "已停用"
+                        : "待审核"}
+                </span>
+              </div>
+            ),
+          },
+          {
+            key: "department",
+            label: "部门",
+            render: (value) => (
+              <span
+                className="text-sm"
+                style={{ color: BUSINESS_COLORS.ui.text.secondary }}
+              >
+                {value}
+              </span>
+            ),
+          },
+          {
+            key: "lastLogin",
+            label: "最后登录",
+            render: (value) => (
+              <div>
+                {value ? (
+                  <>
+                    <p className="text-sm">
+                      {new Date(value).toLocaleDateString("zh-CN")}
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                    >
+                      {new Date(value).toLocaleTimeString("zh-CN")}
+                    </p>
+                  </>
+                ) : (
+                  <span
+                    className="text-sm"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    从未登录
+                  </span>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "actions",
+            label: "操作",
+            render: (_, row) => (
+              <div className="flex items-center space-x-2">
+                <button
+                  className="p-1 rounded transition-colors"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+                <button
+                  className="p-1 rounded transition-colors"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                {row.status !== "admin" && (
+                  <button
+                    className="p-1 rounded transition-colors"
+                    style={{ color: BUSINESS_COLORS.status.error }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

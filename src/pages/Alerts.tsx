@@ -1,363 +1,509 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AlertTriangle,
+  Shield,
+  Activity,
+  Clock,
+  MapPin,
   Search,
   Filter,
   Download,
+  RefreshCw,
   Eye,
-  Clock,
-  MapPin,
+  MoreVertical,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  BusinessCard,
+  StatusCard,
+  InfoCard,
+  DataTableCard,
+} from "@/components/ui/BusinessCard";
+import { BUSINESS_COLORS } from "@/lib/businessColors";
 
-interface Alert {
+interface ThreatAlert {
   id: string;
-  type: "critical" | "high" | "medium" | "low";
   title: string;
   description: string;
-  source: string;
-  location: string;
+  severity: "critical" | "high" | "medium" | "low" | "info";
+  status: "active" | "investigating" | "acknowledged" | "resolved" | "ignored";
   timestamp: string;
-  status: "active" | "investigating" | "resolved";
-  severity: number;
+  source: {
+    ip: string;
+    hostname?: string;
+    location?: string;
+  };
+  target?: {
+    ip: string;
+    hostname?: string;
+    port?: number;
+    service?: string;
+  };
+  category: string;
+  assignee?: string;
 }
 
-const mockAlerts: Alert[] = [
-  {
-    id: "1",
-    type: "critical",
-    title: "DDoS攻击检测",
-    description:
-      "检测到来自多个IP地址的大量异常请求，疑似DDoS攻击，已触发紧急响应流程",
-    source: "192.168.1.100",
-    location: "北京市",
-    timestamp: "2024-01-15 14:32:15",
-    status: "active",
-    severity: 9.2,
-  },
-  {
-    id: "2",
-    type: "high",
-    title: "恶意软件感染",
-    description: "发现主机存在木马程序，已尝试访问敏感文件，建议立即隔离",
-    source: "192.168.1.156",
-    location: "上海市",
-    timestamp: "2024-01-15 14:24:08",
-    status: "investigating",
-    severity: 8.1,
-  },
-  {
-    id: "3",
-    type: "medium",
-    title: "异常登录���试",
-    description: "检测到来自未知地理位置的多次登录失败，可能存在暴力破解行为",
-    source: "203.45.67.89",
-    location: "美国",
-    timestamp: "2024-01-15 14:17:42",
-    status: "investigating",
-    severity: 6.5,
-  },
-  {
-    id: "4",
-    type: "low",
-    title: "端口扫描",
-    description: "检测到对多个端口的扫描行为，暂无进一步恶意活动",
-    source: "172.16.0.45",
-    location: "深圳市",
-    timestamp: "2024-01-15 14:09:21",
-    status: "resolved",
-    severity: 3.2,
-  },
-  {
-    id: "5",
-    type: "medium",
-    title: "数据泄露风险",
-    description: "发现敏感数据在非授权网络传输，需要检查数据加密策略",
-    source: "10.0.0.88",
-    location: "广州市",
-    timestamp: "2024-01-15 13:57:33",
-    status: "active",
-    severity: 7.3,
-  },
-  {
-    id: "6",
-    type: "high",
-    title: "钓鱼邮件攻击",
-    description: "检测到针对内部用户的钓鱼邮件攻击，已拦截邮件并通知用户",
-    source: "smtp.malicious.com",
-    location: "俄罗斯",
-    timestamp: "2024-01-15 13:45:17",
-    status: "resolved",
-    severity: 8.7,
-  },
-];
-
 export default function Alerts() {
+  const [alerts, setAlerts] = useState<ThreatAlert[]>([]);
+  const [selectedAlerts, setSelectedAlerts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("all");
-  const [selectedStatus, setSelectedStatus] = useState<string>("all");
+  const [filterSeverity, setFilterSeverity] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [isAutoRefresh, setIsAutoRefresh] = useState(true);
 
-  const filteredAlerts = mockAlerts.filter((alert) => {
+  // 模拟威胁数据
+  useEffect(() => {
+    const mockAlerts: ThreatAlert[] = [
+      {
+        id: "alert-001",
+        title: "可疑登录尝试",
+        description: "检测到多次失败的登录尝试，可能是暴力破解攻击",
+        severity: "high",
+        status: "active",
+        timestamp: "2024-01-15T14:25:30Z",
+        source: {
+          ip: "203.0.113.45",
+          location: "俄罗斯，莫斯科",
+        },
+        target: {
+          ip: "192.168.1.100",
+          hostname: "server-01",
+          port: 22,
+          service: "SSH",
+        },
+        category: "认证威胁",
+        assignee: "张安全",
+      },
+      {
+        id: "alert-002",
+        title: "恶意软件检测",
+        description: "在工作站上发现已知恶意软件签名",
+        severity: "critical",
+        status: "investigating",
+        timestamp: "2024-01-15T13:45:22Z",
+        source: {
+          ip: "192.168.1.205",
+          hostname: "workstation-205",
+        },
+        category: "恶意软件",
+        assignee: "李防护",
+      },
+      {
+        id: "alert-003",
+        title: "异常网络流量",
+        description: "检测到异常的出站数据流量，可能存在数据泄露风险",
+        severity: "medium",
+        status: "acknowledged",
+        timestamp: "2024-01-15T12:30:18Z",
+        source: {
+          ip: "192.168.1.150",
+          hostname: "db-server-01",
+        },
+        category: "数据泄露",
+      },
+      {
+        id: "alert-004",
+        title: "Web应用漏洞扫描",
+        description: "检测到针对Web应用的自动化漏洞扫描活动",
+        severity: "low",
+        status: "resolved",
+        timestamp: "2024-01-15T11:15:33Z",
+        source: {
+          ip: "104.28.1.1",
+          location: "美国，加利福尼亚",
+        },
+        target: {
+          ip: "203.0.113.200",
+          hostname: "web-app-01",
+          port: 443,
+          service: "HTTPS",
+        },
+        category: "漏洞扫描",
+      },
+    ];
+    setAlerts(mockAlerts);
+  }, []);
+
+  // 过滤告���
+  const filteredAlerts = alerts.filter((alert) => {
     const matchesSearch =
       alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      alert.source.includes(searchTerm);
-    const matchesType = selectedType === "all" || alert.type === selectedType;
+      alert.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSeverity =
+      filterSeverity === "all" || alert.severity === filterSeverity;
     const matchesStatus =
-      selectedStatus === "all" || alert.status === selectedStatus;
+      filterStatus === "all" || alert.status === filterStatus;
 
-    return matchesSearch && matchesType && matchesStatus;
+    return matchesSearch && matchesSeverity && matchesStatus;
   });
 
-  const getThreatColor = (type: string) => {
-    switch (type) {
+  // 获取严重性颜色
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
       case "critical":
-        return "border-l-threat-critical bg-threat-critical/5";
+        return BUSINESS_COLORS.threat.critical;
       case "high":
-        return "border-l-threat-high bg-threat-high/5";
+        return BUSINESS_COLORS.threat.high;
       case "medium":
-        return "border-l-threat-medium bg-threat-medium/5";
+        return BUSINESS_COLORS.threat.medium;
       case "low":
-        return "border-l-threat-low bg-threat-low/5";
+        return BUSINESS_COLORS.threat.low;
+      case "info":
+        return BUSINESS_COLORS.threat.info;
       default:
-        return "border-l-threat-info bg-threat-info/5";
+        return BUSINESS_COLORS.neutral.silver;
     }
   };
 
+  // 获取状态颜色
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "text-threat-critical bg-threat-critical/20";
+        return BUSINESS_COLORS.status.error;
       case "investigating":
-        return "text-threat-medium bg-threat-medium/20";
+        return BUSINESS_COLORS.status.warning;
+      case "acknowledged":
+        return BUSINESS_COLORS.status.processing;
       case "resolved":
-        return "text-threat-low bg-threat-low/20";
+        return BUSINESS_COLORS.status.success;
+      case "ignored":
+        return BUSINESS_COLORS.neutral.silver;
       default:
-        return "text-muted-foreground bg-muted/20";
+        return BUSINESS_COLORS.neutral.silver;
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "活跃";
-      case "investigating":
-        return "调查中";
-      case "resolved":
-        return "已解决";
-      default:
-        return "未知";
-    }
-  };
-
-  const getTypeText = (type: string) => {
-    switch (type) {
-      case "critical":
-        return "严重";
-      case "high":
-        return "高危";
-      case "medium":
-        return "中危";
-      case "low":
-        return "低危";
-      default:
-        return "信息";
-    }
+  // 统计数据
+  const alertStats = {
+    total: alerts.length,
+    critical: alerts.filter((a) => a.severity === "critical").length,
+    high: alerts.filter((a) => a.severity === "high").length,
+    active: alerts.filter((a) => a.status === "active").length,
+    resolved: alerts.filter((a) => a.status === "resolved").length,
   };
 
   return (
-    <div className="min-h-screen matrix-bg">
-      <div className="ml-64 p-8">
-        {/* 页面标题 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white glow-text mb-2">
-            威胁告警管理
-          </h1>
-          <p className="text-muted-foreground">查看、管理和响应安全威胁告警</p>
-        </div>
-
-        {/* 搜索和过滤 */}
-        <div className="cyber-card p-6 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* 搜索框 */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <input
-                type="text"
-                placeholder="搜索告警..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-transparent"
+    <div
+      className="min-h-screen w-full p-6 pt-16 lg:pt-6"
+      style={{ backgroundColor: BUSINESS_COLORS.ui.background.secondary }}
+    >
+      {/* 页面标题 */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{
+                backgroundColor: BUSINESS_COLORS.primary.blue,
+                boxShadow: BUSINESS_COLORS.shadows.lg,
+              }}
+            >
+              <AlertTriangle
+                className="w-6 h-6"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  filter: `drop-shadow(0 0 8px rgba(var(--brand-accent), 0.6))`,
+                }}
               />
             </div>
+            <div>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: BUSINESS_COLORS.ui.text.inverse }}
+              >
+                威胁告警中心
+              </h1>
+              <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
+                实时威胁检测与事件响应管理
+              </p>
+            </div>
+          </div>
 
-            {/* 威胁级别过滤 */}
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="px-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
+          {/* 控制按钮 */}
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setIsAutoRefresh(!isAutoRefresh)}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: isAutoRefresh
+                  ? BUSINESS_COLORS.status.success
+                  : BUSINESS_COLORS.ui.background.panel,
+                color: isAutoRefresh
+                  ? "white"
+                  : BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
             >
-              <option value="all">所有级别</option>
-              <option value="critical">严重</option>
-              <option value="high">高危</option>
-              <option value="medium">中危</option>
-              <option value="low">低危</option>
-            </select>
+              <RefreshCw
+                className={`w-4 h-4 ${isAutoRefresh ? "animate-spin" : ""}`}
+              />
+              <span className="text-sm">
+                {isAutoRefresh ? "自动刷新" : "手动刷新"}
+              </span>
+            </button>
 
-            {/* 状态过滤 */}
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-4 py-2 bg-matrix-surface border border-matrix-border rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-neon-blue"
+            <button
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200"
+              style={{
+                backgroundColor: BUSINESS_COLORS.ui.background.panel,
+                color: BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
             >
-              <option value="all">所有状态</option>
-              <option value="active">活跃</option>
-              <option value="investigating">调查中</option>
-              <option value="resolved">已解决</option>
-            </select>
-
-            {/* 导出按钮 */}
-            <button className="neon-button flex items-center space-x-2">
               <Download className="w-4 h-4" />
-              <span>导出</span>
+              <span className="text-sm">导出报告</span>
             </button>
           </div>
         </div>
-
-        {/* 统计信息 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="cyber-card p-4 border-l-4 border-l-threat-critical">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">严重告警</p>
-                <p className="text-2xl font-bold text-threat-critical">
-                  {mockAlerts.filter((a) => a.type === "critical").length}
-                </p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-threat-critical" />
-            </div>
-          </div>
-          <div className="cyber-card p-4 border-l-4 border-l-threat-high">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">高危告警</p>
-                <p className="text-2xl font-bold text-threat-high">
-                  {mockAlerts.filter((a) => a.type === "high").length}
-                </p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-threat-high" />
-            </div>
-          </div>
-          <div className="cyber-card p-4 border-l-4 border-l-threat-medium">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">中危告警</p>
-                <p className="text-2xl font-bold text-threat-medium">
-                  {mockAlerts.filter((a) => a.type === "medium").length}
-                </p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-threat-medium" />
-            </div>
-          </div>
-          <div className="cyber-card p-4 border-l-4 border-l-threat-low">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">低危告警</p>
-                <p className="text-2xl font-bold text-threat-low">
-                  {mockAlerts.filter((a) => a.type === "low").length}
-                </p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-threat-low" />
-            </div>
-          </div>
-        </div>
-
-        {/* 告警列表 */}
-        <div className="cyber-card">
-          <div className="p-6 border-b border-matrix-border">
-            <h3 className="text-lg font-semibold text-white">
-              告警列表 ({filteredAlerts.length})
-            </h3>
-          </div>
-
-          <div className="divide-y divide-matrix-border">
-            {filteredAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className={cn(
-                  "p-6 hover:bg-matrix-accent/50 transition-all duration-200 cursor-pointer border-l-4",
-                  getThreatColor(alert.type),
-                )}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <span
-                        className={cn(
-                          "inline-flex items-center px-2 py-1 rounded-full text-xs font-mono",
-                          alert.type === "critical" &&
-                            "bg-threat-critical/20 text-threat-critical",
-                          alert.type === "high" &&
-                            "bg-threat-high/20 text-threat-high",
-                          alert.type === "medium" &&
-                            "bg-threat-medium/20 text-threat-medium",
-                          alert.type === "low" &&
-                            "bg-threat-low/20 text-threat-low",
-                        )}
-                      >
-                        {getTypeText(alert.type)}
-                      </span>
-                      <span
-                        className={cn(
-                          "inline-flex items-center px-2 py-1 rounded-full text-xs font-mono",
-                          getStatusColor(alert.status),
-                        )}
-                      >
-                        {getStatusText(alert.status)}
-                      </span>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        风险评分: {alert.severity}/10
-                      </span>
-                    </div>
-
-                    <h4 className="text-lg font-semibold text-white mb-2">
-                      {alert.title}
-                    </h4>
-
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {alert.description}
-                    </p>
-
-                    <div className="flex items-center space-x-6 text-xs text-muted-foreground">
-                      <div className="flex items-center space-x-1">
-                        <Eye className="w-3 h-3" />
-                        <span>源: {alert.source}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="w-3 h-3" />
-                        <span>{alert.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{alert.timestamp}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="ml-6 flex items-center space-x-2">
-                    <button className="px-3 py-1 text-xs border border-neon-blue/30 text-neon-blue rounded hover:bg-neon-blue/10 transition-colors">
-                      详情
-                    </button>
-                    <button className="px-3 py-1 text-xs border border-threat-medium/30 text-threat-medium rounded hover:bg-threat-medium/10 transition-colors">
-                      处理
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
+
+      {/* 统计指标 */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+        <StatusCard
+          title="总告警数"
+          value={alertStats.total}
+          icon={<AlertTriangle className="w-5 h-5" />}
+          status="info"
+        />
+
+        <StatusCard
+          title="严重告警"
+          value={alertStats.critical}
+          icon={<XCircle className="w-5 h-5" />}
+          status="error"
+        />
+
+        <StatusCard
+          title="高危告警"
+          value={alertStats.high}
+          icon={<AlertCircle className="w-5 h-5" />}
+          status="warning"
+        />
+
+        <StatusCard
+          title="活跃告警"
+          value={alertStats.active}
+          icon={<Activity className="w-5 h-5" />}
+          status="warning"
+        />
+
+        <StatusCard
+          title="已解决"
+          value={alertStats.resolved}
+          icon={<CheckCircle className="w-5 h-5" />}
+          status="success"
+        />
+      </div>
+
+      {/* 搜索和过滤 */}
+      <BusinessCard className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+          <div className="flex flex-col md:flex-row gap-4 flex-1">
+            {/* 搜索框 */}
+            <div className="relative flex-1 max-w-md">
+              <Search
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
+                style={{ color: BUSINESS_COLORS.ui.text.muted }}
+              />
+              <input
+                type="text"
+                placeholder="搜索威胁告警..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all duration-200"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = BUSINESS_COLORS.primary.blue;
+                  e.target.style.boxShadow = `0 0 0 3px ${BUSINESS_COLORS.primary.blue}20`;
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor =
+                    BUSINESS_COLORS.ui.border.primary;
+                  e.target.style.boxShadow = "none";
+                }}
+              />
+            </div>
+
+            {/* 过滤器 */}
+            <div className="flex gap-3">
+              <select
+                value={filterSeverity}
+                onChange={(e) => setFilterSeverity(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有严重性</option>
+                <option value="critical">严重</option>
+                <option value="high">高危</option>
+                <option value="medium">中危</option>
+                <option value="low">低危</option>
+                <option value="info">信息</option>
+              </select>
+
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: BUSINESS_COLORS.ui.border.primary,
+                  backgroundColor: BUSINESS_COLORS.ui.background.card,
+                  color: BUSINESS_COLORS.ui.text.primary,
+                }}
+              >
+                <option value="all">所有状态</option>
+                <option value="active">活跃</option>
+                <option value="investigating">调查中</option>
+                <option value="acknowledged">已确认</option>
+                <option value="resolved">已解决</option>
+                <option value="ignored">已忽略</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </BusinessCard>
+
+      {/* 告警列表 */}
+      <DataTableCard
+        title="威胁告警列表"
+        description={`共 ${filteredAlerts.length} 条告警记录`}
+        data={filteredAlerts}
+        columns={[
+          {
+            key: "severity",
+            label: "严重性",
+            render: (value) => (
+              <div className="flex items-center space-x-2">
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: getSeverityColor(value) }}
+                />
+                <span className="font-medium text-sm capitalize">{value}</span>
+              </div>
+            ),
+          },
+          {
+            key: "title",
+            label: "威胁标题",
+            render: (value, row) => (
+              <div>
+                <p className="font-medium text-sm">{value}</p>
+                <p
+                  className="text-xs mt-1"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {row.category}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: "source",
+            label: "来源",
+            render: (value) => (
+              <div>
+                <p className="text-sm font-mono">{value.ip}</p>
+                {value.hostname && (
+                  <p
+                    className="text-xs"
+                    style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                  >
+                    {value.hostname}
+                  </p>
+                )}
+              </div>
+            ),
+          },
+          {
+            key: "status",
+            label: "状态",
+            render: (value) => (
+              <span
+                className="px-2 py-1 rounded-full text-xs font-medium"
+                style={{
+                  backgroundColor: `${getStatusColor(value)}20`,
+                  color: getStatusColor(value),
+                  border: `1px solid ${getStatusColor(value)}40`,
+                }}
+              >
+                {value === "active"
+                  ? "活跃"
+                  : value === "investigating"
+                    ? "调查中"
+                    : value === "acknowledged"
+                      ? "已确认"
+                      : value === "resolved"
+                        ? "已解决"
+                        : "已忽略"}
+              </span>
+            ),
+          },
+          {
+            key: "timestamp",
+            label: "时间",
+            render: (value) => (
+              <div>
+                <p className="text-sm">
+                  {new Date(value).toLocaleDateString("zh-CN")}
+                </p>
+                <p
+                  className="text-xs"
+                  style={{ color: BUSINESS_COLORS.ui.text.muted }}
+                >
+                  {new Date(value).toLocaleTimeString("zh-CN")}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: "actions",
+            label: "操作",
+            render: (_, row) => (
+              <button
+                className="p-2 rounded-lg transition-colors"
+                style={{
+                  color: BUSINESS_COLORS.ui.text.muted,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    BUSINESS_COLORS.ui.background.secondary;
+                  e.currentTarget.style.color = BUSINESS_COLORS.ui.text.primary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                  e.currentTarget.style.color = BUSINESS_COLORS.ui.text.muted;
+                }}
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+            ),
+          },
+        ]}
+        actions={
+          <div className="flex items-center space-x-2">
+            <button
+              className="flex items-center space-x-2 px-3 py-1 rounded-lg transition-colors"
+              style={{
+                backgroundColor: BUSINESS_COLORS.ui.background.secondary,
+                color: BUSINESS_COLORS.ui.text.secondary,
+                border: `1px solid ${BUSINESS_COLORS.ui.border.primary}`,
+              }}
+            >
+              <Filter className="w-4 h-4" />
+              <span className="text-sm">筛选</span>
+            </button>
+          </div>
+        }
+      />
     </div>
   );
 }

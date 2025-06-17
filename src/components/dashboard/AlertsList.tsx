@@ -139,7 +139,13 @@ function AlertItem({ alert, onClick }: { alert: Alert; onClick?: () => void }) {
                   alert.type === "low" && "text-threat-low",
                 )}
               />
-              <h4 className="font-semibold text-white truncate">
+              <h4
+                className="font-semibold truncate"
+                style={{
+                  color: `rgb(var(--brand-lightest))`,
+                  textShadow: `0 0 6px rgba(var(--brand-lightest), 0.4)`,
+                }}
+              >
                 {alert.title}
               </h4>
               <span
@@ -242,7 +248,15 @@ export function AlertsList() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-5 h-5 text-threat-critical" />
-            <h3 className="text-lg font-semibold text-white">实时威胁告警</h3>
+            <h3
+              className="text-lg font-semibold"
+              style={{
+                color: `rgb(var(--brand-lightest))`,
+                textShadow: `0 0 8px rgba(var(--brand-lightest), 0.5)`,
+              }}
+            >
+              实时威胁告警
+            </h3>
             {isUpdating && (
               <div className="w-2 h-2 bg-threat-critical rounded-full animate-pulse" />
             )}
