@@ -6,13 +6,13 @@ import {
   Eye,
   Zap,
   RefreshCw,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  useRealTimeData,
-  generateThreatMetrics,
-} from "@/hooks/useRealTimeData";
 import { BACKEND_COLORS } from "@/lib/backendTheme";
+import { useSystemMetrics, useSystemAlerts } from "@/hooks/useSystemMetrics";
+import { useNetworkMetrics } from "@/hooks/useNetworkMetrics";
 
 interface MetricCardProps {
   title: string;
