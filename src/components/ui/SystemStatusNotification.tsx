@@ -1,8 +1,16 @@
 // 系统状态通知组件 - 显示 API 连接状态和模拟数据提示
 
 import { useState, useEffect } from "react";
-import { X, AlertTriangle, Wifi, WifiOff, Database } from "lucide-react";
+import {
+  X,
+  AlertTriangle,
+  Wifi,
+  WifiOff,
+  Database,
+  RefreshCw,
+} from "lucide-react";
 import { mockApiService } from "@/services/mockApiService";
+import { httpClient } from "@/services/apiService";
 import { BACKEND_COLORS } from "@/lib/backendTheme";
 
 interface SystemStatusNotificationProps {
