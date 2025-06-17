@@ -124,12 +124,16 @@ class HttpClient {
     // 检查后端健康状态
     await this.checkBackendHealth();
 
-    // 如果后端不可用，抛出错误以触发模拟数据
+    // 如果后端不可用，直接抛出503错误
     if (!this.backendAvailable) {
       throw new ApiError("后端服务器不可用", 503);
     }
 
     const url = buildApiUrl(endpoint);
+
+    // 创建可控制的超时信号
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
     const config: RequestInit = {
       ...options,
@@ -137,15 +141,19 @@ class HttpClient {
         ...this.defaultHeaders,
         ...options.headers,
       },
-      signal: options.signal || AbortSignal.timeout(API_CONFIG.TIMEOUT),
+      signal: options.signal || controller.signal,
     };
 
     let lastError: Error;
 
-    // 重试机制
-    for (let attempt = 1; attempt <= API_CONFIG.RETRY_ATTEMPTS; attempt++) {
+    // 减少重试次数，防止过多超时
+    const maxRetries = this.backendAvailable ? API_CONFIG.RETRY_ATTEMPTS : 1;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await fetch(url, config);
+
+        clearTimeout(timeoutId);
 
         // 处理 HTTP 错误状态
         if (!response.ok) {
@@ -161,18 +169,25 @@ class HttpClient {
         const data = await this.parseResponse<T>(response);
         return data;
       } catch (error) {
+        clearTimeout(timeoutId);
         lastError = error as Error;
 
-        // 网络错误时标记后端不可用
-        if (error instanceof TypeError && error.message.includes("fetch")) {
+        // 处理各种错误类型
+        if (
+          error instanceof TypeError ||
+          error instanceof DOMException ||
+          (error as any).name === "AbortError" ||
+          (error as any).name === "TimeoutError"
+        ) {
+          // 网络错误、超时错误或中止错误
           this.backendAvailable = false;
           mockApiService.enable();
-          throw new ApiError("网络连接失败", 503);
+          throw new ApiError("网络连接失败或超时", 503);
         }
 
         // 如果是最后一次重试或者是不可重试的错误，直接抛出
         if (
-          attempt === API_CONFIG.RETRY_ATTEMPTS ||
+          attempt === maxRetries ||
           (error instanceof ApiError &&
             (error.status === HTTP_STATUS.UNAUTHORIZED ||
               error.status === HTTP_STATUS.FORBIDDEN ||
@@ -181,8 +196,13 @@ class HttpClient {
           throw error;
         }
 
-        // 等待后重试
-        await delay(API_CONFIG.RETRY_DELAY * attempt);
+        // 等待后重试（但只对非网络错误重试）
+        if (!(error instanceof TypeError) && !(error instanceof DOMException)) {
+          await delay(API_CONFIG.RETRY_DELAY * attempt);
+        } else {
+          // 网络错误不重试
+          break;
+        }
       }
     }
 
