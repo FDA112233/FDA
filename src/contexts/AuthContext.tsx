@@ -23,19 +23,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (auth === "true" && savedUser) {
       setIsAuthenticated(true);
       setUser(savedUser);
+      console.log("用户已登录:", savedUser);
+    } else {
+      console.log("用户未登录");
     }
 
     setIsInitialized(true);
   }, []);
 
   const login = (username: string) => {
+    console.log("执行登录:", username);
     setIsAuthenticated(true);
     setUser(username);
     localStorage.setItem("cyberguard_auth", "true");
     localStorage.setItem("cyberguard_user", username);
+    console.log("登录状态已更新");
   };
 
   const logout = () => {
+    console.log("执行登出");
     setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem("cyberguard_auth");
