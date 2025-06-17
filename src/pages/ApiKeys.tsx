@@ -610,7 +610,7 @@ export default function ApiStatusMonitor() {
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4" style={{ color: BUSINESS_COLORS.status.success }} />
                   <span style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                    正常: 响应时间 ≤ 1秒，状态码 200
+                    正常: 响应时间 {"<="} 1秒，状态码 200
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">
