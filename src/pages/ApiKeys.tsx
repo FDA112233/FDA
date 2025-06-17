@@ -124,7 +124,7 @@ export default function ApiStatusMonitor() {
         url: "/api/v1/system/services",
         method: "GET",
         category: "系统监控",
-        description: "获取系统服务状态",
+        description: "获取系统服���状态",
         status: "checking",
         uptime: 98.9,
         errorCount: 5,
@@ -340,22 +340,11 @@ export default function ApiStatusMonitor() {
       endpoints.reduce((sum, e) => sum + e.uptime, 0) / endpoints.length,
   };
 
-  // 自动检查
+  // 移除自动检查功能，避免产生大量网络错误
   useEffect(() => {
-    // 组件加载时检查一次
-    if (endpoints.length > 0) {
-      checkAllEndpoints();
-    }
-
-    // 每30秒自动检查一次
-    const interval = setInterval(() => {
-      if (endpoints.length > 0 && !isChecking) {
-        checkAllEndpoints();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [endpoints.length, isChecking]);
+    // 不自动运行检查，只在用户手动点击时运行
+    console.log("🔧 API状态监控已加载，点击'立即检查'按钮开始检测");
+  }, []);
 
   return (
     <div
@@ -694,7 +683,7 @@ export default function ApiStatusMonitor() {
                   • 检查间隔: 30秒
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                  • 超时设置: 5秒
+                  • 超时���置: 5秒
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                   • 目标服务器: {API_CONFIG.BASE_URL}
