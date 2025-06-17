@@ -855,6 +855,15 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
+
+  /* 移动端导航动画 */
+  .mobile-nav-transition {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobile-menu-overlay {
+    animation: fadeIn 0.3s ease-out;
+  }
 }
 
 /* 动画关键帧定义 */
