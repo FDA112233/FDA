@@ -59,15 +59,15 @@ export const API_ENDPOINTS = {
 export const REAL_TIME_CONFIG = {
   // 轮询间隔（毫秒）
   POLLING_INTERVALS: {
-    SYSTEM_METRICS: 2000, // 2秒
-    NETWORK_METRICS: 3000, // 3秒
-    PROCESS_METRICS: 5000, // 5秒
-    SERVICE_STATUS: 10000, // 10秒
+    SYSTEM_METRICS: 5000, // 5秒 - 减少频率
+    NETWORK_METRICS: 6000, // 6秒
+    PROCESS_METRICS: 10000, // 10秒
+    SERVICE_STATUS: 15000, // 15秒
   },
 
   // 数据保留配置
   DATA_RETENTION: {
-    MAX_HISTORY_POINTS: 100, // 最大历史数据点
+    MAX_HISTORY_POINTS: 50, // 减少历史数据点
     CLEANUP_INTERVAL: 60000, // 清理间隔 1分钟
   },
 } as const;
@@ -81,7 +81,7 @@ export const DEFAULT_HEADERS = {
 // 错误消息映射
 export const ERROR_MESSAGES = {
   NETWORK_ERROR: "网络连接失败，请检查网络设置",
-  TIMEOUT_ERROR: "请求超时，请稍后重试",
+  TIMEOUT_ERROR: "请求超时，请���后重试",
   AUTH_ERROR: "认证失败，请重新登录",
   SERVER_ERROR: "服务器内部错误，请联系管理员",
   VALIDATION_ERROR: "数据验证失败，请检查输入",
@@ -124,7 +124,7 @@ export function buildQueryParams(params: Record<string, any>): string {
   return queryString ? `?${queryString}` : "";
 }
 
-// 延迟函数（用于重试机制）
+// 延迟函数（用于��试机制）
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
