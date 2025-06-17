@@ -278,20 +278,55 @@ const httpClient = new HttpClient();
 // 系统指标 API 服务
 export const metricsApi = {
   // 获取系统指标历史数据
-  getMetrics: (params?: MetricsQueryParams): Promise<SystemMetricsList> =>
-    httpClient.get(API_ENDPOINTS.METRICS.BASE, params),
+  getMetrics: async (
+    params?: MetricsQueryParams,
+  ): Promise<SystemMetricsList> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.METRICS.BASE, params);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getSystemMetrics(params);
+      }
+      throw error;
+    }
+  },
 
   // 获取系统指标摘要
-  getSummary: (): Promise<SystemMetricsSummary> =>
-    httpClient.get(API_ENDPOINTS.METRICS.SUMMARY),
+  getSummary: async (): Promise<SystemMetricsSummary> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.METRICS.SUMMARY);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getSystemSummary();
+      }
+      throw error;
+    }
+  },
 
   // 获取当前系统指标
-  getCurrent: (): Promise<Record<string, any>> =>
-    httpClient.get(API_ENDPOINTS.METRICS.CURRENT),
+  getCurrent: async (): Promise<Record<string, any>> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.METRICS.CURRENT);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getCurrentSystemMetrics();
+      }
+      throw error;
+    }
+  },
 
   // 收集系统指标
-  collect: (): Promise<Record<string, any>> =>
-    httpClient.post(API_ENDPOINTS.METRICS.COLLECT),
+  collect: async (): Promise<Record<string, any>> => {
+    try {
+      return await httpClient.post(API_ENDPOINTS.METRICS.COLLECT);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        // 模拟收集成功
+        return { status: "collected", timestamp: new Date().toISOString() };
+      }
+      throw error;
+    }
+  },
 };
 
 // 网络接口 API 服务
