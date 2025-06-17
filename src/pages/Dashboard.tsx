@@ -28,6 +28,9 @@ import { ThreatMetrics } from "@/components/dashboard/ThreatMetrics";
 import { NetworkChart } from "@/components/dashboard/NetworkChart";
 import { AlertsList } from "@/components/dashboard/AlertsList";
 import { NetworkAnalysis } from "@/components/dashboard/NetworkAnalysis";
+import { useSystemMetrics, useSystemStatus } from "@/hooks/useSystemMetrics";
+import { useNetworkMetrics } from "@/hooks/useNetworkMetrics";
+import { formatBytes, formatPercent } from "@/lib/apiConfig";
 
 // 仪表板统计卡片组件
 interface StatCardProps {
@@ -272,7 +275,7 @@ function SystemStatus() {
             className="text-sm"
             style={{ color: BACKEND_COLORS.text.secondary }}
           >
-            系统正常
+            ��统正常
           </span>
         </div>
       </div>
@@ -524,8 +527,8 @@ export default function Dashboard() {
             <h1
               className="text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent"
               style={{
-                backgroundImage: `linear-gradient(45deg, 
-                  ${BACKEND_COLORS.text.primary} 0%, 
+                backgroundImage: `linear-gradient(45deg,
+                  ${BACKEND_COLORS.text.primary} 0%,
                   ${BACKEND_COLORS.text.accent} 100%)`,
                 textShadow: `0 0 20px rgba(var(--brand-primary), 0.3)`,
               }}
@@ -534,7 +537,7 @@ export default function Dashboard() {
             </h1>
             <div className="flex items-center space-x-4 text-sm">
               <span style={{ color: BACKEND_COLORS.text.muted }}>
-                欢迎回来，{user}
+                欢迎回��，{user}
               </span>
               <div className="flex items-center space-x-2">
                 <Clock
