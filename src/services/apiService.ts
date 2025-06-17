@@ -82,11 +82,16 @@ class HttpClient {
     this.lastHealthCheck = now;
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2秒超时
+
       const response = await fetch(buildApiUrl("/health"), {
         method: "GET",
         headers: this.defaultHeaders,
-        signal: AbortSignal.timeout(5000), // 5秒超时
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (response.ok) {
         if (!this.backendAvailable) {
