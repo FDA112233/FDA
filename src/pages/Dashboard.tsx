@@ -151,7 +151,7 @@ function StatCard({
           )}
         </div>
 
-        {/* 右侧装饰图标 */}
+        {/* 右��装饰图标 */}
         <div
           className="w-14 h-14 rounded-xl flex items-center justify-center relative group/icon"
           style={{
@@ -261,17 +261,60 @@ function SystemStatus() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: "CPU", value: systemData.cpu, icon: Cpu, unit: "%" },
-          {
-            label: "内存",
-            value: systemData.memory,
-            icon: HardDrive,
-            unit: "%",
-          },
-          { label: "磁盘", value: systemData.disk, icon: HardDrive, unit: "%" },
-          { label: "网络", value: systemData.network, icon: Wifi, unit: "%" },
-        ].map((item, index) => (
+        {loading ? (
+          // 加载状态
+          Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="p-4 rounded-lg animate-pulse"
+              style={{
+                background: `linear-gradient(135deg, rgba(var(--brand-primary), 0.1) 0%, rgba(var(--brand-primary), 0.05) 100%)`,
+                border: `1px solid rgba(var(--brand-primary), 0.3)`,
+              }}
+            >
+              <div className="h-5 bg-gray-600 rounded mb-2"></div>
+              <div className="h-8 bg-gray-600 rounded"></div>
+            </div>
+          ))
+        ) : error ? (
+          // 错误状态
+          <div className="col-span-4 p-4 rounded-lg text-center" style={{
+            background: `linear-gradient(135deg, rgba(var(--error), 0.1) 0%, rgba(var(--error), 0.05) 100%)`,
+            border: `1px solid rgba(var(--error), 0.3)`,
+          }}>
+            <p style={{ color: `rgb(var(--error))` }}>{error}</p>
+          </div>
+        ) : formatted ? (
+          [
+            {
+              label: "CPU",
+              value: formatted.cpu.percent,
+              icon: Cpu,
+              unit: "%",
+              alert: formatted.cpu.alert
+            },
+            {
+              label: "内存",
+              value: formatted.memory.percent,
+              icon: HardDrive,
+              unit: "%",
+              alert: formatted.memory.alert
+            },
+            {
+              label: "磁盘",
+              value: formatted.disk.percent,
+              icon: HardDrive,
+              unit: "%",
+              alert: formatted.disk.alert
+            },
+            {
+              label: "网络",
+              value: Math.round(networkUtilization),
+              icon: Wifi,
+              unit: "%",
+              alert: false
+            },
+          ].map((item, index) => (
           <div
             key={index}
             className="p-4 rounded-lg transition-all duration-300 hover:scale-105"
