@@ -1,8 +1,20 @@
 // API 配置和基础设置
 
+// 获取动态API配置
+const getDynamicApiUrl = () => {
+  // 优先级：1. localStorage中的自定义设置 2. 环境变量 3. 默认值
+  return (
+    localStorage.getItem("cyberguard_api_url") ||
+    import.meta.env.VITE_API_URL ||
+    "http://jq41030xx76.vicp.fun"
+  );
+};
+
 // API 基础配置
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || "http://jq41030xx76.vicp.fun",
+  get BASE_URL() {
+    return getDynamicApiUrl();
+  },
   VERSION: "v1",
   TIMEOUT: 5000, // 增加超时时间给真实API
   RETRY_ATTEMPTS: 3, // 恢复重试次数
