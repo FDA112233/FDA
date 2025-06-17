@@ -116,6 +116,14 @@ class HttpClient {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<T> {
+    // 检查后端健康状态
+    await this.checkBackendHealth();
+
+    // 如果后端不可用，抛出错误以触发模拟数据
+    if (!this.backendAvailable) {
+      throw new ApiError("后端服务器不可用", 503);
+    }
+
     const url = buildApiUrl(endpoint);
 
     const config: RequestInit = {
@@ -149,6 +157,13 @@ class HttpClient {
         return data;
       } catch (error) {
         lastError = error as Error;
+
+        // 网络错误时标记后端不可用
+        if (error instanceof TypeError && error.message.includes("fetch")) {
+          this.backendAvailable = false;
+          mockApiService.enable();
+          throw new ApiError("网络连接失败", 503);
+        }
 
         // 如果是最后一次重试或者是不可重试的错误，直接抛出
         if (
