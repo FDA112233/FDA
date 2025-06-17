@@ -29,14 +29,18 @@ export function ApiConnectionTest() {
     const startTime = Date.now();
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+
       const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        signal: AbortSignal.timeout(10000), // 10秒超时
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const duration = Date.now() - startTime;
 
       if (response.ok) {
@@ -57,10 +61,23 @@ export function ApiConnectionTest() {
       }
     } catch (error) {
       const duration = Date.now() - startTime;
+
+      // 静默处理网络错误
+      let errorMessage = "连接失败";
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          errorMessage = "请求超时";
+        } else if (error.message.includes("fetch")) {
+          errorMessage = "网络不可达";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       return {
         endpoint,
         status: "error",
-        error: error instanceof Error ? error.message : "未知错误",
+        error: errorMessage,
         duration,
       };
     }
