@@ -2,11 +2,11 @@
 
 // API 基础配置
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:8080",
+  BASE_URL: import.meta.env.VITE_API_URL || "http://jq41030xx76.vicp.fun",
   VERSION: "v1",
-  TIMEOUT: 3000, // 减少到3秒
-  RETRY_ATTEMPTS: 2, // 减少重试次数
-  RETRY_DELAY: 500, // 减少重试延迟
+  TIMEOUT: 5000, // 增加超时时间给真实API
+  RETRY_ATTEMPTS: 3, // 恢复重试次数
+  RETRY_DELAY: 1000, // 恢复重试延迟
 } as const;
 
 // API 端点路径
@@ -81,7 +81,7 @@ export const DEFAULT_HEADERS = {
 // 错误消息映射
 export const ERROR_MESSAGES = {
   NETWORK_ERROR: "网络连接失败，请检查网络设置",
-  TIMEOUT_ERROR: "请求超时，请���后重试",
+  TIMEOUT_ERROR: "请求超时，请稍后重试",
   AUTH_ERROR: "认证失败，请重新登录",
   SERVER_ERROR: "服务器内部错误，请联系管理员",
   VALIDATION_ERROR: "数据验证失败，请检查输入",
@@ -124,7 +124,7 @@ export function buildQueryParams(params: Record<string, any>): string {
   return queryString ? `?${queryString}` : "";
 }
 
-// 延迟函数（用于��试机制）
+// 延迟函数（用于重试机制）
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
