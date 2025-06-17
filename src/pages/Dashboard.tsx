@@ -21,6 +21,8 @@ import {
   BarChart3,
   PieChart,
   RefreshCw,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { BACKEND_COLORS } from "@/lib/backendTheme";
@@ -42,6 +44,8 @@ interface StatCardProps {
   color: string;
   description?: string;
   isUpdating?: boolean;
+  loading?: boolean;
+  error?: boolean;
 }
 
 function StatCard({
@@ -53,6 +57,8 @@ function StatCard({
   color,
   description,
   isUpdating = false,
+  loading = false,
+  error = false,
 }: StatCardProps) {
   return (
     <div
@@ -91,17 +97,39 @@ function StatCard({
             </h3>
           </div>
 
-          <p
-            className="text-3xl font-bold mb-2 transition-all duration-300"
-            style={{
-              color: color,
-              textShadow: `0 0 16px ${color}40`,
-            }}
-          >
-            {value}
-          </p>
+          {loading ? (
+            <div className="flex items-center space-x-2 mb-2">
+              <Loader2 className="w-6 h-6 animate-spin" style={{ color }} />
+              <span
+                className="text-sm"
+                style={{ color: BACKEND_COLORS.text.muted }}
+              >
+                加载中...
+              </span>
+            </div>
+          ) : error ? (
+            <div className="flex items-center space-x-2 mb-2">
+              <AlertCircle
+                className="w-6 h-6"
+                style={{ color: `rgb(var(--error))` }}
+              />
+              <span className="text-sm" style={{ color: `rgb(var(--error))` }}>
+                数据获取失败
+              </span>
+            </div>
+          ) : (
+            <p
+              className="text-3xl font-bold mb-2 transition-all duration-300"
+              style={{
+                color: color,
+                textShadow: `0 0 16px ${color}40`,
+              }}
+            >
+              {value}
+            </p>
+          )}
 
-          {description && (
+          {description && !loading && !error && (
             <p
               className="text-xs mb-2"
               style={{ color: BACKEND_COLORS.text.muted }}
@@ -110,7 +138,7 @@ function StatCard({
             </p>
           )}
 
-          {change !== undefined && (
+          {change !== undefined && !loading && !error && (
             <div className="flex items-center space-x-2">
               {trend === "up" ? (
                 <TrendingUp
@@ -151,7 +179,7 @@ function StatCard({
           )}
         </div>
 
-        {/* 右��装饰图标 */}
+        {/* 右侧装饰图标 */}
         <div
           className="w-14 h-14 rounded-xl flex items-center justify-center relative group/icon"
           style={{
@@ -167,7 +195,7 @@ function StatCard({
             }}
           />
 
-          {isUpdating && (
+          {(isUpdating || loading) && (
             <div
               className="absolute inset-0 border-2 rounded-xl animate-pulse"
               style={{ borderColor: color }}
@@ -209,7 +237,10 @@ function SystemStatus() {
   const getStatusColor = (
     value: number,
     type: "cpu" | "memory" | "disk" | "network",
+    alert?: boolean,
   ) => {
+    if (alert) return `rgb(var(--error))`;
+
     if (type === "network") {
       return value > 80
         ? `rgb(var(--success))`
@@ -223,6 +254,20 @@ function SystemStatus() {
         ? `rgb(var(--warning))`
         : `rgb(var(--success))`;
   };
+
+  const getSystemStatusDisplay = () => {
+    if (loading) return { status: "加载中...", color: `rgb(var(--info))` };
+    if (error) return { status: "数据获取失败", color: `rgb(var(--error))` };
+    if (!formatted)
+      return { status: "数据不可用", color: `rgb(var(--warning))` };
+
+    return {
+      status: systemStatus.message,
+      color: getStatusColor(systemStatus.score, "cpu"),
+    };
+  };
+
+  const systemDisplayStatus = getSystemStatusDisplay();
 
   return (
     <div
@@ -247,15 +292,15 @@ function SystemStatus() {
           <div
             className="w-3 h-3 rounded-full animate-pulse"
             style={{
-              backgroundColor: `rgb(var(--success))`,
-              boxShadow: `0 0 12px rgba(var(--success), 0.6)`,
+              backgroundColor: systemDisplayStatus.color,
+              boxShadow: `0 0 12px ${systemDisplayStatus.color}60`,
             }}
           />
           <span
             className="text-sm"
             style={{ color: BACKEND_COLORS.text.secondary }}
           >
-            系统正常
+            {systemDisplayStatus.status}
           </span>
         </div>
       </div>
@@ -278,10 +323,13 @@ function SystemStatus() {
           ))
         ) : error ? (
           // 错误状态
-          <div className="col-span-4 p-4 rounded-lg text-center" style={{
-            background: `linear-gradient(135deg, rgba(var(--error), 0.1) 0%, rgba(var(--error), 0.05) 100%)`,
-            border: `1px solid rgba(var(--error), 0.3)`,
-          }}>
+          <div
+            className="col-span-4 p-4 rounded-lg text-center"
+            style={{
+              background: `linear-gradient(135deg, rgba(var(--error), 0.1) 0%, rgba(var(--error), 0.05) 100%)`,
+              border: `1px solid rgba(var(--error), 0.3)`,
+            }}
+          >
             <p style={{ color: `rgb(var(--error))` }}>{error}</p>
           </div>
         ) : formatted ? (
@@ -291,90 +339,117 @@ function SystemStatus() {
               value: formatted.cpu.percent,
               icon: Cpu,
               unit: "%",
-              alert: formatted.cpu.alert
+              alert: formatted.cpu.alert,
             },
             {
               label: "内存",
               value: formatted.memory.percent,
               icon: HardDrive,
               unit: "%",
-              alert: formatted.memory.alert
+              alert: formatted.memory.alert,
             },
             {
               label: "磁盘",
               value: formatted.disk.percent,
               icon: HardDrive,
               unit: "%",
-              alert: formatted.disk.alert
+              alert: formatted.disk.alert,
             },
             {
               label: "网络",
               value: Math.round(networkUtilization),
               icon: Wifi,
               unit: "%",
-              alert: false
+              alert: false,
             },
           ].map((item, index) => (
+            <div
+              key={index}
+              className="p-4 rounded-lg transition-all duration-300 hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg, ${getStatusColor(item.value, item.label.toLowerCase() as any, item.alert)}15 0%, ${getStatusColor(item.value, item.label.toLowerCase() as any, item.alert)}05 100%)`,
+                border: `1px solid ${getStatusColor(item.value, item.label.toLowerCase() as any, item.alert)}30`,
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <item.icon
+                  className="w-5 h-5"
+                  style={{
+                    color: getStatusColor(
+                      item.value,
+                      item.label.toLowerCase() as any,
+                      item.alert,
+                    ),
+                    filter: `drop-shadow(0 0 6px ${getStatusColor(item.value, item.label.toLowerCase() as any, item.alert)}60)`,
+                  }}
+                />
+                <span
+                  className="text-xs font-medium"
+                  style={{ color: BACKEND_COLORS.text.muted }}
+                >
+                  {item.label}
+                </span>
+              </div>
+              <div className="text-2xl font-bold">
+                <span
+                  style={{
+                    color: getStatusColor(
+                      item.value,
+                      item.label.toLowerCase() as any,
+                      item.alert,
+                    ),
+                    textShadow: `0 0 8px ${getStatusColor(item.value, item.label.toLowerCase() as any, item.alert)}40`,
+                  }}
+                >
+                  {item.value}
+                </span>
+                <span
+                  className="text-sm ml-1"
+                  style={{ color: BACKEND_COLORS.text.muted }}
+                >
+                  {item.unit}
+                </span>
+              </div>
+              {item.alert && (
+                <div className="flex items-center mt-2">
+                  <AlertTriangle
+                    className="w-4 h-4 mr-1"
+                    style={{ color: `rgb(var(--error))` }}
+                  />
+                  <span
+                    className="text-xs"
+                    style={{ color: `rgb(var(--error))` }}
+                  >
+                    警告
+                  </span>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
           <div
-            key={index}
-            className="p-4 rounded-lg transition-all duration-300 hover:scale-105"
+            className="col-span-4 p-4 rounded-lg text-center"
             style={{
-              background: `linear-gradient(135deg, ${getStatusColor(item.value, item.label.toLowerCase() as any)}15 0%, ${getStatusColor(item.value, item.label.toLowerCase() as any)}05 100%)`,
-              border: `1px solid ${getStatusColor(item.value, item.label.toLowerCase() as any)}30`,
+              background: `linear-gradient(135deg, rgba(var(--warning), 0.1) 0%, rgba(var(--warning), 0.05) 100%)`,
+              border: `1px solid rgba(var(--warning), 0.3)`,
             }}
           >
-            <div className="flex items-center justify-between mb-2">
-              <item.icon
-                className="w-5 h-5"
-                style={{
-                  color: getStatusColor(
-                    item.value,
-                    item.label.toLowerCase() as any,
-                  ),
-                  filter: `drop-shadow(0 0 6px ${getStatusColor(item.value, item.label.toLowerCase() as any)}60)`,
-                }}
-              />
-              <span
-                className="text-xs font-medium"
-                style={{ color: BACKEND_COLORS.text.muted }}
-              >
-                {item.label}
-              </span>
-            </div>
-            <div className="text-2xl font-bold">
-              <span
-                style={{
-                  color: getStatusColor(
-                    item.value,
-                    item.label.toLowerCase() as any,
-                  ),
-                  textShadow: `0 0 8px ${getStatusColor(item.value, item.label.toLowerCase() as any)}40`,
-                }}
-              >
-                {item.value}
-              </span>
-              <span
-                className="text-sm ml-1"
-                style={{ color: BACKEND_COLORS.text.muted }}
-              >
-                {item.unit}
-              </span>
-            </div>
+            <p style={{ color: `rgb(var(--warning))` }}>数据不可用</p>
           </div>
-        ))}
+        )}
       </div>
 
       <div className="flex items-center justify-between text-sm">
         <div>
           <span style={{ color: BACKEND_COLORS.text.muted }}>运行时间: </span>
           <span style={{ color: BACKEND_COLORS.text.secondary }}>
-            {systemData.uptime}
+            15天 7小时 {/* 可以从系统 API 获取 */}
           </span>
         </div>
         <div>
           <span style={{ color: BACKEND_COLORS.text.muted }}>最后更新: </span>
           <span style={{ color: BACKEND_COLORS.text.secondary }}>
-            {systemData.lastUpdate.toLocaleTimeString()}
+            {lastUpdated ? lastUpdated.toLocaleTimeString() : "--:--:--"}
           </span>
         </div>
       </div>
@@ -475,55 +550,97 @@ function QuickActions() {
   );
 }
 
+// 主仪表板组件
 export default function Dashboard() {
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // 模拟数据更新
-  const handleRefresh = () => {
+  // 使用系统和网络指标钩子
+  const {
+    summary: systemSummary,
+    loading: systemLoading,
+    error: systemError,
+    refresh: refreshSystem,
+  } = useSystemMetrics();
+
+  const {
+    summary: networkSummary,
+    interfaces,
+    loading: networkLoading,
+    error: networkError,
+    refresh: refreshNetwork,
+  } = useNetworkMetrics();
+
+  // 手动刷新所有数据
+  const handleRefresh = async () => {
     setIsUpdating(true);
-    setTimeout(() => setIsUpdating(false), 2000);
+    try {
+      await Promise.all([refreshSystem(), refreshNetwork()]);
+    } catch (error) {
+      console.error("刷新数据失败:", error);
+    } finally {
+      setTimeout(() => setIsUpdating(false), 2000);
+    }
   };
 
-  // 主要统计数据
-  const stats = [
-    {
-      title: "威胁检测",
-      value: "1,247",
-      change: -12,
-      trend: "down" as const,
-      icon: AlertTriangle,
-      color: `rgb(var(--error))`,
-      description: "过去24小时",
-    },
-    {
-      title: "安全事件",
-      value: "342",
-      change: 8,
-      trend: "up" as const,
-      icon: Shield,
-      color: `rgb(var(--warning))`,
-      description: "今日新增",
-    },
-    {
-      title: "在线设备",
-      value: "2,856",
-      change: 3,
-      trend: "up" as const,
-      icon: Server,
-      color: `rgb(var(--success))`,
-      description: "当前连接",
-    },
-    {
-      title: "活跃用户",
-      value: "1,892",
-      change: -5,
-      trend: "down" as const,
-      icon: Users,
-      color: `rgb(var(--info))`,
-      description: "过去1小时",
-    },
-  ];
+  // 基于真实数据计算统计
+  const getStatsFromData = () => {
+    const hasError = systemError || networkError;
+    const isLoading = systemLoading || networkLoading;
+
+    return [
+      {
+        title: "威胁检测",
+        value: hasError ? "--" : systemSummary?.alert_count || 0,
+        change: -12,
+        trend: "down" as const,
+        icon: AlertTriangle,
+        color: `rgb(var(--error))`,
+        description: "过去24小时",
+        loading: isLoading,
+        error: !!hasError,
+      },
+      {
+        title: "安全事件",
+        value: hasError ? "--" : systemSummary?.has_alerts ? "活跃" : "正常",
+        change: 8,
+        trend: "up" as const,
+        icon: Shield,
+        color: `rgb(var(--warning))`,
+        description: "今日状态",
+        loading: isLoading,
+        error: !!hasError,
+      },
+      {
+        title: "在线设备",
+        value: hasError ? "--" : networkSummary?.activeInterfaces || 0,
+        change: 3,
+        trend: "up" as const,
+        icon: Server,
+        color: `rgb(var(--success))`,
+        description: "网络接口",
+        loading: isLoading,
+        error: !!hasError,
+      },
+      {
+        title: "网络流量",
+        value: hasError
+          ? "--"
+          : networkSummary
+            ? formatBytes(networkSummary.totalTraffic)
+            : "--",
+        change: -5,
+        trend: "down" as const,
+        icon: Activity,
+        color: `rgb(var(--info))`,
+        description: "总流量",
+        loading: isLoading,
+        error: !!hasError,
+      },
+    ];
+  };
+
+  const stats = getStatsFromData();
 
   return (
     <div
@@ -550,8 +667,8 @@ export default function Dashboard() {
             <h1
               className="text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent"
               style={{
-                backgroundImage: `linear-gradient(45deg,
-                  ${BACKEND_COLORS.text.primary} 0%,
+                backgroundImage: `linear-gradient(45deg, 
+                  ${BACKEND_COLORS.text.primary} 0%, 
                   ${BACKEND_COLORS.text.accent} 100%)`,
                 textShadow: `0 0 20px rgba(var(--brand-primary), 0.3)`,
               }}
@@ -560,7 +677,7 @@ export default function Dashboard() {
             </h1>
             <div className="flex items-center space-x-4 text-sm">
               <span style={{ color: BACKEND_COLORS.text.muted }}>
-                欢迎回��，{user}
+                欢迎回来，{user}
               </span>
               <div className="flex items-center space-x-2">
                 <Clock
