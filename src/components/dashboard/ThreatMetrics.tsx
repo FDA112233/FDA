@@ -228,57 +228,161 @@ function MetricCard({
 }
 
 export function ThreatMetrics() {
+  // 使用真实的系统和网络数据
   const {
-    data: realTimeData,
-    isUpdating,
-    updateData,
-  } = useRealTimeData(generateThreatMetrics, {
-    interval: 5000,
-    enabled: true,
-  });
+    summary: systemSummary,
+    current: systemCurrent,
+    loading: systemLoading,
+    error: systemError,
+    refresh: refreshSystem,
+  } = useSystemMetrics();
 
-  const metrics = [
-    {
-      title: "实时威胁检测",
-      value: realTimeData.realTimeThreats.toString(),
-      change: Math.floor(Math.random() * 30) - 10,
-      trend: Math.random() > 0.5 ? ("up" as const) : ("down" as const),
-      icon: AlertTriangle,
-      threatLevel:
-        realTimeData.realTimeThreats > 45
-          ? ("critical" as const)
-          : ("high" as const),
-      description: "过去1小时",
-    },
-    {
-      title: "活跃连接监控",
-      value: realTimeData.activeConnections.toLocaleString(),
-      change: Math.floor(Math.random() * 10) - 5,
-      trend: Math.random() > 0.5 ? ("up" as const) : ("down" as const),
-      icon: Eye,
-      threatLevel: "info" as const,
-      description: "当前连接数",
-    },
-    {
-      title: "防火墙拦截",
-      value: realTimeData.blockedAttacks.toString(),
-      change: Math.floor(Math.random() * 20) - 5,
-      trend: "up" as const,
-      icon: Shield,
-      threatLevel: "medium" as const,
-      description: "今日拦截次数",
-    },
-    {
-      title: "系统性能",
-      value: `${realTimeData.systemHealth}%`,
-      change: Math.floor(Math.random() * 3),
-      trend: "up" as const,
-      icon: Zap,
-      threatLevel:
-        realTimeData.systemHealth > 96 ? ("low" as const) : ("medium" as const),
-      description: "运行稳定性",
-    },
-  ];
+  const {
+    summary: networkSummary,
+    interfaces,
+    loading: networkLoading,
+    error: networkError,
+    refresh: refreshNetwork,
+  } = useNetworkMetrics();
+
+  const alerts = useSystemAlerts();
+
+  // 计算更新状态
+  const isUpdating = systemLoading || networkLoading;
+  const hasError = systemError || networkError;
+
+  // 手动刷新数据
+  const updateData = async () => {
+    try {
+      await Promise.all([refreshSystem(), refreshNetwork()]);
+    } catch (error) {
+      console.error("刷新威胁数据失败:", error);
+    }
+  };
+
+  // 基于真实数据生成指标
+  const getMetricsFromData = () => {
+    if (hasError) {
+      return [
+        {
+          title: "实时威胁检测",
+          value: "--",
+          icon: AlertTriangle,
+          threatLevel: "critical" as const,
+          description: "数据获取失败",
+          loading: isUpdating,
+          error: true,
+        },
+        {
+          title: "活跃网络接口",
+          value: "--",
+          icon: Eye,
+          threatLevel: "info" as const,
+          description: "连接状态未知",
+          loading: isUpdating,
+          error: true,
+        },
+        {
+          title: "系统警告",
+          value: "--",
+          icon: Shield,
+          threatLevel: "medium" as const,
+          description: "监控状态异常",
+          loading: isUpdating,
+          error: true,
+        },
+        {
+          title: "系统性能",
+          value: "--",
+          icon: Zap,
+          threatLevel: "critical" as const,
+          description: "性能数据缺失",
+          loading: isUpdating,
+          error: true,
+        },
+      ];
+    }
+
+    // 计算威胁级别和性能分数
+    const calculateThreatLevel = (alertCount: number) => {
+      if (alertCount >= 5) return "critical" as const;
+      if (alertCount >= 3) return "high" as const;
+      if (alertCount >= 1) return "medium" as const;
+      return "low" as const;
+    };
+
+    const calculatePerformanceScore = () => {
+      if (!systemCurrent) return 0;
+
+      const cpuScore = 100 - systemCurrent.cpu_percent;
+      const memoryScore = 100 - systemCurrent.memory_percent;
+      const diskScore = 100 - systemCurrent.disk_percent;
+
+      return Math.round((cpuScore + memoryScore + diskScore) / 3);
+    };
+
+    const performanceScore = calculatePerformanceScore();
+    const alertCount = alerts.count;
+    const activeInterfaces = networkSummary?.activeInterfaces || 0;
+    const totalInterfaces = networkSummary?.totalInterfaces || 0;
+
+    return [
+      {
+        title: "实时威胁检测",
+        value: alertCount.toString(),
+        change: alertCount > 0 ? 15 : -10,
+        trend: alertCount > 0 ? ("up" as const) : ("down" as const),
+        icon: AlertTriangle,
+        threatLevel: calculateThreatLevel(alertCount),
+        description: "系统警告计数",
+        loading: isUpdating,
+        error: false,
+      },
+      {
+        title: "活跃网络接口",
+        value: `${activeInterfaces}/${totalInterfaces}`,
+        change: 2,
+        trend: "up" as const,
+        icon: Eye,
+        threatLevel:
+          activeInterfaces === totalInterfaces
+            ? ("low" as const)
+            : ("medium" as const),
+        description: "网络连接状态",
+        loading: isUpdating,
+        error: false,
+      },
+      {
+        title: "系统警告级别",
+        value: alerts.hasAny ? "活跃" : "正常",
+        change: alerts.hasAny ? 8 : -5,
+        trend: alerts.hasAny ? ("up" as const) : ("down" as const),
+        icon: Shield,
+        threatLevel: alerts.hasAny ? ("high" as const) : ("low" as const),
+        description: "当前警告状态",
+        loading: isUpdating,
+        error: false,
+      },
+      {
+        title: "系统性能",
+        value: `${performanceScore}%`,
+        change: 3,
+        trend: "up" as const,
+        icon: Zap,
+        threatLevel:
+          performanceScore > 80
+            ? ("low" as const)
+            : performanceScore > 60
+              ? ("medium" as const)
+              : ("critical" as const),
+        description: "运行稳定性",
+        loading: isUpdating,
+        error: false,
+      },
+    ];
+  };
+
+  const metrics = getMetricsFromData();
 
   return (
     <div
