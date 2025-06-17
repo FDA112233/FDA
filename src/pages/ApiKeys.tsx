@@ -360,7 +360,7 @@ export default function ApiStatusMonitor() {
 
   // 移除自动检查功能，避免产生大量网络错误
   useEffect(() => {
-    // 不自动运行检查��只在用户手动点击时运行
+    // 不自动运行检查，只在用户手动点击时运行
     console.log("🔧 API状态监控已加载，点击'立即检查'按钮开始检测");
   }, []);
 
@@ -396,7 +396,7 @@ export default function ApiStatusMonitor() {
                 API状态监控
               </h1>
               <p style={{ color: BUSINESS_COLORS.neutral.silver }}>
-                实时监控所有API端点的运行状态和性能指标
+                检测所有API端点的运行状态和性能指标（点击"开始检测"进行检查）
               </p>
             </div>
           </div>
