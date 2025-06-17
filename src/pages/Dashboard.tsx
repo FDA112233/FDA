@@ -443,7 +443,7 @@ function SystemStatus() {
         <div>
           <span style={{ color: BACKEND_COLORS.text.muted }}>运行时间: </span>
           <span style={{ color: BACKEND_COLORS.text.secondary }}>
-            15天 7小时 {/* 可以从系统 API 获取 */}
+            15天 7小时
           </span>
         </div>
         <div>
@@ -667,8 +667,8 @@ export default function Dashboard() {
             <h1
               className="text-3xl font-bold mb-2 bg-gradient-to-r bg-clip-text text-transparent"
               style={{
-                backgroundImage: `linear-gradient(45deg, 
-                  ${BACKEND_COLORS.text.primary} 0%, 
+                backgroundImage: `linear-gradient(45deg,
+                  ${BACKEND_COLORS.text.primary} 0%,
                   ${BACKEND_COLORS.text.accent} 100%)`,
                 textShadow: `0 0 20px rgba(var(--brand-primary), 0.3)`,
               }}
