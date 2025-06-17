@@ -206,6 +206,7 @@ function App() {
       <BrowserRouter>
         <AppLayout />
         <ToastContainer />
+        <SystemStatusNotification />
         <DebugAuth />
       </BrowserRouter>
     </AuthProvider>
