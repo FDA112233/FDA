@@ -70,22 +70,7 @@ class HttpClient {
     delete this.defaultHeaders.Authorization;
   }
 
-  // 初始健康检查
-  private async performInitialHealthCheck(): Promise<void> {
-    if (this.healthCheckInProgress) return;
-
-    this.healthCheckInProgress = true;
-
-    try {
-      console.log("🔍 正在检查后端连接...");
-      const success = await this.tryConnectToBackend();
-      if (!success) {
-        console.warn("⚠️ 后端连接失败，切换到模拟数据模式");
-      }
-    } finally {
-      this.healthCheckInProgress = false;
-    }
-  }
+  // 初始健康检查已移除，避免启动时的网络请求
 
   // 尝试连接后端
   async tryConnectToBackend(): Promise<boolean> {
@@ -395,7 +380,7 @@ export const networkApi = {
       }
     },
 
-  // 获取指定网络接口数据
+  // 获取指定网络接口��据
   getInterface: async (
     name: string,
     params?: MetricsQueryParams,
