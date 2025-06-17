@@ -89,35 +89,42 @@ export function ApiConnectionTest() {
 
     console.log(`🧪 开始API连接测试 - 目标服务器: ${API_CONFIG.BASE_URL}`);
 
-    for (const { name, url } of endpoints) {
-      // 添加pending状态
-      setTestResults((prev) => [
-        ...prev,
-        {
-          endpoint: `${name} (${url})`,
-          status: "pending",
-        },
-      ]);
+    try {
+      for (const { name, url } of endpoints) {
+        // 添加pending状态
+        setTestResults((prev) => [
+          ...prev,
+          {
+            endpoint: `${name} (${url})`,
+            status: "pending",
+          },
+        ]);
 
-      const result = await testEndpoint(url);
+        const result = await testEndpoint(url);
 
-      // 更新结果
-      setTestResults((prev) =>
-        prev.map((item) =>
-          item.endpoint === `${name} (${url})`
-            ? { ...result, endpoint: `${name} (${url})` }
-            : item,
-        ),
-      );
+        // 更新结果
+        setTestResults((prev) =>
+          prev.map((item) =>
+            item.endpoint === `${name} (${url})`
+              ? { ...result, endpoint: `${name} (${url})` }
+              : item,
+          ),
+        );
 
-      console.log(`📊 ${name} 测试结果:`, result);
+        // 静默记录结果，避免控制台污染
+        if (result.status === "success") {
+          console.log(`✅ ${name}: ${result.duration}ms`);
+        }
 
-      // 短暂延迟避免过快请求
-      await new Promise((resolve) => setTimeout(resolve, 500));
+        // 短暂延迟避免过快请求
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+    } catch (error) {
+      console.warn("测试过程中断:", error);
+    } finally {
+      setTesting(false);
+      console.log("🔧 API测试完成，如所有测试失败则使用模拟数据模式");
     }
-
-    setTesting(false);
-    console.log("✅ API连接测试完成");
   };
 
   const tryBackendConnection = async () => {
