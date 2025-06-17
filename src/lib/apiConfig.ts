@@ -4,9 +4,9 @@
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:8080",
   VERSION: "v1",
-  TIMEOUT: 10000,
-  RETRY_ATTEMPTS: 3,
-  RETRY_DELAY: 1000,
+  TIMEOUT: 3000, // 减少到3秒
+  RETRY_ATTEMPTS: 2, // 减少重试次数
+  RETRY_DELAY: 500, // 减少重试延迟
 } as const;
 
 // API 端点路径
@@ -124,7 +124,7 @@ export function buildQueryParams(params: Record<string, any>): string {
   return queryString ? `?${queryString}` : "";
 }
 
-// 延迟函数（用于重���机制）
+// 延迟函数（用于重试机制）
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
