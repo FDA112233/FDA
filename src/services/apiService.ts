@@ -47,14 +47,15 @@ class ApiError extends Error {
 class HttpClient {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
-  private backendAvailable: boolean = true;
-  private lastHealthCheck: number = 0;
-  private healthCheckInterval: number = 30000; // 30秒检查一次
+  private backendAvailable: boolean = false; // 默认假设后端不可用
+  private mockMode: boolean = true; // 默认使用模拟模式
 
   constructor() {
     this.baseUrl = API_CONFIG.BASE_URL;
     this.defaultHeaders = { ...DEFAULT_HEADERS };
-    this.checkBackendHealth();
+    // 立即启用模拟数据模式
+    mockApiService.enable();
+    console.log("🔧 API 服务初始化为模拟数据模式");
   }
 
   // 设置认证令牌
@@ -67,23 +68,11 @@ class HttpClient {
     delete this.defaultHeaders.Authorization;
   }
 
-  // 检查后端健康状态
-  private async checkBackendHealth(): Promise<void> {
-    const now = Date.now();
-
-    // 如果最近检查过且后端可用，跳过检查
-    if (
-      this.backendAvailable &&
-      now - this.lastHealthCheck < this.healthCheckInterval
-    ) {
-      return;
-    }
-
-    this.lastHealthCheck = now;
-
+  // 手动检查后端连接（只在用户明确要求时执行）
+  async tryConnectToBackend(): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2秒超时
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
 
       const response = await fetch(buildApiUrl("/health"), {
         method: "GET",
@@ -94,26 +83,32 @@ class HttpClient {
       clearTimeout(timeoutId);
 
       if (response.ok) {
-        if (!this.backendAvailable) {
-          console.log("✅ 后端服务器已恢复连接");
-          mockApiService.disable();
-        }
         this.backendAvailable = true;
-      } else {
-        throw new Error(`HTTP ${response.status}`);
+        this.mockMode = false;
+        mockApiService.disable();
+        console.log("✅ 成功连接到后端服务器");
+        return true;
       }
     } catch (error) {
-      if (this.backendAvailable) {
-        console.warn("⚠️ 后端服务器不可用，切换到模拟数据模式");
-        mockApiService.enable();
-      }
-      this.backendAvailable = false;
+      // 静默处理连接失败
     }
+
+    this.backendAvailable = false;
+    this.mockMode = true;
+    mockApiService.enable();
+    return false;
   }
 
-  // 检查是否应该使用模拟数据
-  private shouldUseMockData(): boolean {
-    return !this.backendAvailable || mockApiService.isActive();
+  // 强制使用模拟数据模式
+  enableMockMode(): void {
+    this.mockMode = true;
+    this.backendAvailable = false;
+    mockApiService.enable();
+  }
+
+  // 检查是否在模拟模式
+  isMockMode(): boolean {
+    return this.mockMode || !this.backendAvailable;
   }
 
   // 通用请求方法
