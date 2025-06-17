@@ -124,7 +124,7 @@ export default function ApiStatusMonitor() {
         url: "/api/v1/system/services",
         method: "GET",
         category: "系统监控",
-        description: "获取系统服���状态",
+        description: "获取系统服务状态",
         status: "checking",
         uptime: 98.9,
         errorCount: 5,
@@ -165,7 +165,7 @@ export default function ApiStatusMonitor() {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 减少超时时间
 
       const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint.url}`, {
         method: endpoint.method,
@@ -193,6 +193,8 @@ export default function ApiStatusMonitor() {
       };
     } catch (error) {
       const responseTime = Date.now() - startTime;
+
+      // 静默处理错误，不输出到控制台
       return {
         ...endpoint,
         status: "offline",
@@ -683,7 +685,7 @@ export default function ApiStatusMonitor() {
                   • 检查间隔: 30秒
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                  • 超时���置: 5秒
+                  • 超时设置: 5秒
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                   • 目标服务器: {API_CONFIG.BASE_URL}
