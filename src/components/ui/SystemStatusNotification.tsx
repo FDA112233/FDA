@@ -12,8 +12,8 @@ interface SystemStatusNotificationProps {
 export function SystemStatusNotification({
   className = "",
 }: SystemStatusNotificationProps) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMockMode, setIsMockMode] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // 默认显示
+  const [isMockMode, setIsMockMode] = useState(true); // 默认模拟模式
   const [isMinimized, setIsMinimized] = useState(false);
 
   useEffect(() => {
@@ -21,20 +21,20 @@ export function SystemStatusNotification({
     const checkMockMode = () => {
       const mockActive = mockApiService.isActive();
       setIsMockMode(mockActive);
-      setIsVisible(mockActive);
+      // 只有明确关闭时才隐藏通知
     };
 
     // 初始检查
     checkMockMode();
 
     // 定期检查状态
-    const interval = setInterval(checkMockMode, 2000);
+    const interval = setInterval(checkMockMode, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // 如果不在模拟模式或用户已关闭，不显示
-  if (!isVisible || !isMockMode) {
+  // 如果用户已关闭，不显示
+  if (!isVisible) {
     return null;
   }
 
