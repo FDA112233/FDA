@@ -208,7 +208,7 @@ function App() {
         <AppLayout />
         <ToastContainer />
         <SystemStatusNotification />
-        <ApiConnectionTest />
+        {/* <ApiConnectionTest /> 临时禁用 */}
         <DebugAuth />
       </BrowserRouter>
     </AuthProvider>
