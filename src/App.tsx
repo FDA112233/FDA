@@ -3,7 +3,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Navigation } from "@/components/Navigation";
 import { ToastContainer } from "@/components/ui/toast";
-import { SystemStatusNotification } from "@/components/ui/SystemStatusNotification";
+import { ConnectionStatus } from "@/components/ui/ConnectionStatus";
+// import { SystemStatusNotification } from "@/components/ui/SystemStatusNotification"; // 替换为简化版本
 // import { ApiConnectionTest } from "@/components/ApiConnectionTest"; // 临时禁用
 import Index from "@/pages/Index";
 import Dashboard from "@/pages/Dashboard";
