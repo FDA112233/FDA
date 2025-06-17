@@ -206,7 +206,10 @@ export default function ApiStatusMonitor() {
 
   // 检查所有端点状态
   const checkAllEndpoints = async () => {
+    if (isChecking) return; // 防止重复检查
+
     setIsChecking(true);
+    console.log(`🔍 开始检查 ${endpoints.length} 个API端点`);
 
     // 设置所有端点为检查中状态
     setEndpoints((prev) =>
@@ -214,14 +217,27 @@ export default function ApiStatusMonitor() {
     );
 
     try {
-      const results = await Promise.all(
-        endpoints.map((endpoint) => checkEndpoint(endpoint)),
-      );
+      // 依次检查，避免并发太多请求
+      const results = [];
+      for (const endpoint of endpoints) {
+        const result = await checkEndpoint(endpoint);
+        results.push(result);
 
-      setEndpoints(results);
+        // 更新单个结果
+        setEndpoints((prev) =>
+          prev.map((ep) => (ep.id === result.id ? result : ep)),
+        );
+
+        // 短暂延迟避免请求过快
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+
       setLastGlobalCheck(new Date());
+      console.log(
+        `✅ 检查完成: ${results.filter((r) => r.status === "online").length}/${results.length} 在线`,
+      );
     } catch (error) {
-      console.error("批量检查API状态失败:", error);
+      console.warn("API状态检查过程中断:", error);
     } finally {
       setIsChecking(false);
     }
@@ -322,7 +338,7 @@ export default function ApiStatusMonitor() {
         return <Globe className="w-5 h-5" />;
       case "系统监控":
         return <Database className="w-5 h-5" />;
-      case "认证服务":
+      case "认证服��":
         return <Shield className="w-5 h-5" />;
       case "系统管理":
         return <Zap className="w-5 h-5" />;
