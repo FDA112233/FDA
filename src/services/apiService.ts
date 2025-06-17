@@ -275,7 +275,7 @@ class HttpClient {
 // 创建 HTTP 客户端实例
 const httpClient = new HttpClient();
 
-// 系统指标 API 服务
+// 系���指标 API 服务
 export const metricsApi = {
   // 获取系统指标历史数据
   getMetrics: async (
@@ -384,36 +384,94 @@ export const networkApi = {
 // 系统监控 API 服务
 export const systemApi = {
   // 获取进程信息
-  getProcesses: (
+  getProcesses: async (
     params?: PaginationParams,
-  ): Promise<ProcessMetricsResponse[]> =>
-    httpClient.get(API_ENDPOINTS.SYSTEM.PROCESSES, params),
+  ): Promise<ProcessMetricsResponse[]> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.SYSTEM.PROCESSES, params);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getProcesses(params);
+      }
+      throw error;
+    }
+  },
 
   // 收集进程信息
-  collectProcesses: (): Promise<ProcessMetricsResponse[]> =>
-    httpClient.post(API_ENDPOINTS.SYSTEM.PROCESSES_COLLECT),
+  collectProcesses: async (): Promise<ProcessMetricsResponse[]> => {
+    try {
+      return await httpClient.post(API_ENDPOINTS.SYSTEM.PROCESSES_COLLECT);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getProcesses();
+      }
+      throw error;
+    }
+  },
 
   // 获取网络连接
-  getNetworkConnections: (
+  getNetworkConnections: async (
     params?: PaginationParams,
-  ): Promise<NetworkConnectionResponse[]> =>
-    httpClient.get(API_ENDPOINTS.SYSTEM.NETWORK, params),
+  ): Promise<NetworkConnectionResponse[]> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.SYSTEM.NETWORK, params);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getNetworkConnections(params);
+      }
+      throw error;
+    }
+  },
 
   // 收集网络连接
-  collectNetworkConnections: (): Promise<NetworkConnectionResponse[]> =>
-    httpClient.post(API_ENDPOINTS.SYSTEM.NETWORK_COLLECT),
+  collectNetworkConnections: async (): Promise<NetworkConnectionResponse[]> => {
+    try {
+      return await httpClient.post(API_ENDPOINTS.SYSTEM.NETWORK_COLLECT);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getNetworkConnections();
+      }
+      throw error;
+    }
+  },
 
   // 获取服务状态
-  getServices: (params?: PaginationParams): Promise<ServiceStatusSimple[]> =>
-    httpClient.get(API_ENDPOINTS.SYSTEM.SERVICES, params),
+  getServices: async (
+    params?: PaginationParams,
+  ): Promise<ServiceStatusSimple[]> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.SYSTEM.SERVICES, params);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getServices(params);
+      }
+      throw error;
+    }
+  },
 
   // 收集服务状态
-  collectServices: (): Promise<ServiceStatusSimple[]> =>
-    httpClient.post(API_ENDPOINTS.SYSTEM.SERVICES_COLLECT),
+  collectServices: async (): Promise<ServiceStatusSimple[]> => {
+    try {
+      return await httpClient.post(API_ENDPOINTS.SYSTEM.SERVICES_COLLECT);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getServices();
+      }
+      throw error;
+    }
+  },
 
   // 收集所有系统数据
-  collectAll: (): Promise<any> =>
-    httpClient.post(API_ENDPOINTS.SYSTEM.COLLECT_ALL),
+  collectAll: async (): Promise<any> => {
+    try {
+      return await httpClient.post(API_ENDPOINTS.SYSTEM.COLLECT_ALL);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return { status: "collected", timestamp: new Date().toISOString() };
+      }
+      throw error;
+    }
+  },
 };
 
 // 认证 API 服务
