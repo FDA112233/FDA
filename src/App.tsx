@@ -208,8 +208,7 @@ function App() {
       <BrowserRouter>
         <AppLayout />
         <ToastContainer />
-        <SystemStatusNotification />
-        {/* <ApiConnectionTest /> 临时禁用 */}
+        <ConnectionStatus />
         <DebugAuth />
       </BrowserRouter>
     </AuthProvider>
