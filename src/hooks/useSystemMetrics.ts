@@ -114,8 +114,23 @@ export function useSystemMetrics(): UseSystemMetricsReturn {
     } catch (err) {
       if (!mountedRef.current) return;
 
-      console.error("获取系统指标失败:", err);
-      setError(err instanceof Error ? err.message : "获取系统指标失败");
+      // 静默处理超时和网络错误，不显示给用户
+      const errorMessage =
+        err instanceof Error ? err.message : "获取系统指标失败";
+
+      if (
+        errorMessage.includes("timeout") ||
+        errorMessage.includes("fetch") ||
+        errorMessage.includes("网络") ||
+        errorMessage.includes("503")
+      ) {
+        // 网络相关错误，静默处理
+        console.warn("系统指标获取失败，使用模拟数据:", errorMessage);
+        setError(null); // 不显示错误给用户
+      } else {
+        console.error("获取系统指标失败:", err);
+        setError(errorMessage);
+      }
     }
   }, [clearError]);
 
