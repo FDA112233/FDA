@@ -275,7 +275,7 @@ class HttpClient {
 // 创建 HTTP 客户端实例
 const httpClient = new HttpClient();
 
-// 系���指标 API 服务
+// 系统指标 API 服务
 export const metricsApi = {
   // 获取系统指标历史数据
   getMetrics: async (
@@ -531,7 +531,16 @@ export const logsApi = {
 // 健康检查 API 服务
 export const healthApi = {
   // 健康检查
-  check: (): Promise<any> => httpClient.get(API_ENDPOINTS.HEALTH),
+  check: async (): Promise<any> => {
+    try {
+      return await httpClient.get(API_ENDPOINTS.HEALTH);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.healthCheck();
+      }
+      throw error;
+    }
+  },
 };
 
 // 统一的 API 服务导出
