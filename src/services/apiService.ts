@@ -332,21 +332,53 @@ export const metricsApi = {
 // 网络接口 API 服务
 export const networkApi = {
   // 获取网络接口历史数据
-  getInterfaces: (
+  getInterfaces: async (
     params?: MetricsQueryParams,
-  ): Promise<NetworkInterfaceMetricsList> =>
-    httpClient.get(API_ENDPOINTS.NETWORK_INTERFACES.BASE, params),
+  ): Promise<NetworkInterfaceMetricsList> => {
+    try {
+      return await httpClient.get(
+        API_ENDPOINTS.NETWORK_INTERFACES.BASE,
+        params,
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        // 返回空的历史数据
+        return { metrics: [] };
+      }
+      throw error;
+    }
+  },
 
   // 获取当前网络接口数据
-  getCurrentInterfaces: (): Promise<CurrentNetworkInterfaceMetricsList> =>
-    httpClient.get(API_ENDPOINTS.NETWORK_INTERFACES.CURRENT),
+  getCurrentInterfaces:
+    async (): Promise<CurrentNetworkInterfaceMetricsList> => {
+      try {
+        return await httpClient.get(API_ENDPOINTS.NETWORK_INTERFACES.CURRENT);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 503) {
+          return await mockApiService.getCurrentNetworkInterfaces();
+        }
+        throw error;
+      }
+    },
 
   // 获取指定网络接口数据
-  getInterface: (
+  getInterface: async (
     name: string,
     params?: MetricsQueryParams,
-  ): Promise<NetworkInterfaceMetricsList> =>
-    httpClient.get(API_ENDPOINTS.NETWORK_INTERFACES.BY_NAME(name), params),
+  ): Promise<NetworkInterfaceMetricsList> => {
+    try {
+      return await httpClient.get(
+        API_ENDPOINTS.NETWORK_INTERFACES.BY_NAME(name),
+        params,
+      );
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 503) {
+        return await mockApiService.getNetworkInterface(name, params);
+      }
+      throw error;
+    }
+  },
 };
 
 // 系统监控 API 服务
