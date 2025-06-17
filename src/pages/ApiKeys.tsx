@@ -700,16 +700,16 @@ export default function ApiStatusMonitor() {
               </h4>
               <div className="space-y-2 text-sm">
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                  • 检查间隔: 30秒
+                  • 检查方式: 手动触发
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                  • 超时设置: 5秒
+                  • 超时设置: 3秒
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
                   • 目标服务器: {API_CONFIG.BASE_URL}
                 </div>
                 <div style={{ color: BUSINESS_COLORS.ui.text.secondary }}>
-                  • 数据更新: 实时
+                  • 检查间隔: 200ms/端点
                 </div>
               </div>
             </div>
