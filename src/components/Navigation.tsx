@@ -71,7 +71,7 @@ const navItems = [
     color: "from-slate-500 to-gray-500",
   },
   {
-    name: "API密钥",
+    name: "API状态监控",
     path: "/api-keys",
     icon: Key,
     color: "from-amber-500 to-yellow-500",
@@ -266,7 +266,7 @@ export function Navigation() {
                 className="text-xs transition-colors duration-300"
                 style={{ color: `rgb(var(--brand-light))` }}
               >
-                网��安全管理平台
+                网络安全管理平台
               </p>
             </div>
           </div>
