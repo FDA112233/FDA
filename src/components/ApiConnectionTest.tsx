@@ -1,4 +1,4 @@
-// API 连接测试组件 - 用于调试和测试API连接
+// API 连接测试组件 - 用于��试和测试API连接
 
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Loader2, RefreshCw } from "lucide-react";
@@ -68,7 +68,7 @@ export function ApiConnectionTest() {
         if (error.name === "AbortError") {
           errorMessage = "请求超时";
         } else if (error.message.includes("fetch")) {
-          errorMessage = "网络不可达";
+          errorMessage = "网���不可达";
         } else {
           errorMessage = error.message;
         }
@@ -143,8 +143,13 @@ export function ApiConnectionTest() {
   };
 
   useEffect(() => {
-    // 组件加载时自动运行测试
-    runTests();
+    // 仅显示初始状态，不自动运行测试
+    setTestResults(
+      endpoints.map(({ name, url }) => ({
+        endpoint: `${name} (${url})`,
+        status: "pending" as const,
+      })),
+    );
   }, []);
 
   return (
