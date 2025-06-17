@@ -238,7 +238,6 @@ export function AlertsList() {
     status: Alert["status"],
   ) => {
     // 这里应该调用API更新状态
-    console.log(`更新告警 ${alertId} 状态为 ${status}`);
     setIsModalOpen(false);
   };
 
