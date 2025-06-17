@@ -397,7 +397,6 @@ export default function SituationDisplay() {
 
   const exportView = () => {
     // 导出当前视图逻辑
-    console.log("导出视图");
   };
 
   const resetCamera = () => {
@@ -572,7 +571,7 @@ export default function SituationDisplay() {
                     className="text-xs"
                     style={{ color: BUSINESS_COLORS.status.success }}
                   >
-                    实时更新
+                    实时更��
                   </span>
                 </div>
               </div>
@@ -1042,7 +1041,7 @@ export default function SituationDisplay() {
                         <span
                           style={{ color: BUSINESS_COLORS.ui.text.secondary }}
                         >
-                          数据流
+                          数据���
                         </span>
                         <span
                           style={{ color: BUSINESS_COLORS.ui.text.primary }}
@@ -1187,7 +1186,7 @@ export default function SituationDisplay() {
                   }}
                 >
                   <Download className="w-4 h-4" />
-                  <span className="text-sm">导出</span>
+                  <span className="text-sm">���出</span>
                 </button>
               </div>
 
@@ -1251,7 +1250,7 @@ export default function SituationDisplay() {
                 />
 
                 <StatusCard
-                  title="运行时间"
+                  title="运行时��"
                   value={realTimeData.uptime}
                   icon={<Activity className="w-5 h-5" />}
                   status="success"
