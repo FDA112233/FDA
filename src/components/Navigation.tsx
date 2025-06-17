@@ -266,7 +266,7 @@ export function Navigation() {
                 className="text-xs transition-colors duration-300"
                 style={{ color: `rgb(var(--brand-light))` }}
               >
-                网络安全管理平台
+                智能网络安全管理平台
               </p>
             </div>
           </div>
