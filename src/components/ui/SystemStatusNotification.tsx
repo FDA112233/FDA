@@ -23,6 +23,7 @@ export function SystemStatusNotification({
   const [isVisible, setIsVisible] = useState(true); // 默认显示
   const [isMockMode, setIsMockMode] = useState(true); // 默认模拟模式
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   useEffect(() => {
     // 检查模拟模式状态
@@ -40,6 +41,23 @@ export function SystemStatusNotification({
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleTryConnect = async () => {
+    setIsConnecting(true);
+    try {
+      const success = await httpClient.tryConnectToBackend();
+      if (success) {
+        // 连接成功，刷新页面或更新状态
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      console.warn("连接尝试失败:", error);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
 
   // 如果用户已关闭，不显示
   if (!isVisible) {
