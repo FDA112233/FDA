@@ -465,28 +465,28 @@ function QuickActions() {
       description: "执行全系统安全扫描",
       icon: Shield,
       color: `rgb(var(--brand-primary))`,
-      action: () => console.log("启动安全扫描"),
+      action: () => {},
     },
     {
       title: "威胁分析",
       description: "分析最新威胁情报",
       icon: BarChart3,
       color: `rgb(var(--info))`,
-      action: () => console.log("启动威胁分析"),
+      action: () => {},
     },
     {
       title: "系统备份",
       description: "创建系统配置备份",
       icon: HardDrive,
       color: `rgb(var(--success))`,
-      action: () => console.log("启动系统备份"),
+      action: () => {},
     },
     {
       title: "用户审计",
       description: "查看用户活动日志",
       icon: Users,
       color: `rgb(var(--warning))`,
-      action: () => console.log("启动用户审计"),
+      action: () => {},
     },
   ];
 
@@ -583,7 +583,7 @@ export default function Dashboard() {
     }
   };
 
-  // 基于真实数据计算统计
+  // ��于真实数据计算统计
   const getStatsFromData = () => {
     const hasError = systemError || networkError;
     const isLoading = systemLoading || networkLoading;
