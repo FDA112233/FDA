@@ -251,7 +251,7 @@ export default function SituationDisplay() {
     },
     {
       id: "srv-02",
-      name: "应用服务器",
+      name: "应用��务器",
       type: "server",
       status: "online",
       position: [-2, 1, 2],
@@ -747,7 +747,7 @@ export default function SituationDisplay() {
 
       {/* 主要内容区域 */}
       <div className="flex h-full" style={{ height: "calc(100vh - 4rem)" }}>
-        {/* 3D可视化区域 */}
+        {/* 3D可视化区��� */}
         {(viewMode === "3d" || viewMode === "split") && (
           <div
             className={`transition-all duration-500 ${
@@ -881,22 +881,20 @@ export default function SituationDisplay() {
                             }
                             className="sr-only peer"
                           />
-                          <div className="w-8 h-4 bg-gray-200 rounded-full peer transition-colors peer-checked:bg-blue-600">
-                            rounded-full shadow transform transition-all
-                            duration-200 peer-checked:translate-x-4
-                            translate-x-0.5 mt-0.5" style=
-                            {{
+                          <div
+                            className="w-8 h-4 bg-gray-200 rounded-full peer transition-colors peer-checked:bg-blue-600"
+                            style={{
                               background: `linear-gradient(135deg, rgb(var(--brand-lightest)) 0%, rgb(var(--brand-accent)) 100%)`,
                               boxShadow: `0 2px 8px rgba(var(--brand-primary), 0.3)`,
                             }}
-                            w-3 h-3 rounded-full shadow transform transition-all
-                            duration-200 peer-checked:translate-x-4
-                            translate-x-0.5 mt-0.5" style=
-                            {{
-                              background: `linear-gradient(135deg, rgb(var(--brand-lightest)) 0%, rgb(var(--brand-accent)) 100%)`,
-                              boxShadow: `0 2px 6px rgba(var(--brand-primary), 0.25)`,
-                            }}
-                            <div className="w-3 h-3 bg-white rounded-full shadow transform transition-transform peer-checked:translate-x-4 translate-x-0.5 mt-0.5" />
+                          >
+                            <div
+                              className="w-3 h-3 bg-white rounded-full shadow transform transition-transform peer-checked:translate-x-4 translate-x-0.5 mt-0.5"
+                              style={{
+                                background: `linear-gradient(135deg, rgb(var(--brand-lightest)) 0%, rgb(var(--brand-accent)) 100%)`,
+                                boxShadow: `0 2px 6px rgba(var(--brand-primary), 0.25)`,
+                              }}
+                            />
                           </div>
                         </label>
                       </div>
